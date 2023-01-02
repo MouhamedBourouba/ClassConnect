@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:school_app/data/extentions.dart';
+import 'package:school_app/domain/models/text_field_value.dart';
+import 'package:school_app/data/model/user.dart';
+import 'package:school_app/data/repository/auth_repository.dart';
 import 'package:school_app/ui/pages/home_page.dart';
 import 'package:school_app/ui/pages/register_page.dart';
 import 'package:school_app/ui/widgets/loading.dart';
 
-import '../../data/model/text_field_value.dart';
-import '../../data/model/user.dart';
-import '../../data/repository/auth_repository.dart';
-
 class LoginProvider extends ChangeNotifier {
   final AuthRepository authenticationRepo = GetIt.I.get<AuthRepository>();
-  var emailTextFieldValue = TextFieldValue();
-  var passwordTextValue = TextFieldValue();
-  var isPasswordVisible = false;
+  TextFieldValue emailTextFieldValue = TextFieldValue();
+  TextFieldValue passwordTextValue = TextFieldValue();
+  bool isPasswordVisible = false;
 
-  updateEmail(String value) {
+  void updateEmail(String value) {
     emailTextFieldValue.value = value;
     if (value != "") {
       value.isEmail()
@@ -28,7 +27,7 @@ class LoginProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updatePassword(value) {
+  void updatePassword(String value) {
     passwordTextValue.value = value;
     if (value != "") {
       value.length < 8
@@ -40,22 +39,28 @@ class LoginProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  resetProvider() {
+  void resetProvider() {
     emailTextFieldValue = TextFieldValue();
     passwordTextValue = TextFieldValue();
   }
 
-  togglePasswordVisibility() {
+  void togglePasswordVisibility() {
     isPasswordVisible = !isPasswordVisible;
     notifyListeners();
   }
 
-  login(context) {
+  void login(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
-    showDialog(context: context, builder: (ctx) => const LoadingDialog(), barrierDismissible: false);
+    showDialog(
+      context: context,
+      builder: (ctx) => const LoadingDialog(),
+      barrierDismissible: false,
+    );
 
-    var singInTask = authenticationRepo.login(
-        emailTextFieldValue.value, passwordTextValue.value);
+    final singInTask = authenticationRepo.login(
+      emailTextFieldValue.value,
+      passwordTextValue.value,
+    );
     singInTask.then(
       (User value) {
         Navigator.pop(context);
@@ -80,7 +85,7 @@ class LoginProvider extends ChangeNotifier {
     );
   }
 
-  navigateToRegisterScreen(context) {
+  void navigateToRegisterScreen(BuildContext context) {
     resetProvider();
     Navigator.pushReplacement(
       context,

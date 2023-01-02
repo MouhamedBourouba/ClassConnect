@@ -24,11 +24,16 @@ dependencies:
   connectivity_plus: ^3.0.2
   dropdown_textfield: ^1.0.7
   intl_phone_number_input: ^0.7.1
+  hive:
+  hive_flutter:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^2.0.0
+  hive_generator:
+  build_runner:
+  lint: ^2.0.1
 
 flutter:
 

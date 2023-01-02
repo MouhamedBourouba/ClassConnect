@@ -3,34 +3,35 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
+import 'package:school_app/domain/models/text_field_value.dart';
 import 'package:school_app/data/repository/auth_repository.dart';
 import 'package:school_app/ui/pages/home_page.dart';
 import 'package:school_app/ui/pages/login_page.dart';
 import 'package:school_app/ui/widgets/loading.dart';
 
 class RegisterProvider extends ChangeNotifier {
-  var usernameTextFieldValue = TextFieldValue();
-  var emailTextFieldValue = TextFieldValue();
-  var passwordTextFieldValue = TextFieldValue();
-  var conformPasswordTextFieldValue = TextFieldValue();
-  var isPasswordVisible = false;
-  var isLoading = false;
-  var canRegister = false;
+  TextFieldValue usernameTextFieldValue = TextFieldValue();
+  TextFieldValue emailTextFieldValue = TextFieldValue();
+  TextFieldValue passwordTextFieldValue = TextFieldValue();
+  TextFieldValue conformPasswordTextFieldValue = TextFieldValue();
+  bool isPasswordVisible = false;
+  bool isLoading = false;
+  bool canRegister = false;
   final AuthRepository authRepository = GetIt.I.get();
 
-  togglePasswordVisibility() {
+  void togglePasswordVisibility() {
     isPasswordVisible = !isPasswordVisible;
     notifyListeners();
   }
 
-  updateUsername(String value) {
+  void updateUsername(String value) {
     usernameTextFieldValue.value = value;
     notifyListeners();
   }
 
-  updateEmail(String value) {
+  void updateEmail(String value) {
     emailTextFieldValue.value = value;
-    if (!validateEmail(value)) {
+    if (validateEmail(value) == false) {
       emailTextFieldValue.errorMessage = "Email Address is Badly Formatted";
     } else {
       emailTextFieldValue.errorMessage = null;
@@ -38,7 +39,7 @@ class RegisterProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updatePassword(String value) {
+  void updatePassword(String value) {
     passwordTextFieldValue.value = value;
     if (value.length < 8) {
       passwordTextFieldValue.errorMessage = "Password is too short";
@@ -55,7 +56,7 @@ class RegisterProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateConformPassword(String value) async {
+  Future<void> updateConformPassword(String value) async {
     conformPasswordTextFieldValue.value = value;
     if (value != passwordTextFieldValue.value) {
       conformPasswordTextFieldValue.errorMessage = "Password doesn't match";
@@ -65,14 +66,14 @@ class RegisterProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  validateEmail(email) {
+  bool validateEmail(String email) {
     final emailValid = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
     );
     return emailValid.hasMatch(email);
   }
 
-  navigateToLoginScreen(BuildContext context) {
+  void navigateToLoginScreen(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (builder) => const LoginPage()),
@@ -80,7 +81,7 @@ class RegisterProvider extends ChangeNotifier {
     );
   }
 
-  register(context) async {
+  Future<void> register(BuildContext context) async {
     final isOnline = await Connectivity().checkConnectivity();
     if (isOnline == ConnectivityResult.none) {
       Fluttertoast.showToast(
@@ -102,8 +103,11 @@ class RegisterProvider extends ChangeNotifier {
       (value) {
         Navigator.pop(context);
         log("Account Created");
-        Navigator.pushAndRemoveUntil(context,
-            MaterialPageRoute(builder: (ctx) => HomePage()), (route) => false);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (ctx) => HomePage()),
+          (route) => false,
+        );
       },
       onError: (error) {
         Navigator.pop(context);
@@ -111,9 +115,4 @@ class RegisterProvider extends ChangeNotifier {
       },
     );
   }
-}
-
-class TextFieldValue {
-  String value = "";
-  String? errorMessage;
 }

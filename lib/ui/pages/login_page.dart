@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:school_app/domain/controllers/login_controller.dart';
+import 'package:school_app/ui/widgets/authentication_scaffold.dart';
 import 'package:school_app/ui/widgets/outlined_text_field.dart';
-
-import '../widgets/authentication_scaffold.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -12,9 +11,9 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    var isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
 
-    logo() {
+    Widget logo() {
       return Hero(
         // logo is heading when keyboard is open
         tag: isKeyboardOpen ? "" : "logo",
@@ -25,22 +24,23 @@ class LoginPage extends StatelessWidget {
       );
     }
 
-    loginText() {
+    Widget loginText() {
       return Text(
         "Login",
         textAlign: TextAlign.center,
         style: theme.textTheme.headline4!.copyWith(
-            color: theme.colorScheme.primary, fontWeight: FontWeight.w500),
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.w500,
+        ),
       );
     }
 
-    emailTextField() {
+    Widget emailTextField() {
       return Consumer<LoginProvider>(
         builder: (_, controller, __) => OutlinedTextFiled(
           hint: "email",
           prefixIcon: Icons.email,
           isTextShown: true,
-          suffixIcon: null,
           onValueChanged: controller.updateEmail,
           inputType: TextInputType.emailAddress,
           padding:
@@ -50,7 +50,7 @@ class LoginPage extends StatelessWidget {
       );
     }
 
-    passwordTextField() {
+    Widget passwordTextField() {
       return Consumer<LoginProvider>(
         builder: (_, controller, __) => OutlinedTextFiled(
           hint: "password",
@@ -66,26 +66,26 @@ class LoginPage extends StatelessWidget {
           ),
           onValueChanged: controller.updatePassword,
           inputType: TextInputType.visiblePassword,
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
+          padding: const EdgeInsets.only(left: 16, right: 16),
           errorText: controller.passwordTextValue.errorMessage,
         ),
       );
     }
 
-    loginButton() {
+    Widget loginButton() {
       return Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         child: Consumer<LoginProvider>(
           builder: (_, controller, __) => ElevatedButton(
             style: ElevatedButton.styleFrom(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(16),
-                  ),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(16),
                 ),
-                backgroundColor: theme.colorScheme.secondary),
-            onPressed: (
-                    controller.emailTextFieldValue.value.isNotEmpty &&
+              ),
+              backgroundColor: theme.colorScheme.secondary,
+            ),
+            onPressed: (controller.emailTextFieldValue.value.isNotEmpty &&
                     controller.passwordTextValue.value.isNotEmpty &&
                     controller.emailTextFieldValue.errorMessage == null &&
                     controller.passwordTextValue.errorMessage == null)
@@ -105,7 +105,7 @@ class LoginPage extends StatelessWidget {
       );
     }
 
-    registerNavigationText() {
+    Widget registerNavigationText() {
       return Wrap(
         alignment: WrapAlignment.center,
         children: [

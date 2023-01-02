@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class OutlinedTextFiled extends StatelessWidget {
   const OutlinedTextFiled({
-    Key? key,
+    super.key,
     required this.hint,
     required this.prefixIcon,
     this.isTextShown,
@@ -12,7 +12,7 @@ class OutlinedTextFiled extends StatelessWidget {
     this.padding,
     this.errorText,
     this.validator,
-  }) : super(key: key);
+  });
 
   final String hint;
   final IconData prefixIcon;
@@ -38,7 +38,6 @@ class OutlinedTextFiled extends StatelessWidget {
           errorText: errorText == "" ? null : errorText,
           hintText: hint,
         ),
-        maxLines: 1,
         keyboardType: inputType,
         onChanged: onValueChanged,
         obscureText: isTextShown == false,

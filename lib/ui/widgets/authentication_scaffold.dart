@@ -3,15 +3,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 
 class AuthenticationScaffold extends StatelessWidget {
-  const AuthenticationScaffold({Key? key, required this.body, this.topImageSize, this.hideWhenKeyboardAppears})
-      : super(key: key);
+  const AuthenticationScaffold({super.key, required this.body, this.topImageSize, this.hideWhenKeyboardAppears});
   final Widget body;
   final double? topImageSize;
   final bool? hideWhenKeyboardAppears;
 
   @override
   Widget build(BuildContext context) {
-    var isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
 
     return SafeArea(
       child: Scaffold(

@@ -1,12 +1,10 @@
-import 'dart:developer';
-import 'dart:io';
 import 'package:gsheets/gsheets.dart';
-import 'package:school_app/data/model/user.dart';
 import 'package:school_app/data/extentions.dart';
+import 'package:school_app/data/model/user.dart';
 
 class GoogleSheets {
-  static const String _spreadSheetCredentials = r''' 
-{
+  final String _spreadSheetCredentials = r''' 
+  {
   "type": "service_account",
   "project_id": "school-app-369018",
   "private_key_id": "ec7af375eea3db8df2551ad501672bd3875d928a",
@@ -19,44 +17,51 @@ class GoogleSheets {
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/app-db%40school-app-369018.iam.gserviceaccount.com"
 }
 ''';
-  static const String _usersSpreadSheetId =
+
+  static int row = 0;
+  final String _usersSpreadSheetId =
       "1GvxPl2xXmgNP2LNhkr6EebgTQl-AieL1_NIYMTyLJnU";
-  Spreadsheet? _spreadSheet;
-  Worksheet? _usersWorkSheet;
-  static final _gsheets = GSheets(_spreadSheetCredentials);
+  late Spreadsheet spreadSheet;
+  late Worksheet usersWorkSheet;
 
-  init() => log("Google sheet created");
-
-  Future<bool> insertUser(User user) async {
-    _spreadSheet ??= await _gsheets
+  Future<void> init() async {
+    final gsheets = GSheets(_spreadSheetCredentials);
+    spreadSheet = await gsheets
         .spreadsheet(_usersSpreadSheetId)
         .timeout(const Duration(seconds: 20));
-    _usersWorkSheet ??= _spreadSheet!.worksheetByTitle("Users");
+    usersWorkSheet = spreadSheet.worksheetByTitle("Users")!;
+  }
 
-    var userList = await _usersWorkSheet!.cells.findByValue(user.email);
+  Future<bool> insertUser(User user) async {
+    final userList = await usersWorkSheet.cells.findByValue(user.email);
     if (userList.isNotEmpty) {
       return Future.error("User Already Exist, try Login in");
     }
-    return _usersWorkSheet!.values.appendRow(user.toList()).timeout(
-          const Duration(seconds: 20),
-        );
+    return usersWorkSheet.values
+        .appendRow(user.toList())
+        .timeout(const Duration(seconds: 20));
   }
 
-  Future<User> getUser(email) async {
-    try {
-      _spreadSheet ??= await _gsheets
-          .spreadsheet(_usersSpreadSheetId)
-          .timeout(const Duration(seconds: 20));
-      _usersWorkSheet ??= _spreadSheet!.worksheetByTitle("Users");
-      var userLocation = await _usersWorkSheet!.cells
-          .findByValue(email)
-          .timeout(const Duration(seconds: 20));
-      var userList = await _usersWorkSheet!.values.row(userLocation.first.row);
-      return userList.toUser();
-    } on SocketException {
-      return Future.error("Please Check your internet Connection");
-    } on Exception {
-      return Future.error("Unknown Error Please Try Again Later");
-    }
+  Future<User> getUserByEmail(String email) async {
+    final userLocation = await usersWorkSheet.cells
+        .findByValue(email)
+        .timeout(const Duration(seconds: 20));
+    row = userLocation.first.row;
+    final userList = await usersWorkSheet.values.row(userLocation.first.row);
+    return userList.toUser();
   }
+
+  Future<bool> updateUser(String value, FieldType field) async {
+    return false;
+  }
+}
+
+enum FieldType {
+  firstName,
+  lastName,
+  email,
+  password,
+  username,
+  parentPhone,
+  grade
 }

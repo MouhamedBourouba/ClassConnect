@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,9 +14,8 @@ class CompleteAccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fToast = FToast().init(context);
 
-    welcomeText() => Wrap(
+    Widget welcomeText() => Wrap(
           alignment: WrapAlignment.center,
           children: [
             Text(
@@ -33,10 +30,9 @@ class CompleteAccountPage extends StatelessWidget {
           ],
         );
 
-    fullNameTextFields() => Padding(
+    Widget fullNameTextFields() => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
           child: Row(
-            mainAxisSize: MainAxisSize.max,
             children: [
               Consumer<CompleteAccountProvider>(
                 builder: (context, provider, _) => Expanded(
@@ -67,9 +63,9 @@ class CompleteAccountPage extends StatelessWidget {
           ),
         );
 
-    phoneNumberTextField() => Consumer<CompleteAccountProvider>(
+    Widget phoneNumberTextField() => Consumer<CompleteAccountProvider>(
           builder: (context, provider, widget) => Padding(
-            padding: const EdgeInsets.only(right: 8.0, left: 16, bottom: 0),
+            padding: const EdgeInsets.only(right: 8.0, left: 16),
             child: InternationalPhoneNumberInput(
               inputDecoration: InputDecoration(
                 label: const Text("Prent phone"),
@@ -84,39 +80,41 @@ class CompleteAccountPage extends StatelessWidget {
           ),
         );
 
-    gradeTextField() => Padding(
+    Widget gradeTextField() => Padding(
           padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
           child: Consumer<CompleteAccountProvider>(
-              builder: (context, provider, _) {
-            return DropDownTextField(
-              onChanged: (value) {
-                provider.updateGrade(value);
-              },
-              initialValue: "First Grade",
-              textFieldDecoration: const InputDecoration(
-                label: Text("Grade"),
-                filled: true,
-              ),
-              dropDownList: const [
-                DropDownValueModel(name: "First Grade", value: 1),
-                DropDownValueModel(name: "Second Grade", value: 2),
-                DropDownValueModel(name: "Third Grade", value: 3),
-              ],
-            );
-          }),
+            builder: (context, provider, _) {
+              return DropDownTextField(
+                onChanged: (value) {
+                  provider.updateGrade(value);
+                },
+                initialValue: "First Grade",
+                textFieldDecoration: const InputDecoration(
+                  label: Text("Grade"),
+                  filled: true,
+                ),
+                dropDownList: const [
+                  DropDownValueModel(name: "First Grade", value: 1),
+                  DropDownValueModel(name: "Second Grade", value: 2),
+                  DropDownValueModel(name: "Third Grade", value: 3),
+                ],
+              );
+            },
+          ),
         );
 
-    saveButton() => Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 16),
+    Widget saveButton() => Padding(
+          padding: const EdgeInsets.only(left: 8, right: 8, bottom: 16),
           child: Consumer<CompleteAccountProvider>(
             builder: (context, provider, widget) => ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(16),
-                    ),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(16),
                   ),
-                  backgroundColor: theme.colorScheme.secondary),
+                ),
+                backgroundColor: theme.colorScheme.secondary,
+              ),
               onPressed: provider.firstNameTextFieldValue.isNotEmpty &&
                       provider.lastNameTextFieldValue.isNotEmpty &&
                       provider.gradeTextFieldValue != null &&
@@ -124,9 +122,12 @@ class CompleteAccountPage extends StatelessWidget {
                       provider.parentPhoneTextFieldValue.errorMessage == null
                   ? () {
                       provider.saveUserAccount(
-                        onStart: () => LoadingController.showLoading(context),
-                        onCompleted: () => LoadingController.hideLoading(context),
-                        onError: (error) => Fluttertoast.showToast(msg: error, backgroundColor: Colors.red),
+                        onStart: () => showLoading(context),
+                        onCompleted: () => hideLoading(context),
+                        onError: (error) => Fluttertoast.showToast(
+                          msg: error,
+                          backgroundColor: Colors.red,
+                        ),
                         onSuccess: () => Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (ctx) => HomePage()),

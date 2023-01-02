@@ -4,12 +4,12 @@ import 'package:school_app/data/extentions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
+  HomePage({super.key});
   final username = GetIt.I.get<SharedPreferences>().getString("username");
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     return SafeArea(
       child: Scaffold(

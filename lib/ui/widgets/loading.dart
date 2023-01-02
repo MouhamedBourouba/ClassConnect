@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
-  const LoadingDialog({Key? key}) : super(key: key);
+  const LoadingDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,18 +22,16 @@ class LoadingDialog extends StatelessWidget {
   }
 }
 
-class LoadingController {
-  static showLoading(context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => const LoadingDialog(),
-      barrierDismissible: false,
-    );
-  }
+void showLoading(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (ctx) => const LoadingDialog(),
+    barrierDismissible: false,
+  );
+}
 
-  static hideLoading(context) {
-    if (ModalRoute.of(context)?.isCurrent != true) {
-      Navigator.pop(context);
-    }
+void hideLoading(BuildContext context) {
+  if (ModalRoute.of(context)?.isCurrent != true) {
+    Navigator.pop(context);
   }
 }

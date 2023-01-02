@@ -2,32 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:school_app/domain/controllers/register_controller.dart';
-import '../widgets/authentication_scaffold.dart';
-import '../widgets/outlined_text_field.dart';
+import 'package:school_app/ui/widgets/authentication_scaffold.dart';
+import 'package:school_app/ui/widgets/outlined_text_field.dart';
 
 class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
-    var isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
+    final theme = Theme.of(context);
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
 
-    logo() {
-      return Padding(
-        padding: const EdgeInsets.only(top: 0.0),
-        child: Hero(
-          // logo is heading when keyboard is open
-          tag: isKeyboardOpen ? "1" : "logo",
-          child: SvgPicture.asset(
-            "assets/images/logo_no_text.svg",
-            width: isKeyboardOpen ? 0 : 180,
-          ),
+    Widget logo() {
+      return Hero(
+        // logo is heading when keyboard is open
+        tag: isKeyboardOpen ? "1" : "logo",
+        child: SvgPicture.asset(
+          "assets/images/logo_no_text.svg",
+          width: isKeyboardOpen ? 0 : 180,
         ),
       );
     }
 
-    registerText() {
+    Widget registerText() {
       return Text(
         "Register",
         textAlign: TextAlign.center,
@@ -38,12 +35,11 @@ class RegisterScreen extends StatelessWidget {
       );
     }
 
-    usernameTextField() {
+    Widget usernameTextField() {
       return OutlinedTextFiled(
         hint: "User name",
         prefixIcon: Icons.person,
         isTextShown: true,
-        suffixIcon: null,
         onValueChanged: (value) =>
             Provider.of<RegisterProvider>(context, listen: false)
                 .updateUsername(value),
@@ -52,23 +48,22 @@ class RegisterScreen extends StatelessWidget {
       );
     }
 
-    emailTextField() {
+    Widget emailTextField() {
       return Consumer<RegisterProvider>(
         builder: (_, controller, __) => OutlinedTextFiled(
           hint: "email",
           prefixIcon: Icons.email,
           isTextShown: true,
-          suffixIcon: null,
           errorText: controller.emailTextFieldValue.errorMessage,
           onValueChanged: (value) => controller.updateEmail(value),
           inputType: TextInputType.emailAddress,
           padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 8),
+              const EdgeInsets.only(left: 16, right: 16, bottom: 8),
         ),
       );
     }
 
-    passwordTextField() {
+    Widget passwordTextField() {
       return Consumer<RegisterProvider>(
         builder: (_, controller, __) => OutlinedTextFiled(
           hint: "password",
@@ -90,22 +85,21 @@ class RegisterScreen extends StatelessWidget {
       );
     }
 
-    conformPasswordTextField() {
+    Widget conformPasswordTextField() {
       return Consumer<RegisterProvider>(
         builder: (_, provider, __) => OutlinedTextFiled(
           hint: "Conform Password",
           prefixIcon: Icons.password,
           isTextShown: provider.isPasswordVisible,
-          suffixIcon: null,
           errorText: provider.conformPasswordTextFieldValue.errorMessage,
           onValueChanged: (value) => provider.updateConformPassword(value),
           inputType: TextInputType.visiblePassword,
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
+          padding: const EdgeInsets.only(left: 16, right: 16),
         ),
       );
     }
 
-    registerButton() {
+    Widget registerButton() {
       return Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         child: Consumer<RegisterProvider>(
@@ -123,7 +117,8 @@ class RegisterScreen extends StatelessWidget {
                     controller.conformPasswordTextFieldValue.value != "" &&
                     controller.emailTextFieldValue.errorMessage == null &&
                     controller.passwordTextFieldValue.errorMessage == null &&
-                    controller.conformPasswordTextFieldValue.errorMessage == null)
+                    controller.conformPasswordTextFieldValue.errorMessage ==
+                        null)
                 ? () {
                     controller.register(context);
                   }
@@ -140,7 +135,7 @@ class RegisterScreen extends StatelessWidget {
       );
     }
 
-    loginNavigationText() {
+    Widget loginNavigationText() {
       return Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Wrap(
