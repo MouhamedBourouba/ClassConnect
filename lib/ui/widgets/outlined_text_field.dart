@@ -1,48 +1,50 @@
 import 'package:flutter/material.dart';
 
-class OutlinedTextFiled extends StatelessWidget {
-  const OutlinedTextFiled({
+const outlinedInputBorder = OutlineInputBorder(
+  borderRadius: BorderRadius.all(
+    Radius.circular(100),
+  ),
+);
+class PasswordTextField extends StatefulWidget {
+  const PasswordTextField({
     super.key,
-    required this.hint,
-    required this.prefixIcon,
-    this.isTextShown,
-    this.suffixIcon,
-    required this.onValueChanged,
-    this.inputType,
-    this.padding,
-    this.errorText,
-    this.validator,
+    this.initValue,
+    required this.onChange,
   });
 
-  final String hint;
-  final IconData prefixIcon;
-  final bool? isTextShown;
-  final Widget? suffixIcon;
-  final TextInputType? inputType;
-  final Function(String value) onValueChanged;
-  final EdgeInsets? padding;
-  final String? errorText;
-  final String? Function(String?)? validator;
+  final void Function(String value) onChange;
+  final String? initValue;
+
+  @override
+  State<PasswordTextField> createState() => _PasswordTextFieldState();
+}
+
+class _PasswordTextFieldState extends State<PasswordTextField> {
+  bool isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: padding ?? EdgeInsets.zero,
-      child: TextFormField(
-        decoration: InputDecoration(
-          prefixIcon: Icon(prefixIcon),
-          suffixIcon: suffixIcon,
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30)),
-          ),
-          errorText: errorText == "" ? null : errorText,
-          hintText: hint,
+    return TextFormField(
+      initialValue: widget.initValue,
+      decoration: InputDecoration(
+        border: outlinedInputBorder,
+        hintText: "password",
+        prefixIcon: const Icon(Icons.lock),
+        suffixIcon: IconButton(
+          onPressed: () {
+            setState(() {
+              isPasswordVisible = !isPasswordVisible;
+            });
+          },
+          icon: Icon(isPasswordVisible ? Icons.visibility : Icons.visibility_off),
         ),
-        keyboardType: inputType,
-        onChanged: onValueChanged,
-        obscureText: isTextShown == false,
-        validator: validator,
       ),
+      obscureText: !isPasswordVisible,
+      onChanged: widget.onChange,
+      validator: (value) {
+        if (value == "" || value == null || value.length > 8) return null;
+        return "Password is too short";
+      },
     );
   }
 }

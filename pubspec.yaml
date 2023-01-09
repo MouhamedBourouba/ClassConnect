@@ -20,11 +20,13 @@ dependencies:
   fluttertoast: ^8.1.1
   google_fonts: ^3.0.1
   get_it:
-  provider:
+  flutter_bloc:
+  email_validator:
   connectivity_plus: ^3.0.2
   dropdown_textfield: ^1.0.7
   intl_phone_number_input: ^0.7.1
   hive:
+  equatable:
   hive_flutter:
 
 dev_dependencies:

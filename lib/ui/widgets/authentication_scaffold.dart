@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-
 class AuthenticationScaffold extends StatelessWidget {
-  const AuthenticationScaffold({super.key, required this.body, this.topImageSize, this.hideWhenKeyboardAppears});
+  const AuthenticationScaffold({super.key, required this.body, this.topImageSize, this.hideTopImageOnkeyboard});
+
   final Widget body;
   final double? topImageSize;
-  final bool? hideWhenKeyboardAppears;
+  final bool? hideTopImageOnkeyboard;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class AuthenticationScaffold extends StatelessWidget {
               right: 0,
               child: SvgPicture.asset(
                 "assets/images/top.svg",
-                width: isKeyboardOpen && (hideWhenKeyboardAppears == true) ? 0 : topImageSize,
+                width: isKeyboardOpen ? 0  : topImageSize ,
               ),
             ),
             body,

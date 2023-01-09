@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:school_app/data/extentions.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_app/data/extension.dart';
+import 'package:school_app/domain/bloc/home/cubit/home_cubit.dart';
 
 class HomePage extends StatelessWidget {
-  HomePage({super.key});
-  final username = GetIt.I.get<SharedPreferences>().getString("username");
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +15,10 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Classes"),
           backgroundColor: theme.colorScheme.secondary,
-          // leading: IconButton(onPressed: () {
-          //
-          // }, icon: const Icon(Icons.menu)),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Text("+"),
         ),
         drawer: Drawer(
           child: ListView(
@@ -35,9 +35,8 @@ class HomePage extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          username?.firstLatter() ?? "A",
-                          style: theme.textTheme.headline6!
-                              .copyWith(color: Colors.white, fontSize: 30),
+                          "A",
+                          style: theme.textTheme.headline6!.copyWith(color: Colors.white, fontSize: 30),
                         ),
                       ),
                     ),
@@ -45,7 +44,7 @@ class HomePage extends StatelessWidget {
                       width: 8,
                     ),
                     Text(
-                      username ?? "username",
+                      "username",
                       style: theme.textTheme.headline5,
                     ),
                   ],

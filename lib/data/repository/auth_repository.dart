@@ -1,8 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:school_app/data/google_sheets.dart';
+import 'package:school_app/data/model/unknown_exception.dart';
 import 'package:school_app/data/model/user.dart';
-import 'package:school_app/data/model/user_entity.dart';
-import 'package:school_app/domain/services/hashing.dart';
+import 'package:school_app/data/user_data_source.dart';
+import 'package:school_app/domain/services/hashing_service.dart';
 import 'package:uuid/uuid.dart';
 
 abstract class AuthRepository {
@@ -12,33 +12,17 @@ abstract class AuthRepository {
 }
 
 class AuthRepositoryImp extends AuthRepository {
-
   final Uuid uuid;
-  final HashingService hash;
-  final GoogleSheets googleSheets;
+  final HashingService hashingService;
+  final UserDataSource dataSource;
   final Box hiveBox;
 
   AuthRepositoryImp({
     required this.uuid,
-    required this.hash,
-    required this.googleSheets,
+    required this.hashingService,
+    required this.dataSource,
     required this.hiveBox,
   });
-
-  Future<void> insertUserToPref(User user, int row) async {
-    await hiveBox.put(
-      "user",
-      UserEntity(
-        row: row,
-        username: user.username,
-        email: user.email,
-        id: user.id,
-        grade: int.parse(user.grade ?? "0"),
-        lastName: user.grade,
-        firstName: user.firstName,
-      ),
-    );
-  }
 
   @override
   Future<void> createAccount(
@@ -46,29 +30,32 @@ class AuthRepositoryImp extends AuthRepository {
     String email,
     String username,
   ) async {
-    final insertedUser = User(
+    final user = User(
       id: uuid.v4(),
       username: username,
-      hashedPassword: hash.hash(password),
+      password: hashingService.hash(password),
       email: email,
     );
-
-    final success = await googleSheets.insertUser(insertedUser);
-
-    if (!success) {
-      return Future.error(
-        "Error while establishing connection with the server, try Again later",
-      );
-    } else {
-      insertUserToPref(insertedUser, GoogleSheets.row);
-    }
+    await dataSource.appendUser(user);
+    await hiveBox.put(
+      "user",
+      user,
+    );
+    await hiveBox.put("isLoggedIn", true);
+    await hiveBox.put("isAccountCompleted", false);
+    return;
   }
 
   @override
   Future<User> login(String email, String password) async {
-    final user = await googleSheets.getUserByEmail(email);
-    if (hash.verify(password, user.hashedPassword)) {
-      insertUserToPref(user, GoogleSheets.row);
+    final user = await dataSource.findUserByEmail(email);
+    if (hashingService.verify(password, user.password)) {
+      await hiveBox.put("user", user);
+      await hiveBox.put("isLoggedIn", true);
+      await hiveBox.put(
+        "isAccountCompleted",
+        user.lastName != null && user.lastName != null && user.grade != null && user.parentPhone != null,
+      );
       return user;
     } else {
       return Future.error("Wrong password");
