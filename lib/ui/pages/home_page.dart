@@ -9,16 +9,54 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final homeCubit = context.read<HomeCubit>();
 
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Classes"),
           backgroundColor: theme.colorScheme.secondary,
+          actions: [
+            CircleAvatar(
+              backgroundColor: Colors.blueGrey,
+              child: Text(
+                (homeCubit.state is Loaded) ? (homeCubit.state as Loaded).user.username.firstLatter() : 'A',
+                style: theme.textTheme.headline6!.copyWith(color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 8)
+          ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: const Text("+"),
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(topRight: Radius.circular(16), topLeft: Radius.circular(16)),
+              ),
+              builder: (ctx) => SizedBox(
+                height: MediaQuery.of(context).size.height * 0.15,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAccountPage()));
+                      },
+                      child: const Text("Create class"),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text("Join class"),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+          child: const Icon(Icons.add),
         ),
         drawer: Drawer(
           child: ListView(
@@ -50,6 +88,41 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CreateAccountPage extends StatelessWidget {
+  const CreateAccountPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Create class"),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: Form(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: const InputDecoration(
+                  label: Text("Class name"),
+                  filled: true,
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),

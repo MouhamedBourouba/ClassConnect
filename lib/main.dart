@@ -20,9 +20,11 @@ Future<void> main() async {
   // final userFromDb = await userdata.fetchUserById(user.id);
   // debugPrint(user.toString());
   // debugPrint(userFromDb?.toMap().toString());
-  final firstPage = hiveBox.get("isLoggedIn") == true ? hiveBox.get("isAccountCompleted") == true
-      ? const HomePage()
-      : const CompleteAccountPage() : const LoginScreen();
+  final firstPage = hiveBox.get("isLoggedIn") == true
+      ? hiveBox.get("isAccountCompleted") == true
+          ? const HomePage()
+          : const CompleteAccountPage()
+      : const LoginScreen();
 
   runApp(
     MultiBlocProvider(

@@ -7,12 +7,12 @@ import 'package:school_app/data/model/user.dart';
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit() : super(HomeInitial(currentUser: User.defaultUser())) {
+  HomeCubit() : super(HomeInitial()) {
     fetchUser();
   }
 
   Future<void> fetchUser() async {
-    final user = await GetIt.I.getAsync<User>();
-    return;
+      emit(Loaded(await GetIt.I.getAsync()));
   }
+
 }
