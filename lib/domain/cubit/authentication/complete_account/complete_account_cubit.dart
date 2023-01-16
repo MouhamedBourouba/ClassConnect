@@ -8,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:school_app/data/model/unknown_exception.dart';
 import 'package:school_app/data/repository/complete_account_repository.dart';
-import 'package:school_app/domain/bloc/authentication/screen_status.dart';
+import 'package:school_app/domain/cubit/authentication/screen_status.dart';
 
 part 'complete_account_state.dart';
 

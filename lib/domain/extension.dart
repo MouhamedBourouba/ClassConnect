@@ -15,6 +15,64 @@ extension UserFromList on List<String> {
   }
 }
 
+extension SubjectExtentionFromInt on int {
+  Subject fromInt() {
+    switch (this) {
+      case 0:
+        return Subject.match;
+      case 1:
+        return Subject.arabic;
+      case 2:
+        return Subject.english;
+      case 3:
+        return Subject.french;
+      case 4:
+        return Subject.history;
+      case 5:
+        return Subject.physics;
+      case 6:
+        return Subject.science;
+      case 7:
+        return Subject.other;
+    }
+    return Subject.other;
+  }
+}
+
+extension SubjectExtentionFromSubject on Subject {
+  int toInt() {
+    switch (this) {
+      case Subject.match:
+        return 0;
+      case Subject.arabic:
+        return 1;
+      case Subject.english:
+        return 2;
+      case Subject.french:
+        return 3;
+      case Subject.history:
+        return 4;
+      case Subject.physics:
+        return 5;
+      case Subject.science:
+        return 6;
+      case Subject.other:
+        return 7;
+    }
+  }
+}
+
+enum Subject {
+  match,
+  arabic,
+  english,
+  french,
+  history,
+  physics,
+  science,
+  other,
+}
+
 extension UserFromMap on Map<String, dynamic> {
   User toUser() => User(
         id: this["id"].toString(),
@@ -42,5 +100,3 @@ extension StringUtils on String {
     return this[0];
   }
 }
-
-enum FieldType { firstName, lastName, email, password, username, parentPhone, grade }

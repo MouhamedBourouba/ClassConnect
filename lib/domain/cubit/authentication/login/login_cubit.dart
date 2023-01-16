@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:school_app/data/model/unknown_exception.dart';
 import 'package:school_app/data/model/user.dart';
 import 'package:school_app/data/repository/auth_repository.dart';
-import 'package:school_app/domain/bloc/authentication/screen_status.dart';
+import 'package:school_app/domain/cubit/authentication/screen_status.dart';
 
 part 'login_state.dart';
 

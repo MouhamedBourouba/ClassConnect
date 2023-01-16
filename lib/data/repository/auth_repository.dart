@@ -1,7 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:school_app/data/model/unknown_exception.dart';
+import 'package:school_app/data/data_source/user_data_source.dart';
 import 'package:school_app/data/model/user.dart';
-import 'package:school_app/data/user_data_source.dart';
 import 'package:school_app/domain/services/hashing_service.dart';
 import 'package:uuid/uuid.dart';
 
@@ -14,13 +13,13 @@ abstract class AuthRepository {
 class AuthRepositoryImp extends AuthRepository {
   final Uuid uuid;
   final HashingService hashingService;
-  final UserDataSource dataSource;
+  final UserDataSource userDataSource;
   final Box hiveBox;
 
   AuthRepositoryImp({
     required this.uuid,
     required this.hashingService,
-    required this.dataSource,
+    required this.userDataSource,
     required this.hiveBox,
   });
 
@@ -36,7 +35,7 @@ class AuthRepositoryImp extends AuthRepository {
       password: hashingService.hash(password),
       email: email,
     );
-    await dataSource.appendUser(user);
+    await userDataSource.appendUser(user);
     await hiveBox.put(
       "user",
       user,
@@ -48,7 +47,7 @@ class AuthRepositoryImp extends AuthRepository {
 
   @override
   Future<User> login(String email, String password) async {
-    final user = await dataSource.findUserByEmail(email);
+    final user = await userDataSource.findUserByEmail(email);
     if (hashingService.verify(password, user.password)) {
       await hiveBox.put("user", user);
       await hiveBox.put("isLoggedIn", true);

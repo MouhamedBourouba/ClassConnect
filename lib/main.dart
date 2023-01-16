@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
-import 'package:school_app/domain/bloc/authentication/complete_account/complete_account_cubit.dart';
-import 'package:school_app/domain/bloc/authentication/login/login_cubit.dart';
-import 'package:school_app/domain/bloc/authentication/register/register_cubit.dart';
-import 'package:school_app/domain/bloc/home/cubit/home_cubit.dart';
+import 'package:school_app/domain/cubit/authentication/complete_account/complete_account_cubit.dart';
+import 'package:school_app/domain/cubit/authentication/login/login_cubit.dart';
+import 'package:school_app/domain/cubit/authentication/register/register_cubit.dart';
+import 'package:school_app/domain/cubit/home/home_cubit.dart';
 import 'package:school_app/domain/utils/locator.dart';
 import 'package:school_app/ui/pages/complete_account_page.dart';
 import 'package:school_app/ui/pages/home_page.dart';
@@ -16,10 +16,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupDi();
   final hiveBox = await GetIt.I.getAsync<Box>();
-  // final userdata = await GetIt.I.getAsync<UserDataSource>();
-  // final userFromDb = await userdata.fetchUserById(user.id);
-  // debugPrint(user.toString());
-  // debugPrint(userFromDb?.toMap().toString());
   final firstPage = hiveBox.get("isLoggedIn") == true
       ? hiveBox.get("isAccountCompleted") == true
           ? const HomePage()

@@ -1,10 +1,9 @@
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:school_app/domain/bloc/authentication/complete_account/complete_account_cubit.dart';
-import 'package:school_app/domain/bloc/authentication/screen_status.dart';
+import 'package:school_app/domain/cubit/authentication/complete_account/complete_account_cubit.dart';
+import 'package:school_app/domain/cubit/authentication/screen_status.dart';
 import 'package:school_app/ui/pages/home_page.dart';
 import 'package:school_app/ui/widgets/authentication_scaffold.dart';
 import 'package:school_app/ui/widgets/button.dart';
@@ -59,7 +58,9 @@ class CompleteAccountPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   welcomeText(),
-                  const Divider(color: Colors.black,),
+                  const Divider(
+                    color: Colors.black,
+                  ),
                   Form(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     child: Column(
@@ -80,11 +81,6 @@ class CompleteAccountPage extends StatelessWidget {
                             state.lastName.isNotEmpty &&
                             state.grade != null &&
                             state.parentPhone.length - (state.dialCode?.length ?? 0) == 10;
-                        print("state.firstName.isNotEmpty: ${state.firstName.isNotEmpty}");
-                        print("state.lastName.isNotEmpty: ${state.lastName.isNotEmpty}");
-                        print("state.grade != null: ${state.grade != null}");
-                        print(
-                            "state.parentPhone.length - (state.dialCode?.length ?? 0) == 10: ${state.parentPhone.length - (state.dialCode?.length ?? 0) == 10}");
                         return MButton(
                           onClick: canSave
                               ? () {
@@ -210,7 +206,6 @@ class PhoneNumberTextField extends StatelessWidget {
         ),
         initialValue: PhoneNumber(isoCode: "DZ"),
         onInputChanged: (PhoneNumber value) {
-
           context
               .read<CompleteAccountCubit>()
               .parentPhoneChanged(value.phoneNumber.toString(), value.dialCode.toString());
