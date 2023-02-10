@@ -1,9 +1,7 @@
 import 'package:hive/hive.dart';
-
 part 'user.g.dart';
-
 @HiveType(typeId: 2)
-class User extends HiveObject {
+class User {
   User({
     required this.id,
     required this.username,
@@ -46,16 +44,16 @@ class User extends HiveObject {
 
   List<dynamic> toList() => [id, username, email, password, grade, parentPhone, firstName, lastName, classes];
 
-  Map<String, dynamic>? toMap() => {
+  Map<String, String> toMap() => {
         "id": id,
         "username": username,
         "email": email,
         "hashedPassword": password,
-        "grade": grade,
-        "parentPhone": parentPhone,
-        "firstName": firstName,
-        "lastName": lastName,
-        "teachingClasses": teachingClasses,
-        "classes": classes
+        "grade": grade.toString(),
+        "parentPhone": parentPhone.toString(),
+        "firstName": firstName.toString(),
+        "lastName": lastName.toString(),
+        "teachingClasses": teachingClasses.toString(),
+        "classes": classes.toString()
       };
 }

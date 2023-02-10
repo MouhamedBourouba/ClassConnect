@@ -1,9 +1,6 @@
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:school_app/domain/cubit/authentication/screen_status.dart';
 import 'package:school_app/domain/cubit/authentication/login/login_cubit.dart';
 import 'package:school_app/ui/pages/complete_account_page.dart';
 import 'package:school_app/ui/pages/home_page.dart';
@@ -19,85 +16,86 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocListener<LoginCubit, LoginState>(
-      listener: (context, state) {
-        if (state.loginStatus == ScreenStatus.error) {
-          hideLoading(context);
-          if (state.error != null)
-            Fluttertoast.showToast(
-              msg: state.error.toString(),
-              backgroundColor: Colors.red,
+    return BlocProvider(
+      create: (context) => LoginCubit(),
+      child: BlocListener<LoginCubit, LoginState>(
+        listener: (context, state) {
+          if (state.isLoading) {
+            showLoading(context);
+          } else {
+            hideLoading(context);
+          }
+          if (state.isSuccess) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  if (state.user?.firstName != null &&
+                      state.user?.lastName != null &&
+                      state.user?.grade != null &&
+                      state.user?.parentPhone != null) {
+                    return const HomePage();
+                  } else {
+                    return const CompleteAccountPage();
+                  }
+                },
+              ),
             );
-        }
-        if (state.loginStatus == ScreenStatus.loading) {
-          showLoading(context);
-        } else if (state.loginStatus == ScreenStatus.success) {
-          hideLoading(context);
-          context.read<LoginCubit>().close();
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => state.isUserAccountCompleted == true
-                  ? const HomePage()
-                  : const CompleteAccountPage(),
-            ),
-            (route) => false,
-          );
-        }
-      },
-      child: AuthenticationScaffold(
-        body: Center(
-          child: SingleChildScrollView(
-            reverse: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Hero(
-                  tag: "logo",
-                  child: SvgPicture.asset(
-                    "assets/images/logo_no_text.svg",
-                    width: 200,
+          }
+        },
+        child: AuthenticationScaffold(
+          body: Center(
+            child: SingleChildScrollView(
+              reverse: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Hero(
+                    tag: "logo",
+                    child: SvgPicture.asset(
+                      "assets/images/logo_no_text.svg",
+                      width: 200,
+                    ),
                   ),
-                ),
-                Text(
-                  "Login",
-                  style: theme.textTheme.headline4
-                      ?.copyWith(color: theme.colorScheme.primary),
-                  textAlign: TextAlign.center,
-                ),
-                LoginForm(),
-                const SizedBox(height: 16),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  children: [
-                    Text(
-                      "No account? , ",
-                      style: theme.textTheme.bodyLarge,
-                    ),
-                    GestureDetector(
-                      child: Text(
-                        "CLICK HERE ",
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.secondary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  Text(
+                    "Login",
+                    style: theme.textTheme.headline4?.copyWith(color: theme.colorScheme.primary),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  LoginForm(),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      Text(
+                        "No account? , ",
+                        style: theme.textTheme.bodyLarge,
                       ),
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RegisterScreen()),
-                        );
-                      },
-                    ),
-                    Text(
-                      "to register",
-                      style: theme.textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-              ],
+                      GestureDetector(
+                        child: Text(
+                          "CLICK HERE ",
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.secondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                          );
+                        },
+                      ),
+                      Text(
+                        "to register",
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
         ),
@@ -113,6 +111,11 @@ class LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loginCubit = context.watch<LoginCubit>();
+    final canRegister = loginCubit.state.password.isNotEmpty &&
+        loginCubit.state.email.isNotEmpty &&
+        loginCubit.state.password.length > 8;
+
     return Form(
       key: formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -125,38 +128,21 @@ class LoginForm extends StatelessWidget {
             TextFormField(
               initialValue: context.read<LoginCubit>().state.email,
               decoration: const InputDecoration(
-                hintText: "email",
+                hintText: "email/username",
                 border: outlinedInputBorder,
                 prefixIcon: Icon(Icons.email),
               ),
-              onChanged: context.read<LoginCubit>().updateEmail,
-              validator: (value) {
-                if (value == "" || value == null) return null;
-                if (EmailValidator.validate(value)) return null;
-                return "Invalid email";
-              },
+              onChanged: loginCubit.onEmailChanged,
             ),
             const SizedBox(height: 6),
             PasswordTextField(
-              onChange: context.read<LoginCubit>().updatePassword,
+              onChange: loginCubit.onPasswordChanged,
               initValue: context.read<LoginCubit>().state.password,
             ),
             const MDivider(),
-            BlocBuilder<LoginCubit, LoginState>(
-              builder: (context, state) {
-                final canRegister = state.password.isNotEmpty &&
-                    state.email.isNotEmpty &&
-                    EmailValidator.validate(state.email) &&
-                    state.password.length > 8;
-                return MButton(
-                  onClick: canRegister
-                      ? () {
-                          context.read<LoginCubit>().login();
-                        }
-                      : null,
-                  title: "SingIn",
-                );
-              },
+            MButton(
+              onClick: canRegister ? loginCubit.login : null,
+              title: "SingIn",
             ),
           ],
         ),

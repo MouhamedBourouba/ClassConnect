@@ -1,51 +1,45 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'package:bloc/bloc.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get_it/get_it.dart';
-import 'package:school_app/data/model/unknown_exception.dart';
-import 'package:school_app/data/repository/complete_account_repository.dart';
-import 'package:school_app/domain/cubit/authentication/screen_status.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:school_app/data/repository/user_repository.dart';
+import 'package:school_app/di/di.dart';
+import 'package:school_app/domain/utils/error_logger.dart';
+import 'package:school_app/domain/utils/utils.dart';
+
+part 'complete_account_cubit.freezed.dart';
 
 part 'complete_account_state.dart';
 
 class CompleteAccountCubit extends Cubit<CompleteAccountState> {
-  CompleteAccountCubit() : super(CompleteAccountState());
-  CompleteAccountRepository? completeAccountRepository;
+  CompleteAccountCubit() : super(const CompleteAccountState.initial()) {
+    userRepository = getIt();
+    errorLogger = getIt();
+  }
 
-  void firstNameChanged(String value) => emit(state.copyWith(firstName: value));
+  late UserRepository userRepository;
+  late ErrorLogger errorLogger;
 
-  void lastNameChanged(String value) => emit(state.copyWith(lastName: value));
+  void onParentPhoneChange(String value) => emit(state.copyWith(parentPhone: value));
 
-  void parentPhoneChanged(String value, String dial) => emit(state.copyWith(parentPhone: value)..dialCode = dial);
+  void onFirstNameChange(String value) => emit(state.copyWith(firstName: value));
 
-  void gradeChanged(int? value) => emit(state.copyWith()..grade = value);
+  void onLastNameChange(String value) => emit(state.copyWith(lastName: value));
 
-  Future<void> register() async {
-    if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
-      Fluttertoast.showToast(msg: "¨Please check you connection", backgroundColor: Colors.red);
-      return;
-    }
-    emit(state.copyWith(screenStatus: ScreenStatus.loading));
-    try {
-      completeAccountRepository ??= await GetIt.I.getAsync<CompleteAccountRepository>();
+  void onGradeChange(int value) => emit(state.copyWith(grade: value));
 
-      completeAccountRepository!.completeAccount(state.grade!, state.firstName, state.lastName, state.parentPhone).then(
-        (value) => emit(state.copyWith(screenStatus: ScreenStatus.success)),
-        onError: (error) {
-          emit(
-            state.copyWith(
-              screenStatus: ScreenStatus.error,
-              error: error is UnknownException ? "Unknown error please try again later" : error.toString(),
-            ),
-          );
-        },
-      );
-    } on Exception {
-      emit(state.copyWith(screenStatus: ScreenStatus.error, error: "Unknown error try again later"));
-    }
+  Future<void> completeRegistration() async {
+    final updateTask = userRepository.updateUser(
+      firstName: state.firstName,
+      lastName: state.lastName,
+      grade: state.grade,
+      parentPhone: state.parentPhone,
+    );
+    await checkInternetConnection();
+    updateTask.then(
+      (value) {
+        emit(state.copyWith(isSuccess: true));
+      },
+      onError: errorLogger.showError,
+    );
+    emit(state.copyWith(isLoading: false));
   }
 }

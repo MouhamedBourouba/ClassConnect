@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:school_app/domain/cubit/authentication/complete_account/complete_account_cubit.dart';
-import 'package:school_app/domain/cubit/authentication/screen_status.dart';
-import 'package:school_app/ui/pages/home_page.dart';
 import 'package:school_app/ui/widgets/authentication_scaffold.dart';
 import 'package:school_app/ui/widgets/button.dart';
-import 'package:school_app/ui/widgets/loading.dart';
 
 class CompleteAccountPage extends StatelessWidget {
   const CompleteAccountPage({super.key});
@@ -30,73 +27,56 @@ class CompleteAccountPage extends StatelessWidget {
           ],
         );
 
-    return BlocListener<CompleteAccountCubit, CompleteAccountState>(
-      listener: (context, state) {
-        if (state.screenStatus == ScreenStatus.error) {
-          hideLoading(context);
-          state.screenStatus = ScreenStatus.initial;
-        }
-        if (state.screenStatus == ScreenStatus.success) {
-          hideLoading(context);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const HomePage()),
-            (route) => false,
-          );
-        }
-        if (state.screenStatus == ScreenStatus.loading) {
-          showLoading(context);
-        }
-      },
-      child: SafeArea(
-        child: AuthenticationScaffold(
-          topImageSize: 150,
-          body: Center(
-            child: SingleChildScrollView(
-              reverse: true,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  welcomeText(),
-                  const Divider(
-                    color: Colors.black,
+    return SafeArea(
+      child: AuthenticationScaffold(
+        topImageSize: 150,
+        body: Center(
+          child: SingleChildScrollView(
+            reverse: true,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                welcomeText(),
+                const Divider(
+                  color: Colors.black,
+                ),
+                Form(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: Column(
+                    children: const [
+                      FullNameTextField(),
+                      GradeDropDown(),
+                      PhoneNumberTextField(),
+                    ],
                   ),
-                  Form(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    child: Column(
-                      children: const [
-                        FullNameTextField(),
-                        GradeDropDown(),
-                        PhoneNumberTextField(),
-                      ],
-                    ),
-                  ),
-                  // const MDivider(),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: BlocBuilder<CompleteAccountCubit, CompleteAccountState>(
-                      builder: (context, state) {
-                        final canSave = state.firstName.isNotEmpty &&
-                            state.lastName.isNotEmpty &&
-                            state.grade != null &&
-                            state.parentPhone.length - (state.dialCode?.length ?? 0) == 10;
-                        return MButton(
-                          onClick: canSave
-                              ? () {
-                                  context.read<CompleteAccountCubit>().register();
-                                }
-                              : null,
-                          title: "Save",
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                // const MDivider(),
+                const SizedBox(height: 8),
+              ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CompleteAccountButton extends StatelessWidget {
+  const CompleteAccountButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final completeAccountCubit = context.watch<CompleteAccountCubit>();
+
+    final canSave = completeAccountCubit.state.firstName.isNotEmpty &&
+        completeAccountCubit.state.lastName.isNotEmpty &&
+        completeAccountCubit.state.grade != -1 &&
+        completeAccountCubit.state.parentPhone.length == 10;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: MButton(
+        onClick: canSave ? completeAccountCubit.completeRegistration : null,
+        title: "Save",
       ),
     );
   }
@@ -127,7 +107,7 @@ class GradeDropDown extends StatelessWidget {
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
       child: DropDownTextField(
         onChanged: (value) {
-          context.read<CompleteAccountCubit>().gradeChanged((value is String ? null : value.value) as int?);
+          context.read<CompleteAccountCubit>().onGradeChange(int.tryParse(value.toString()) ?? -1);
         },
         initialValue: "First Grade",
         textFieldDecoration: const InputDecoration(
@@ -157,7 +137,7 @@ class FullNameTextField extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              onChanged: context.read<CompleteAccountCubit>().firstNameChanged,
+              onChanged: context.read<CompleteAccountCubit>().onLastNameChange,
               decoration: const InputDecoration(
                 label: Text("First Name"),
                 filled: true,
@@ -169,7 +149,7 @@ class FullNameTextField extends StatelessWidget {
           ),
           Expanded(
             child: TextField(
-              onChanged: context.read<CompleteAccountCubit>().lastNameChanged,
+              onChanged: context.read<CompleteAccountCubit>().onLastNameChange,
               decoration: const InputDecoration(
                 label: Text("Last Name"),
                 filled: true,
@@ -193,8 +173,7 @@ class PhoneNumberTextField extends StatelessWidget {
       padding: const EdgeInsets.only(right: 8.0, left: 16),
       child: InternationalPhoneNumberInput(
         validator: (value) {
-          print(value?.replaceAll(" ", "").length);
-          if (value == null || value.isEmpty || value.replaceAll(" ", "").length == 10) return null;
+          if (value == null || value.isEmpty || value.length == 10) return null;
           return "Invalid phone number";
         },
         inputDecoration: const InputDecoration(
@@ -206,10 +185,7 @@ class PhoneNumberTextField extends StatelessWidget {
         ),
         initialValue: PhoneNumber(isoCode: "DZ"),
         onInputChanged: (PhoneNumber value) {
-          context
-              .read<CompleteAccountCubit>()
-              .parentPhoneChanged(value.phoneNumber.toString(), value.dialCode.toString());
-          print(value.phoneNumber);
+          context.read<CompleteAccountCubit>().onParentPhoneChange(value.phoneNumber.toString());
         },
       ),
     );

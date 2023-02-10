@@ -24,7 +24,7 @@ class ClassAdapter extends TypeAdapter<Class> {
       homeWorkId: fields[4] as String,
       bannedStudents: (fields[5] as List).cast<String>(),
       className: fields[6] as String,
-      subject: fields[7] as int,
+      subject: fields[7] as String,
     );
   }
 

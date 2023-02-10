@@ -1,53 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
-import 'package:school_app/domain/cubit/authentication/complete_account/complete_account_cubit.dart';
-import 'package:school_app/domain/cubit/authentication/login/login_cubit.dart';
-import 'package:school_app/domain/cubit/authentication/register/register_cubit.dart';
-import 'package:school_app/domain/cubit/home/home_cubit.dart';
-import 'package:school_app/domain/utils/locator.dart';
+import 'package:school_app/data/repository/user_repository.dart';
+import 'package:school_app/di/di.dart';
 import 'package:school_app/ui/pages/complete_account_page.dart';
 import 'package:school_app/ui/pages/home_page.dart';
 import 'package:school_app/ui/pages/login_page.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await setupDi();
-  final hiveBox = await GetIt.I.getAsync<Box>();
-  final firstPage = hiveBox.get("isLoggedIn") == true
-      ? hiveBox.get("isAccountCompleted") == true
-          ? const HomePage()
-          : const CompleteAccountPage()
-      : const LoginScreen();
-
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (ctx) => LoginCubit()),
-        BlocProvider(create: (_) => RegisterCubit()),
-        BlocProvider(create: (_) => CompleteAccountCubit()),
-        BlocProvider(create: (_) => HomeCubit()),
-      ],
-      child: App(firstPage: firstPage),
-    ),
-  );
+void main() async {
+  await init();
+  runApp(const App());
 }
 
 class App extends StatelessWidget {
-  const App({
-    super.key,
-    required this.firstPage,
-  });
+  const App({super.key});
 
-  final Widget firstPage;
+  StatelessWidget firstScreen() {
+    final user = getIt<UserRepository>().getCurrentUser();
+    if (user == null) {
+      return const LoginScreen();
+    } else if (user.firstName != null || user.lastName != null || user.parentPhone != null || user.grade != null) {
+      return const CompleteAccountPage();
+    } else {
+      return const HomePage();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: firstPage,
+      home: firstScreen(),
       theme: ThemeData(
         colorScheme: const ColorScheme.light(
           secondary: Color.fromRGBO(63, 114, 175, 1),

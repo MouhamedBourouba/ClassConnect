@@ -1,10 +1,8 @@
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:school_app/domain/cubit/authentication/screen_status.dart';
 import 'package:school_app/domain/cubit/authentication/register/register_cubit.dart';
+import 'package:school_app/domain/utils/extension.dart';
 import 'package:school_app/ui/pages/complete_account_page.dart';
 import 'package:school_app/ui/pages/login_page.dart';
 import 'package:school_app/ui/widgets/authentication_scaffold.dart';
@@ -19,76 +17,76 @@ class RegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return BlocListener<RegisterCubit, RegisterState>(
-      listener: (context, state) {
-        if (state.authStatus == ScreenStatus.error) {
-          hideLoading(context);
-          Fluttertoast.showToast(msg: state.error, backgroundColor: Colors.red);
-        }
-        if (state.authStatus == ScreenStatus.success) {
-          hideLoading(context);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const CompleteAccountPage()),
-            (route) => false,
-          );
-        }
-        if(state.authStatus == ScreenStatus.loading) {
-          showLoading(context);
-        }
-      },
-      child: AuthenticationScaffold(
-        body: Center(
-          child: SingleChildScrollView(
-            reverse: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Hero(
-                  tag: "logo",
-                  child: SvgPicture.asset(
-                    "assets/images/logo_no_text.svg",
-                    width: 200,
+    return BlocProvider(
+      create: (context) => RegisterCubit(),
+      child: BlocListener<RegisterCubit, RegisterState>(
+        listener: (context, state) {
+          if (state.isSuccess) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (ctx) => const CompleteAccountPage()),
+              (route) => false,
+            );
+          }
+          if (state.isLoading) {
+            showLoading(context);
+          } else {
+            hideLoading(context);
+          }
+        },
+        child: AuthenticationScaffold(
+          body: Center(
+            child: SingleChildScrollView(
+              reverse: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Hero(
+                    tag: "logo",
+                    child: SvgPicture.asset(
+                      "assets/images/logo_no_text.svg",
+                      width: 200,
+                    ),
                   ),
-                ),
-                Text(
-                  "Register",
-                  style: theme.textTheme.headline4?.copyWith(color: theme.colorScheme.primary),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                const RegisterForm(),
-                const SizedBox(height: 16),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  children: [
-                    Text(
-                      "Already have account? , ",
-                      style: theme.textTheme.bodyLarge,
-                    ),
-                    GestureDetector(
-                      child: Text(
-                        "CLICK HERE ",
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.secondary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  Text(
+                    "Register",
+                    style: theme.textTheme.headline4?.copyWith(color: theme.colorScheme.primary),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const RegisterForm(),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      Text(
+                        "Already have account? , ",
+                        style: theme.textTheme.bodyLarge,
                       ),
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen()),
-                        );
-                      },
-                    ),
-                    Text(
-                      "to login",
-                      style: theme.textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-              ],
+                      GestureDetector(
+                        child: Text(
+                          "CLICK HERE ",
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.secondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          );
+                        },
+                      ),
+                      Text(
+                        "to login",
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
         ),
@@ -102,7 +100,14 @@ class RegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final registerCubit = context.read<RegisterCubit>();
+    final registerCubit = context.watch<RegisterCubit>();
+    final canRegister = registerCubit.state.conformPassword.isNotEmpty &&
+        registerCubit.state.password.isNotEmpty &&
+        registerCubit.state.email.isNotEmpty &&
+        registerCubit.state.username.isNotEmpty &&
+        registerCubit.state.password.length > 8 &&
+        registerCubit.state.conformPassword == registerCubit.state.password &&
+        registerCubit.state.email.isEmail();
 
     return Form(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -113,7 +118,7 @@ class RegisterForm extends StatelessWidget {
           children: [
             TextFormField(
               initialValue: registerCubit.state.username,
-              onChanged: registerCubit.updateUsername,
+              onChanged: registerCubit.onUsernameChanged,
               decoration: const InputDecoration(
                 hintText: "username",
                 border: outlinedInputBorder,
@@ -128,16 +133,15 @@ class RegisterForm extends StatelessWidget {
                 border: outlinedInputBorder,
                 prefixIcon: Icon(Icons.email),
               ),
-              onChanged: registerCubit.updateEmail,
+              onChanged: registerCubit.onEmailChanged,
               validator: (value) {
-                if (value == "" || value == null) return null;
-                if (EmailValidator.validate(value)) return null;
+                if ((value == "" || value == null) || value.contains("@") && value.contains(".")) return null;
                 return "Invalid email";
               },
             ),
             const SizedBox(height: 4),
             PasswordTextField(
-              onChange: registerCubit.updatePassword,
+              onChange: registerCubit.onPasswordChanged,
               initValue: registerCubit.state.password,
             ),
             const SizedBox(height: 4),
@@ -149,32 +153,16 @@ class RegisterForm extends StatelessWidget {
               ),
               initialValue: registerCubit.state.conformPassword,
               obscureText: true,
-              onChanged: registerCubit.updateConformPassword,
+              onChanged: registerCubit.onConformPasswordChanged,
               validator: (value) {
                 if (value == "" || value == null || value == registerCubit.state.password) return null;
                 return "Password dose not match";
               },
             ),
             const MDivider(),
-            BlocBuilder<RegisterCubit, RegisterState>(
-              builder: (context, state) {
-                final canRegister = state.conformPassword.isNotEmpty &&
-                    state.password.isNotEmpty &&
-                    state.email.isNotEmpty &&
-                    state.username.isNotEmpty &&
-                    state.password.length > 8 &&
-                    state.conformPassword == state.password &&
-                    EmailValidator.validate(state.email);
-                print(canRegister);
-                return MButton(
-                  onClick: canRegister
-                      ? () {
-                          registerCubit.register();
-                        }
-                      : null,
-                  title: "SingUp",
-                );
-              },
+            MButton(
+              onClick: canRegister ? registerCubit.register : null,
+              title: "SingUp",
             ),
           ],
         ),
