@@ -116,6 +116,7 @@ class ClassesOptionsBottomSheet extends StatelessWidget {
     super.key,
     required this.homeCubit,
   });
+
   final HomeCubit homeCubit;
 
   @override
@@ -136,7 +137,7 @@ class ClassesOptionsBottomSheet extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              showDialog(context: context, builder: (context) => JoinClassDialog(homeCubit: homeCubit));
+              showDialog(context: context, builder: (context) => const JoinClassDialog());
             },
             child: const Text("Join class"),
           )
@@ -147,12 +148,11 @@ class ClassesOptionsBottomSheet extends StatelessWidget {
 }
 
 class JoinClassDialog extends StatelessWidget {
-  const JoinClassDialog({super.key, required this.homeCubit});
-
-  final HomeCubit homeCubit;
+  const JoinClassDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final HomeCubit homeCubit = context.watch<HomeCubit>();
     return Dialog(
       insetPadding: EdgeInsets.zero,
       child: SizedBox(

@@ -16,7 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$CompleteAccountState {
-  int get grade => throw _privateConstructorUsedError;
+  String get grade => throw _privateConstructorUsedError;
   String get firstName => throw _privateConstructorUsedError;
   String get lastName => throw _privateConstructorUsedError;
   String get parentPhone => throw _privateConstructorUsedError;
@@ -24,21 +24,21 @@ mixin _$CompleteAccountState {
   bool get isLoading => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(int grade, String firstName, String lastName,
+    required TResult Function(String grade, String firstName, String lastName,
             String parentPhone, bool isSuccess, bool isLoading)
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(int grade, String firstName, String lastName,
+    TResult? Function(String grade, String firstName, String lastName,
             String parentPhone, bool isSuccess, bool isLoading)?
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(int grade, String firstName, String lastName,
+    TResult Function(String grade, String firstName, String lastName,
             String parentPhone, bool isSuccess, bool isLoading)?
         initial,
     required TResult orElse(),
@@ -73,7 +73,7 @@ abstract class $CompleteAccountStateCopyWith<$Res> {
       _$CompleteAccountStateCopyWithImpl<$Res, CompleteAccountState>;
   @useResult
   $Res call(
-      {int grade,
+      {String grade,
       String firstName,
       String lastName,
       String parentPhone,
@@ -106,7 +106,7 @@ class _$CompleteAccountStateCopyWithImpl<$Res,
       grade: null == grade
           ? _value.grade
           : grade // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       firstName: null == firstName
           ? _value.firstName
           : firstName // ignore: cast_nullable_to_non_nullable
@@ -140,7 +140,7 @@ abstract class _$$_InitialCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int grade,
+      {String grade,
       String firstName,
       String lastName,
       String parentPhone,
@@ -169,7 +169,7 @@ class __$$_InitialCopyWithImpl<$Res>
       grade: null == grade
           ? _value.grade
           : grade // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       firstName: null == firstName
           ? _value.firstName
           : firstName // ignore: cast_nullable_to_non_nullable
@@ -198,7 +198,7 @@ class __$$_InitialCopyWithImpl<$Res>
 
 class _$_Initial implements _Initial {
   const _$_Initial(
-      {this.grade = -1,
+      {this.grade = "First Grade",
       this.firstName = "",
       this.lastName = "",
       this.parentPhone = "",
@@ -207,7 +207,7 @@ class _$_Initial implements _Initial {
 
   @override
   @JsonKey()
-  final int grade;
+  final String grade;
   @override
   @JsonKey()
   final String firstName;
@@ -260,7 +260,7 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(int grade, String firstName, String lastName,
+    required TResult Function(String grade, String firstName, String lastName,
             String parentPhone, bool isSuccess, bool isLoading)
         initial,
   }) {
@@ -271,7 +271,7 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(int grade, String firstName, String lastName,
+    TResult? Function(String grade, String firstName, String lastName,
             String parentPhone, bool isSuccess, bool isLoading)?
         initial,
   }) {
@@ -282,7 +282,7 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(int grade, String firstName, String lastName,
+    TResult Function(String grade, String firstName, String lastName,
             String parentPhone, bool isSuccess, bool isLoading)?
         initial,
     required TResult orElse(),
@@ -325,7 +325,7 @@ class _$_Initial implements _Initial {
 
 abstract class _Initial implements CompleteAccountState {
   const factory _Initial(
-      {final int grade,
+      {final String grade,
       final String firstName,
       final String lastName,
       final String parentPhone,
@@ -333,7 +333,7 @@ abstract class _Initial implements CompleteAccountState {
       final bool isLoading}) = _$_Initial;
 
   @override
-  int get grade;
+  String get grade;
   @override
   String get firstName;
   @override

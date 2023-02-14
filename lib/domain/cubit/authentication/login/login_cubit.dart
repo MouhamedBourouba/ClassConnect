@@ -12,15 +12,11 @@ part 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(const LoginState.initial()) {
-    _init();
+    userRepository = getIt();
   }
 
   late UserRepository userRepository;
   final errorLogger = getIt<ErrorLogger>();
-
-  void _init() {
-    userRepository = getIt();
-  }
 
   void onEmailChanged(String value) => emit(state.copyWith(email: value));
 
@@ -29,11 +25,12 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> login() async {
     await checkInternetConnection();
     emit(state.copyWith(isLoading: true));
-    userRepository.loginUser(state.email, state.password).then(
-      (value) => emit(state.copyWith(isSuccess: true, isLoading: false, user: value)),
-      onError: (error) {
-        errorLogger.showError(error.toString());
+    final loginResult = await userRepository.loginUser(state.email, state.password);
+    loginResult.when(
+      (user) => emit(state.copyWith(isSuccess: true, user: user, isLoading: false)),
+      (error) {
         emit(state.copyWith(isLoading: false));
+        errorLogger.showError(error.errorMessage);
       },
     );
   }

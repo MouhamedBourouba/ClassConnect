@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,10 +32,7 @@ class LoginScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  if (state.user?.firstName != null &&
-                      state.user?.lastName != null &&
-                      state.user?.grade != null &&
-                      state.user?.parentPhone != null) {
+                  if (state.user?.isAccountCompleted() == true) {
                     return const HomePage();
                   } else {
                     return const CompleteAccountPage();

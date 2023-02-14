@@ -18,7 +18,7 @@ class App extends StatelessWidget {
     final user = getIt<UserRepository>().getCurrentUser();
     if (user == null) {
       return const LoginScreen();
-    } else if (user.firstName != null || user.lastName != null || user.parentPhone != null || user.grade != null) {
+    } else if (user.firstName == null || user.lastName == null || user.parentPhone == null || user.grade == null) {
       return const CompleteAccountPage();
     } else {
       return const HomePage();
@@ -29,7 +29,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: firstScreen(),
+      home: LoginScreen(),
       theme: ThemeData(
         colorScheme: const ColorScheme.light(
           secondary: Color.fromRGBO(63, 114, 175, 1),

@@ -23,7 +23,7 @@ class UserAdapter extends TypeAdapter<User> {
       email: fields[3] as String,
       firstName: fields[4] as String?,
       lastName: fields[5] as String?,
-      grade: fields[6] as int?,
+      grade: fields[6] as String?,
       parentPhone: fields[7] as String?,
       classes: (fields[8] as List?)?.cast<String>(),
       teachingClasses: (fields[9] as List?)?.cast<String>(),

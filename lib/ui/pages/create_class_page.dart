@@ -12,7 +12,22 @@ class CreateClassPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CreateClassCubit(),
-      child: const CreateClassBody(),
+      child: BlocListener<CreateClassCubit, CreateClassState>(
+        listener: (BuildContext context, state) {
+          if (state.isLoading) {
+            showLoading(context);
+          } else if (!state.isLoading) {
+            hideLoading(context);
+          }
+          if (state.isSuccess) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (ctx) => const HomePage()),
+            );
+          }
+        },
+        child: const CreateClassBody(),
+      ),
     );
   }
 }

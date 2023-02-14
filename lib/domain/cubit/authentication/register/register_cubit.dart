@@ -24,15 +24,15 @@ class RegisterCubit extends Cubit<RegisterState> {
   void onConformPasswordChanged(String value) => emit(state.copyWith(conformPassword: value));
 
   Future<void> register() async {
-    if (await isNotOnline()) {
-      errorLogger.showNoInternetError();
-      return;
-    }
+    await checkInternetConnection();
     emit(state.copyWith(isLoading: true));
-    await userRepository.registerUser(state.username, state.email, state.password).then(
-          (value) => emit(state.copyWith(isSuccess: true, isLoading: false)),
-          onError: errorLogger.showError,
-        );
-    emit(state.copyWith(isLoading: false));
+    final registeringTask = await userRepository.registerUser(state.username, state.email, state.password);
+    registeringTask.when(
+      (success) => emit(state.copyWith(isLoading: false, isSuccess: true)),
+      (error) {
+        errorLogger.showError(error.errorMessage);
+        emit(state.copyWith(isLoading: false));
+      },
+    );
   }
 }

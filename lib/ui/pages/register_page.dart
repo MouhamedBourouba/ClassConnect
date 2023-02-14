@@ -21,17 +21,16 @@ class RegisterScreen extends StatelessWidget {
       create: (context) => RegisterCubit(),
       child: BlocListener<RegisterCubit, RegisterState>(
         listener: (context, state) {
-          if (state.isSuccess) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (ctx) => const CompleteAccountPage()),
-              (route) => false,
-            );
-          }
           if (state.isLoading) {
             showLoading(context);
           } else {
             hideLoading(context);
+          }
+          if (state.isSuccess) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (ctx) => const CompleteAccountPage()),
+            );
           }
         },
         child: AuthenticationScaffold(

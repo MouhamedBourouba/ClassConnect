@@ -18,19 +18,27 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$HomeState {
   User? get currentUser => throw _privateConstructorUsedError;
   String get joinClassId => throw _privateConstructorUsedError;
+  bool get isLoading => throw _privateConstructorUsedError;
+  bool get isJoiningClassTaskSuccess => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User? currentUser, String joinClassId) initial,
+    required TResult Function(User? currentUser, String joinClassId,
+            bool isLoading, bool isJoiningClassTaskSuccess)
+        initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(User? currentUser, String joinClassId)? initial,
+    TResult? Function(User? currentUser, String joinClassId, bool isLoading,
+            bool isJoiningClassTaskSuccess)?
+        initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User? currentUser, String joinClassId)? initial,
+    TResult Function(User? currentUser, String joinClassId, bool isLoading,
+            bool isJoiningClassTaskSuccess)?
+        initial,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -61,7 +69,11 @@ abstract class $HomeStateCopyWith<$Res> {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) then) =
       _$HomeStateCopyWithImpl<$Res, HomeState>;
   @useResult
-  $Res call({User? currentUser, String joinClassId});
+  $Res call(
+      {User? currentUser,
+      String joinClassId,
+      bool isLoading,
+      bool isJoiningClassTaskSuccess});
 }
 
 /// @nodoc
@@ -79,6 +91,8 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
   $Res call({
     Object? currentUser = freezed,
     Object? joinClassId = null,
+    Object? isLoading = null,
+    Object? isJoiningClassTaskSuccess = null,
   }) {
     return _then(_value.copyWith(
       currentUser: freezed == currentUser
@@ -89,6 +103,14 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
           ? _value.joinClassId
           : joinClassId // ignore: cast_nullable_to_non_nullable
               as String,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isJoiningClassTaskSuccess: null == isJoiningClassTaskSuccess
+          ? _value.isJoiningClassTaskSuccess
+          : isJoiningClassTaskSuccess // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -100,7 +122,11 @@ abstract class _$$_InitialCopyWith<$Res> implements $HomeStateCopyWith<$Res> {
       __$$_InitialCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({User? currentUser, String joinClassId});
+  $Res call(
+      {User? currentUser,
+      String joinClassId,
+      bool isLoading,
+      bool isJoiningClassTaskSuccess});
 }
 
 /// @nodoc
@@ -115,6 +141,8 @@ class __$$_InitialCopyWithImpl<$Res>
   $Res call({
     Object? currentUser = freezed,
     Object? joinClassId = null,
+    Object? isLoading = null,
+    Object? isJoiningClassTaskSuccess = null,
   }) {
     return _then(_$_Initial(
       currentUser: freezed == currentUser
@@ -125,6 +153,14 @@ class __$$_InitialCopyWithImpl<$Res>
           ? _value.joinClassId
           : joinClassId // ignore: cast_nullable_to_non_nullable
               as String,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isJoiningClassTaskSuccess: null == isJoiningClassTaskSuccess
+          ? _value.isJoiningClassTaskSuccess
+          : isJoiningClassTaskSuccess // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -132,17 +168,27 @@ class __$$_InitialCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Initial implements _Initial {
-  const _$_Initial({this.currentUser, this.joinClassId = ""});
+  const _$_Initial(
+      {this.currentUser,
+      this.joinClassId = "",
+      this.isLoading = false,
+      this.isJoiningClassTaskSuccess = false});
 
   @override
   final User? currentUser;
   @override
   @JsonKey()
   final String joinClassId;
+  @override
+  @JsonKey()
+  final bool isLoading;
+  @override
+  @JsonKey()
+  final bool isJoiningClassTaskSuccess;
 
   @override
   String toString() {
-    return 'HomeState.initial(currentUser: $currentUser, joinClassId: $joinClassId)';
+    return 'HomeState.initial(currentUser: $currentUser, joinClassId: $joinClassId, isLoading: $isLoading, isJoiningClassTaskSuccess: $isJoiningClassTaskSuccess)';
   }
 
   @override
@@ -153,11 +199,17 @@ class _$_Initial implements _Initial {
             (identical(other.currentUser, currentUser) ||
                 other.currentUser == currentUser) &&
             (identical(other.joinClassId, joinClassId) ||
-                other.joinClassId == joinClassId));
+                other.joinClassId == joinClassId) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.isJoiningClassTaskSuccess,
+                    isJoiningClassTaskSuccess) ||
+                other.isJoiningClassTaskSuccess == isJoiningClassTaskSuccess));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentUser, joinClassId);
+  int get hashCode => Object.hash(runtimeType, currentUser, joinClassId,
+      isLoading, isJoiningClassTaskSuccess);
 
   @JsonKey(ignore: true)
   @override
@@ -168,27 +220,36 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User? currentUser, String joinClassId) initial,
+    required TResult Function(User? currentUser, String joinClassId,
+            bool isLoading, bool isJoiningClassTaskSuccess)
+        initial,
   }) {
-    return initial(currentUser, joinClassId);
+    return initial(
+        currentUser, joinClassId, isLoading, isJoiningClassTaskSuccess);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(User? currentUser, String joinClassId)? initial,
+    TResult? Function(User? currentUser, String joinClassId, bool isLoading,
+            bool isJoiningClassTaskSuccess)?
+        initial,
   }) {
-    return initial?.call(currentUser, joinClassId);
+    return initial?.call(
+        currentUser, joinClassId, isLoading, isJoiningClassTaskSuccess);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User? currentUser, String joinClassId)? initial,
+    TResult Function(User? currentUser, String joinClassId, bool isLoading,
+            bool isJoiningClassTaskSuccess)?
+        initial,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(currentUser, joinClassId);
+      return initial(
+          currentUser, joinClassId, isLoading, isJoiningClassTaskSuccess);
     }
     return orElse();
   }
@@ -223,13 +284,20 @@ class _$_Initial implements _Initial {
 }
 
 abstract class _Initial implements HomeState {
-  const factory _Initial({final User? currentUser, final String joinClassId}) =
-      _$_Initial;
+  const factory _Initial(
+      {final User? currentUser,
+      final String joinClassId,
+      final bool isLoading,
+      final bool isJoiningClassTaskSuccess}) = _$_Initial;
 
   @override
   User? get currentUser;
   @override
   String get joinClassId;
+  @override
+  bool get isLoading;
+  @override
+  bool get isJoiningClassTaskSuccess;
   @override
   @JsonKey(ignore: true)
   _$$_InitialCopyWith<_$_Initial> get copyWith =>

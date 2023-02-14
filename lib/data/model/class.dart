@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
+
 part 'class.g.dart';
+
 @HiveType(typeId: 3)
 class Class {
   @HiveField(0)

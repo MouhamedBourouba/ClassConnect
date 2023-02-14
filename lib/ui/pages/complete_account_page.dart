@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:school_app/domain/cubit/authentication/complete_account/complete_account_cubit.dart';
+import 'package:school_app/ui/pages/home_page.dart';
 import 'package:school_app/ui/widgets/authentication_scaffold.dart';
 import 'package:school_app/ui/widgets/button.dart';
+import 'package:school_app/ui/widgets/loading.dart';
 
 class CompleteAccountPage extends StatelessWidget {
   const CompleteAccountPage({super.key});
@@ -28,31 +30,53 @@ class CompleteAccountPage extends StatelessWidget {
         );
 
     return SafeArea(
-      child: AuthenticationScaffold(
-        topImageSize: 150,
-        body: Center(
-          child: SingleChildScrollView(
-            reverse: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                welcomeText(),
-                const Divider(
-                  color: Colors.black,
+      child: BlocProvider(
+        create: (context) => CompleteAccountCubit(),
+        child: BlocListener<CompleteAccountCubit, CompleteAccountState>(
+          listener: (context, state) {
+            if (state.isLoading) {
+              showLoading(context);
+            } else {
+              hideLoading(context);
+            }
+            if (state.isSuccess) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const HomePage();
+                  },
                 ),
-                Form(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  child: Column(
-                    children: const [
-                      FullNameTextField(),
-                      GradeDropDown(),
-                      PhoneNumberTextField(),
-                    ],
-                  ),
+              );
+            }
+          },
+          child: AuthenticationScaffold(
+            topImageSize: 150,
+            body: Center(
+              child: SingleChildScrollView(
+                reverse: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    welcomeText(),
+                    const Divider(
+                      color: Colors.black,
+                    ),
+                    Form(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      child: Column(
+                        children: const [
+                          FullNameTextField(),
+                          GradeDropDown(),
+                          PhoneNumberTextField(),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const CompleteAccountButton(),
+                  ],
                 ),
-                // const MDivider(),
-                const SizedBox(height: 8),
-              ],
+              ),
             ),
           ),
         ),
@@ -67,11 +91,12 @@ class CompleteAccountButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final completeAccountCubit = context.watch<CompleteAccountCubit>();
-
-    final canSave = completeAccountCubit.state.firstName.isNotEmpty &&
-        completeAccountCubit.state.lastName.isNotEmpty &&
-        completeAccountCubit.state.grade != -1 &&
-        completeAccountCubit.state.parentPhone.length == 10;
+    final phoneNumber = completeAccountCubit.state.parentPhone;
+    final bool phoneNUmberTrue = (phoneNumber.length > 8 && phoneNumber.length < 12);
+    final canSave = completeAccountCubit.state.grade != "" &&
+        phoneNUmberTrue &&
+        completeAccountCubit.state.firstName.isNotEmpty &&
+        completeAccountCubit.state.lastName.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: MButton(
@@ -107,7 +132,13 @@ class GradeDropDown extends StatelessWidget {
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
       child: DropDownTextField(
         onChanged: (value) {
-          context.read<CompleteAccountCubit>().onGradeChange(int.tryParse(value.toString()) ?? -1);
+          if (value == "") {
+            context.read<CompleteAccountCubit>().onGradeChange("");
+            return;
+          } else {
+            value as DropDownValueModel;
+            context.read<CompleteAccountCubit>().onGradeChange(value.name);
+          }
         },
         initialValue: "First Grade",
         textFieldDecoration: const InputDecoration(
@@ -137,7 +168,7 @@ class FullNameTextField extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              onChanged: context.read<CompleteAccountCubit>().onLastNameChange,
+              onChanged: context.read<CompleteAccountCubit>().onFirstNameChange,
               decoration: const InputDecoration(
                 label: Text("First Name"),
                 filled: true,
@@ -173,7 +204,8 @@ class PhoneNumberTextField extends StatelessWidget {
       padding: const EdgeInsets.only(right: 8.0, left: 16),
       child: InternationalPhoneNumberInput(
         validator: (value) {
-          if (value == null || value.isEmpty || value.length == 10) return null;
+          final phoneNumber = value?.replaceAll(" ", "");
+          if (value == null || value.isEmpty || (phoneNumber!.length > 8 && phoneNumber.length < 12)) return null;
           return "Invalid phone number";
         },
         inputDecoration: const InputDecoration(
@@ -185,7 +217,9 @@ class PhoneNumberTextField extends StatelessWidget {
         ),
         initialValue: PhoneNumber(isoCode: "DZ"),
         onInputChanged: (PhoneNumber value) {
-          context.read<CompleteAccountCubit>().onParentPhoneChange(value.phoneNumber.toString());
+          context
+              .read<CompleteAccountCubit>()
+              .onParentPhoneChange(value.phoneNumber?.split(value.dialCode!).last ?? "");
         },
       ),
     );

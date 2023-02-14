@@ -10,7 +10,7 @@ extension UserFromList on List<String> {
       parentPhone: this[5],
       firstName: this[6],
       lastName: this[7],
-      grade: int.tryParse(this[4]),
+      grade: this[4],
     );
   }
 }
@@ -23,7 +23,7 @@ extension UserFromMap on Map<String, dynamic> {
         email: this["email"].toString(),
         firstName: this["firstName"].toString(),
         lastName: this["lastName"].toString(),
-        grade: int.tryParse(this["grade"].toString()),
+        grade:this["grade"].toString(),
         parentPhone: this["parentPhone"].toString(),
         classes: this["classes"].toString().split(","),
         teachingClasses: this["teachingClasses"].toString().split(","),

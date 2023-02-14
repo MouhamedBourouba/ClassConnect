@@ -24,22 +24,23 @@ class CompleteAccountCubit extends Cubit<CompleteAccountState> {
 
   void onLastNameChange(String value) => emit(state.copyWith(lastName: value));
 
-  void onGradeChange(int value) => emit(state.copyWith(grade: value));
+  void onGradeChange(String value) => emit(state.copyWith(grade: value));
 
   Future<void> completeRegistration() async {
-    final updateTask = userRepository.updateUser(
+    await checkInternetConnection();
+    final updateTask = await userRepository.updateUser(
       firstName: state.firstName,
       lastName: state.lastName,
       grade: state.grade,
       parentPhone: state.parentPhone,
     );
-    await checkInternetConnection();
-    updateTask.then(
-      (value) {
-        emit(state.copyWith(isSuccess: true));
+    emit(state.copyWith(isLoading: true));
+    updateTask.when(
+      (success) => emit(state.copyWith(isLoading: false, isSuccess: true)),
+      (error) {
+        emit(state.copyWith(isLoading: false));
+        errorLogger.showError(error.errorMessage);
       },
-      onError: errorLogger.showError,
     );
-    emit(state.copyWith(isLoading: false));
   }
 }

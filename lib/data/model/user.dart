@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
+
 part 'user.g.dart';
+
 @HiveType(typeId: 2)
 class User {
   User({
@@ -12,7 +14,7 @@ class User {
     this.grade,
     this.parentPhone,
     this.classes,
-    this.teachingClasses
+    this.teachingClasses,
   });
 
   @HiveField(0)
@@ -28,7 +30,7 @@ class User {
   @HiveField(5)
   String? lastName;
   @HiveField(6)
-  int? grade;
+  String? grade;
   @HiveField(7)
   String? parentPhone;
   @HiveField(8)
@@ -44,7 +46,7 @@ class User {
 
   List<dynamic> toList() => [id, username, email, password, grade, parentPhone, firstName, lastName, classes];
 
-  Map<String, String> toMap() => {
+  Map<String, dynamic> toMap() => {
         "id": id,
         "username": username,
         "email": email,
@@ -56,4 +58,6 @@ class User {
         "teachingClasses": teachingClasses.toString(),
         "classes": classes.toString()
       };
+
+  bool isAccountCompleted() => firstName != "null" && grade != "null" && parentPhone != "null" && lastName != "null";
 }
