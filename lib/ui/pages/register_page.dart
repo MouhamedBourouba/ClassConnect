@@ -27,9 +27,10 @@ class RegisterScreen extends StatelessWidget {
             hideLoading(context);
           }
           if (state.isSuccess) {
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (ctx) => const CompleteAccountPage()),
+              (route) => false,
             );
           }
         },

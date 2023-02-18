@@ -40,13 +40,14 @@ class CompleteAccountPage extends StatelessWidget {
               hideLoading(context);
             }
             if (state.isSuccess) {
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
                   builder: (context) {
                     return const HomePage();
                   },
                 ),
+                (route) => false,
               );
             }
           },
@@ -92,7 +93,7 @@ class CompleteAccountButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final completeAccountCubit = context.watch<CompleteAccountCubit>();
     final phoneNumber = completeAccountCubit.state.parentPhone;
-    final bool phoneNUmberTrue = (phoneNumber.length > 8 && phoneNumber.length < 12);
+    final bool phoneNUmberTrue = phoneNumber.length > 8 && phoneNumber.length < 12;
     final canSave = completeAccountCubit.state.grade != "" &&
         phoneNUmberTrue &&
         completeAccountCubit.state.firstName.isNotEmpty &&

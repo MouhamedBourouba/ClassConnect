@@ -37,7 +37,7 @@ dev_dependencies:
   lint: ^2.0.1
   flutter_test:
     sdk: flutter
-
+#
 flutter_native_splash:
   color: "#ffffff"
   image: assets/images/logo.png
@@ -46,9 +46,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/logo_no_text.svg
-    - assets/images/top.svg
-    - assets/images/logo.png
-    - assets/images/calculate.png
-    - assets/images/blackboard.png
+    - assets/images/
 

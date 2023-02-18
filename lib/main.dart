@@ -28,8 +28,9 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: firstScreen(),
       theme: ThemeData(
         colorScheme: const ColorScheme.light(
           secondary: Color.fromRGBO(63, 114, 175, 1),

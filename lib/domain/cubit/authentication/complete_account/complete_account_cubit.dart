@@ -28,13 +28,13 @@ class CompleteAccountCubit extends Cubit<CompleteAccountState> {
 
   Future<void> completeRegistration() async {
     await checkInternetConnection();
+    emit(state.copyWith(isLoading: true));
     final updateTask = await userRepository.updateUser(
       firstName: state.firstName,
       lastName: state.lastName,
       grade: state.grade,
       parentPhone: state.parentPhone,
     );
-    emit(state.copyWith(isLoading: true));
     updateTask.when(
       (success) => emit(state.copyWith(isLoading: false, isSuccess: true)),
       (error) {

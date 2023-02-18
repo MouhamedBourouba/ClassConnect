@@ -16,51 +16,55 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$HomeState {
-  User? get currentUser => throw _privateConstructorUsedError;
-  String get joinClassId => throw _privateConstructorUsedError;
-  bool get isLoading => throw _privateConstructorUsedError;
-  bool get isJoiningClassTaskSuccess => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User? currentUser, String joinClassId,
-            bool isLoading, bool isJoiningClassTaskSuccess)
-        initial,
+    required TResult Function() loading,
+    required TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)
+        loaded,
+    required TResult Function(String errorMessage) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(User? currentUser, String joinClassId, bool isLoading,
-            bool isJoiningClassTaskSuccess)?
-        initial,
+    TResult? Function()? loading,
+    TResult? Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult? Function(String errorMessage)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User? currentUser, String joinClassId, bool isLoading,
-            bool isJoiningClassTaskSuccess)?
-        initial,
+    TResult Function()? loading,
+    TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult Function(String errorMessage)? error,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Loaded value) loaded,
+    required TResult Function(_Error value) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? loaded,
+    TResult? Function(_Error value)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Loaded value)? loaded,
+    TResult Function(_Error value)? error,
     required TResult orElse(),
   }) =>
-      throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $HomeStateCopyWith<HomeState> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -68,12 +72,6 @@ mixin _$HomeState {
 abstract class $HomeStateCopyWith<$Res> {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) then) =
       _$HomeStateCopyWithImpl<$Res, HomeState>;
-  @useResult
-  $Res call(
-      {User? currentUser,
-      String joinClassId,
-      bool isLoading,
-      bool isJoiningClassTaskSuccess});
 }
 
 /// @nodoc
@@ -85,171 +83,78 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? currentUser = freezed,
-    Object? joinClassId = null,
-    Object? isLoading = null,
-    Object? isJoiningClassTaskSuccess = null,
-  }) {
-    return _then(_value.copyWith(
-      currentUser: freezed == currentUser
-          ? _value.currentUser
-          : currentUser // ignore: cast_nullable_to_non_nullable
-              as User?,
-      joinClassId: null == joinClassId
-          ? _value.joinClassId
-          : joinClassId // ignore: cast_nullable_to_non_nullable
-              as String,
-      isLoading: null == isLoading
-          ? _value.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isJoiningClassTaskSuccess: null == isJoiningClassTaskSuccess
-          ? _value.isJoiningClassTaskSuccess
-          : isJoiningClassTaskSuccess // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
-  }
 }
 
 /// @nodoc
-abstract class _$$_InitialCopyWith<$Res> implements $HomeStateCopyWith<$Res> {
-  factory _$$_InitialCopyWith(
-          _$_Initial value, $Res Function(_$_Initial) then) =
-      __$$_InitialCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {User? currentUser,
-      String joinClassId,
-      bool isLoading,
-      bool isJoiningClassTaskSuccess});
+abstract class _$$_LoadingCopyWith<$Res> {
+  factory _$$_LoadingCopyWith(
+          _$_Loading value, $Res Function(_$_Loading) then) =
+      __$$_LoadingCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$_InitialCopyWithImpl<$Res>
-    extends _$HomeStateCopyWithImpl<$Res, _$_Initial>
-    implements _$$_InitialCopyWith<$Res> {
-  __$$_InitialCopyWithImpl(_$_Initial _value, $Res Function(_$_Initial) _then)
+class __$$_LoadingCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$_Loading>
+    implements _$$_LoadingCopyWith<$Res> {
+  __$$_LoadingCopyWithImpl(_$_Loading _value, $Res Function(_$_Loading) _then)
       : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? currentUser = freezed,
-    Object? joinClassId = null,
-    Object? isLoading = null,
-    Object? isJoiningClassTaskSuccess = null,
-  }) {
-    return _then(_$_Initial(
-      currentUser: freezed == currentUser
-          ? _value.currentUser
-          : currentUser // ignore: cast_nullable_to_non_nullable
-              as User?,
-      joinClassId: null == joinClassId
-          ? _value.joinClassId
-          : joinClassId // ignore: cast_nullable_to_non_nullable
-              as String,
-      isLoading: null == isLoading
-          ? _value.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isJoiningClassTaskSuccess: null == isJoiningClassTaskSuccess
-          ? _value.isJoiningClassTaskSuccess
-          : isJoiningClassTaskSuccess // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$_Initial implements _Initial {
-  const _$_Initial(
-      {this.currentUser,
-      this.joinClassId = "",
-      this.isLoading = false,
-      this.isJoiningClassTaskSuccess = false});
-
-  @override
-  final User? currentUser;
-  @override
-  @JsonKey()
-  final String joinClassId;
-  @override
-  @JsonKey()
-  final bool isLoading;
-  @override
-  @JsonKey()
-  final bool isJoiningClassTaskSuccess;
+class _$_Loading implements _Loading {
+  const _$_Loading();
 
   @override
   String toString() {
-    return 'HomeState.initial(currentUser: $currentUser, joinClassId: $joinClassId, isLoading: $isLoading, isJoiningClassTaskSuccess: $isJoiningClassTaskSuccess)';
+    return 'HomeState.loading()';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_Initial &&
-            (identical(other.currentUser, currentUser) ||
-                other.currentUser == currentUser) &&
-            (identical(other.joinClassId, joinClassId) ||
-                other.joinClassId == joinClassId) &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
-            (identical(other.isJoiningClassTaskSuccess,
-                    isJoiningClassTaskSuccess) ||
-                other.isJoiningClassTaskSuccess == isJoiningClassTaskSuccess));
+        (other.runtimeType == runtimeType && other is _$_Loading);
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentUser, joinClassId,
-      isLoading, isJoiningClassTaskSuccess);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$_InitialCopyWith<_$_Initial> get copyWith =>
-      __$$_InitialCopyWithImpl<_$_Initial>(this, _$identity);
+  int get hashCode => runtimeType.hashCode;
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(User? currentUser, String joinClassId,
-            bool isLoading, bool isJoiningClassTaskSuccess)
-        initial,
+    required TResult Function() loading,
+    required TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)
+        loaded,
+    required TResult Function(String errorMessage) error,
   }) {
-    return initial(
-        currentUser, joinClassId, isLoading, isJoiningClassTaskSuccess);
+    return loading();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(User? currentUser, String joinClassId, bool isLoading,
-            bool isJoiningClassTaskSuccess)?
-        initial,
+    TResult? Function()? loading,
+    TResult? Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult? Function(String errorMessage)? error,
   }) {
-    return initial?.call(
-        currentUser, joinClassId, isLoading, isJoiningClassTaskSuccess);
+    return loading?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(User? currentUser, String joinClassId, bool isLoading,
-            bool isJoiningClassTaskSuccess)?
-        initial,
+    TResult Function()? loading,
+    TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult Function(String errorMessage)? error,
     required TResult orElse(),
   }) {
-    if (initial != null) {
-      return initial(
-          currentUser, joinClassId, isLoading, isJoiningClassTaskSuccess);
+    if (loading != null) {
+      return loading();
     }
     return orElse();
   }
@@ -257,49 +162,370 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Loaded value) loaded,
+    required TResult Function(_Error value) error,
   }) {
-    return initial(this);
+    return loading(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? loaded,
+    TResult? Function(_Error value)? error,
   }) {
-    return initial?.call(this);
+    return loading?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Loaded value)? loaded,
+    TResult Function(_Error value)? error,
     required TResult orElse(),
   }) {
-    if (initial != null) {
-      return initial(this);
+    if (loading != null) {
+      return loading(this);
     }
     return orElse();
   }
 }
 
-abstract class _Initial implements HomeState {
-  const factory _Initial(
-      {final User? currentUser,
-      final String joinClassId,
-      final bool isLoading,
-      final bool isJoiningClassTaskSuccess}) = _$_Initial;
+abstract class _Loading implements HomeState {
+  const factory _Loading() = _$_Loading;
+}
+
+/// @nodoc
+abstract class _$$_LoadedCopyWith<$Res> {
+  factory _$$_LoadedCopyWith(_$_Loaded value, $Res Function(_$_Loaded) then) =
+      __$$_LoadedCopyWithImpl<$Res>;
+  @useResult
+  $Res call({User currentUser, List<Class> classes, List<User> teachers});
+}
+
+/// @nodoc
+class __$$_LoadedCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$_Loaded>
+    implements _$$_LoadedCopyWith<$Res> {
+  __$$_LoadedCopyWithImpl(_$_Loaded _value, $Res Function(_$_Loaded) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? currentUser = null,
+    Object? classes = null,
+    Object? teachers = null,
+  }) {
+    return _then(_$_Loaded(
+      currentUser: null == currentUser
+          ? _value.currentUser
+          : currentUser // ignore: cast_nullable_to_non_nullable
+              as User,
+      classes: null == classes
+          ? _value._classes
+          : classes // ignore: cast_nullable_to_non_nullable
+              as List<Class>,
+      teachers: null == teachers
+          ? _value._teachers
+          : teachers // ignore: cast_nullable_to_non_nullable
+              as List<User>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_Loaded implements _Loaded {
+  const _$_Loaded(
+      {required this.currentUser,
+      final List<Class> classes = const [],
+      final List<User> teachers = const []})
+      : _classes = classes,
+        _teachers = teachers;
 
   @override
-  User? get currentUser;
+  final User currentUser;
+  final List<Class> _classes;
   @override
-  String get joinClassId;
+  @JsonKey()
+  List<Class> get classes {
+    if (_classes is EqualUnmodifiableListView) return _classes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_classes);
+  }
+
+  final List<User> _teachers;
   @override
-  bool get isLoading;
+  @JsonKey()
+  List<User> get teachers {
+    if (_teachers is EqualUnmodifiableListView) return _teachers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_teachers);
+  }
+
   @override
-  bool get isJoiningClassTaskSuccess;
+  String toString() {
+    return 'HomeState.loaded(currentUser: $currentUser, classes: $classes, teachers: $teachers)';
+  }
+
   @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_Loaded &&
+            (identical(other.currentUser, currentUser) ||
+                other.currentUser == currentUser) &&
+            const DeepCollectionEquality().equals(other._classes, _classes) &&
+            const DeepCollectionEquality().equals(other._teachers, _teachers));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      currentUser,
+      const DeepCollectionEquality().hash(_classes),
+      const DeepCollectionEquality().hash(_teachers));
+
   @JsonKey(ignore: true)
-  _$$_InitialCopyWith<_$_Initial> get copyWith =>
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_LoadedCopyWith<_$_Loaded> get copyWith =>
+      __$$_LoadedCopyWithImpl<_$_Loaded>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loading,
+    required TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)
+        loaded,
+    required TResult Function(String errorMessage) error,
+  }) {
+    return loaded(currentUser, classes, teachers);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loading,
+    TResult? Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult? Function(String errorMessage)? error,
+  }) {
+    return loaded?.call(currentUser, classes, teachers);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loading,
+    TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult Function(String errorMessage)? error,
+    required TResult orElse(),
+  }) {
+    if (loaded != null) {
+      return loaded(currentUser, classes, teachers);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Loaded value) loaded,
+    required TResult Function(_Error value) error,
+  }) {
+    return loaded(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? loaded,
+    TResult? Function(_Error value)? error,
+  }) {
+    return loaded?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Loaded value)? loaded,
+    TResult Function(_Error value)? error,
+    required TResult orElse(),
+  }) {
+    if (loaded != null) {
+      return loaded(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Loaded implements HomeState {
+  const factory _Loaded(
+      {required final User currentUser,
+      final List<Class> classes,
+      final List<User> teachers}) = _$_Loaded;
+
+  User get currentUser;
+  List<Class> get classes;
+  List<User> get teachers;
+  @JsonKey(ignore: true)
+  _$$_LoadedCopyWith<_$_Loaded> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$_ErrorCopyWith<$Res> {
+  factory _$$_ErrorCopyWith(_$_Error value, $Res Function(_$_Error) then) =
+      __$$_ErrorCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String errorMessage});
+}
+
+/// @nodoc
+class __$$_ErrorCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$_Error>
+    implements _$$_ErrorCopyWith<$Res> {
+  __$$_ErrorCopyWithImpl(_$_Error _value, $Res Function(_$_Error) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? errorMessage = null,
+  }) {
+    return _then(_$_Error(
+      errorMessage: null == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_Error implements _Error {
+  const _$_Error({this.errorMessage = ""});
+
+  @override
+  @JsonKey()
+  final String errorMessage;
+
+  @override
+  String toString() {
+    return 'HomeState.error(errorMessage: $errorMessage)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_Error &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, errorMessage);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_ErrorCopyWith<_$_Error> get copyWith =>
+      __$$_ErrorCopyWithImpl<_$_Error>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loading,
+    required TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)
+        loaded,
+    required TResult Function(String errorMessage) error,
+  }) {
+    return error(errorMessage);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loading,
+    TResult? Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult? Function(String errorMessage)? error,
+  }) {
+    return error?.call(errorMessage);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loading,
+    TResult Function(
+            User currentUser, List<Class> classes, List<User> teachers)?
+        loaded,
+    TResult Function(String errorMessage)? error,
+    required TResult orElse(),
+  }) {
+    if (error != null) {
+      return error(errorMessage);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Loaded value) loaded,
+    required TResult Function(_Error value) error,
+  }) {
+    return error(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? loaded,
+    TResult? Function(_Error value)? error,
+  }) {
+    return error?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Loaded value)? loaded,
+    TResult Function(_Error value)? error,
+    required TResult orElse(),
+  }) {
+    if (error != null) {
+      return error(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Error implements HomeState {
+  const factory _Error({final String errorMessage}) = _$_Error;
+
+  String get errorMessage;
+  @JsonKey(ignore: true)
+  _$$_ErrorCopyWith<_$_Error> get copyWith =>
       throw _privateConstructorUsedError;
 }

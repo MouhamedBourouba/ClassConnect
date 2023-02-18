@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 import 'package:multiple_result/multiple_result.dart';
 import 'package:school_app/data/data_source/cloud_data_source.dart';
@@ -57,16 +56,14 @@ class UserRepositoryImp extends UserRepository {
   @override
   Future<Result<List<User>, MException>> saveUsersToLocalDataSource() async {
     try {
-      final allUsersMap = await cloudDataSource.getAllRows(MTable.usersTable);
+      final allUsersMap = await cloudDataSource.getAllRows(MTable.usersTable).timeout(7.seconds());
       final List<User> allUsers = [];
       for (final userMap in allUsersMap!) {
         allUsers.add(userMap.toUser());
         await localDataSource.addUserToUsersBox(userMap.toUser());
       }
       return Result.success(allUsers);
-    } on SocketException {
-      return Result.error(MException.noInternetConnection());
-    } on Exception {
+    } catch (e) {
       return Result.error(MException.unknown());
     }
   }
@@ -78,13 +75,14 @@ class UserRepositoryImp extends UserRepository {
   Future<Result<Unit, MException>> registerUser(String username, String email, String password) async {
     try {
       final user = User(id: uuid.v1(), username: username, password: hashingService.hash(password), email: email);
-      final allUsers = await getAllUsers(DataSource.remote).timeout(const Duration(seconds: 10));
+      final allUsers = await getAllUsers(DataSource.remote).timeout(7.seconds());
       if (allUsers.isError()) return Error(allUsers.tryGetError()!);
-      checkUserDetails(username, email, allUsers.tryGetSuccess()!);
-      await cloudDataSource.appendRow(user.toMap(), MTable.usersTable).timeout(const Duration(seconds: 10));
+      final isUserValidResult = checkUserDetails(username, email, allUsers.tryGetSuccess()!);
+      if(isUserValidResult.isError()) return Result.error(isUserValidResult.tryGetError()!);
+      await cloudDataSource.appendRow(user.toMap(), MTable.usersTable).timeout(7.seconds());
       await localDataSource.putDataToAppBox("current_user", user);
       return const Success(unit);
-    } catch(e) {
+    } catch (e) {
       return Result.error(MException.unknown());
     }
   }
@@ -107,8 +105,7 @@ class UserRepositoryImp extends UserRepository {
       if (!isPasswordCorrect) return Result.error(MException("Wrong password !"));
       await localDataSource.putDataToAppBox("current_user", user);
       return Result.success(user);
-    } catch(e) {
-      debugPrint(e.toString());
+    } catch (e) {
       return Result.error(MException.unknown());
     }
   }
@@ -125,7 +122,7 @@ class UserRepositoryImp extends UserRepository {
       return Result.success(localDataSource.getUsers());
     } else {
       try {
-        final usersJson = await cloudDataSource.getAllRows(MTable.usersTable).timeout(const Duration(seconds: 10));
+        final usersJson = await cloudDataSource.getAllRows(MTable.usersTable).timeout(10.seconds());
         if (usersJson == null || usersJson.isEmpty) return Result.error(MException.unknown());
         final List<User> users = [];
         for (final userJson in usersJson) {
@@ -162,6 +159,7 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "username",
         ),
       );
+      localDataSource.updateCurrentUser(username: username);
     }
     if (firstName != null) {
       tasksList.add(
@@ -172,6 +170,7 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "firstName",
         ),
       );
+      localDataSource.updateCurrentUser(firstName: firstName);
     }
     if (lastName != null) {
       tasksList.add(
@@ -182,6 +181,7 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "lastName",
         ),
       );
+      localDataSource.updateCurrentUser(lastName: lastName);
     }
     if (email != null) {
       tasksList.add(
@@ -192,6 +192,7 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "email",
         ),
       );
+      localDataSource.updateCurrentUser(email: email);
     }
     if (grade != null) {
       tasksList.add(
@@ -202,6 +203,7 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "grade",
         ),
       );
+      localDataSource.updateCurrentUser(grade: grade);
     }
     if (parentPhone != null) {
       tasksList.add(
@@ -212,6 +214,7 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "parentPhone",
         ),
       );
+      localDataSource.updateCurrentUser(parentPhone: parentPhone);
     }
     if (classes != null) {
       tasksList.add(
@@ -222,6 +225,7 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "classes",
         ),
       );
+      localDataSource.updateCurrentUser(classes: classes);
     }
     if (teachingClasses != null) {
       tasksList.add(
@@ -232,13 +236,14 @@ class UserRepositoryImp extends UserRepository {
           columnKey: "teachingClasses",
         ),
       );
+      localDataSource.updateCurrentUser(teachingClasses: teachingClasses);
     }
     try {
       for (final task in tasksList) {
-        await task;
+        await task.timeout(7.seconds());
       }
       return Result.success(unit);
-    } on Exception {
+    } catch (e) {
       return Result.error(MException.unknown());
     }
   }

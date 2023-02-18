@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
 import 'package:school_app/data/model/class.dart';
@@ -15,7 +16,7 @@ abstract class LocalDataSource {
 
   Future<void> addClass(Class class_);
 
-  List<Class> getClasses();
+  ValueListenable<Box<Class>> getClassesValueListener();
 
   Future<void> updateCurrentUser({
     String username,
@@ -27,9 +28,11 @@ abstract class LocalDataSource {
     List<String> classes,
     List<String> teachingClasses,
   });
+
+  List<Class> getClasses();
 }
 
-@LazySingleton(as: LocalDataSource)
+@Singleton(as: LocalDataSource)
 class HiveLocalDataBase implements LocalDataSource {
   late Box appBox;
   late Box<User> usersBox;
@@ -61,7 +64,7 @@ class HiveLocalDataBase implements LocalDataSource {
   Future<void> addClass(Class class_) => classesBox.add(class_);
 
   @override
-  List<Class> getClasses() => classesBox.toMap().values.toList();
+  List<Class> getClasses() => classesBox.values.toList();
 
   @override
   Future<void> updateCurrentUser({
@@ -86,4 +89,7 @@ class HiveLocalDataBase implements LocalDataSource {
       ..teachingClasses = teachingClasses ?? currentUser.teachingClasses;
     return appBox.put("current_user", currentUser);
   }
+
+  @override
+  ValueListenable<Box<Class>> getClassesValueListener() => classesBox.listenable();
 }

@@ -166,7 +166,7 @@ class __$$_InitialCopyWithImpl<$Res>
 class _$_Initial implements _Initial {
   const _$_Initial(
       {this.className = "",
-      this.classSubject = "",
+      this.classSubject = "match",
       this.isLoading = false,
       this.isSuccess = false});
 

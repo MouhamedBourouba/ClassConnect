@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_app/data/model/class.dart';
+import 'package:school_app/domain/cubit/home/join_class/join_class_cubit.dart';
 import 'package:school_app/domain/cubit/home/main_page/home_cubit.dart';
 import 'package:school_app/domain/utils/extension.dart';
 import 'package:school_app/ui/pages/create_class_page.dart';
-import 'package:school_app/ui/widgets/outlined_text_field.dart';
+import 'package:school_app/ui/widgets/join_class_dialog.dart';
+
+import '../../data/model/user.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,8 +18,24 @@ class HomePage extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => HomeCubit(),
-      child: SafeArea(
-        child: HomeBody(theme: theme),
+      child: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          return state.when(
+            loading: () => const ColoredBox(
+              color: Colors.white,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            loaded: (user, classes, teachers) => HomeBody(
+              currentUser: user,
+              theme: theme,
+              classes: classes,
+              teachers: teachers,
+            ),
+            error: (errorMessage) => Scaffold(body: Center(child: Text(errorMessage))),
+          );
+        },
       ),
     );
   }
@@ -25,14 +45,18 @@ class HomeBody extends StatelessWidget {
   const HomeBody({
     super.key,
     required this.theme,
+    required this.currentUser,
+    required this.classes,
+    required this.teachers,
   });
 
   final ThemeData theme;
+  final User currentUser;
+  final List<Class> classes;
+  final List<User> teachers;
 
   @override
   Widget build(BuildContext context) {
-    final homeCubit = context.watch<HomeCubit>();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Classes"),
@@ -41,7 +65,7 @@ class HomeBody extends StatelessWidget {
           CircleAvatar(
             backgroundColor: Colors.blueGrey,
             child: Text(
-              homeCubit.state.currentUser?.firstName.firstLatter() ?? "A",
+              currentUser.firstName.firstLatter(),
               style: theme.textTheme.headline6!.copyWith(color: Colors.white),
             ),
           ),
@@ -55,12 +79,32 @@ class HomeBody extends StatelessWidget {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(topRight: Radius.circular(16), topLeft: Radius.circular(16)),
             ),
-            builder: (ctx) => ClassesOptionsBottomSheet(homeCubit: homeCubit),
+            builder: (ctx) => const ClassesOptionsBottomSheet(),
           );
         },
         child: const Icon(Icons.add),
       ),
-      drawer: HomeDrawer(theme: theme),
+      drawer: HomeDrawer(theme: theme, currentUser: currentUser),
+      body: ListView.builder(
+        itemCount: classes.length,
+        itemBuilder: (context, index) {
+          final class_ = classes[index];
+          final teacher = teachers.where((user) => user.id == class_.creatorId).first;
+          return ListTile(
+            leading: CircleAvatar(
+              foregroundImage: AssetImage(class_.subject.getSubjectIconPath()),
+              backgroundColor: Colors.transparent,
+            ),
+            subtitle: Text("Teacher: ${teacher.username}"),
+            title: Text(class_.className),
+            trailing: Text(
+              "class code: ${class_.id}",
+              style: theme.textTheme.caption,
+            ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          );
+        },
+      ),
     );
   }
 }
@@ -69,9 +113,11 @@ class HomeDrawer extends StatelessWidget {
   const HomeDrawer({
     super.key,
     required this.theme,
+    required this.currentUser,
   });
 
   final ThemeData theme;
+  final User currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +136,7 @@ class HomeDrawer extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      "A",
+                      currentUser.firstName.firstLatter(),
                       style: theme.textTheme.headline6!.copyWith(color: Colors.white, fontSize: 30),
                     ),
                   ),
@@ -99,7 +145,7 @@ class HomeDrawer extends StatelessWidget {
                   width: 8,
                 ),
                 Text(
-                  "username",
+                  currentUser.username,
                   style: theme.textTheme.headline5,
                 ),
               ],
@@ -114,10 +160,7 @@ class HomeDrawer extends StatelessWidget {
 class ClassesOptionsBottomSheet extends StatelessWidget {
   const ClassesOptionsBottomSheet({
     super.key,
-    required this.homeCubit,
   });
-
-  final HomeCubit homeCubit;
 
   @override
   Widget build(BuildContext context) {
@@ -137,76 +180,17 @@ class ClassesOptionsBottomSheet extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              showDialog(context: context, builder: (context) => const JoinClassDialog());
+              showDialog(
+                context: context,
+                builder: (context) => BlocProvider(
+                  child: const JoinClassDialog(),
+                  create: (c) => JoinClassCubit(),
+                ),
+              );
             },
             child: const Text("Join class"),
           )
         ],
-      ),
-    );
-  }
-}
-
-class JoinClassDialog extends StatelessWidget {
-  const JoinClassDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final HomeCubit homeCubit = context.watch<HomeCubit>();
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width / 1.1,
-        height: 270,
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: -100,
-              child: Image.asset(
-                "assets/images/blackboard.png",
-                width: 160,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 76),
-                  Text(
-                    "Join Class",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    onChanged: homeCubit.onJoinClassIdChanged,
-                    decoration: const InputDecoration(
-                      hintText: "Class code",
-                      border: outlinedInputBorder,
-                      prefixIcon: Icon(Icons.code),
-                      suffixIcon: Tooltip(
-                        triggerMode: TooltipTriggerMode.tap,
-                        message: "Ask your teacher for the class code",
-                        child: Icon(Icons.info_outline),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: homeCubit.state.joinClassId.isNotEmpty ? homeCubit.joinClass : null,
-                      child: const Text("join"),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
       ),
     );
   }

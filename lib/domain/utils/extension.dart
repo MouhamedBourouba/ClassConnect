@@ -1,3 +1,4 @@
+import 'package:school_app/data/model/class.dart';
 import 'package:school_app/data/model/user.dart';
 
 extension UserFromList on List<String> {
@@ -23,11 +24,26 @@ extension UserFromMap on Map<String, dynamic> {
         email: this["email"].toString(),
         firstName: this["firstName"].toString(),
         lastName: this["lastName"].toString(),
-        grade:this["grade"].toString(),
+        grade: this["grade"].toString(),
         parentPhone: this["parentPhone"].toString(),
         classes: this["classes"].toString().split(","),
         teachingClasses: this["teachingClasses"].toString().split(","),
       );
+
+  Class toClass() => Class(
+        id: this["id"].toString(),
+        creatorId: this["creatorId"].toString(),
+        streamMessagesId: this["streamMessagesId"].toString(),
+        studentsIds: [],
+        homeWorkId: this["homeWorkId"].toString(),
+        bannedStudents: [],
+        className: this["className"].toString(),
+        subject: this["subject"].toString(),
+      );
+}
+
+extension IntUtils on int {
+  Duration seconds() => Duration(seconds: this);
 }
 
 extension StringUtils on String? {
@@ -36,6 +52,19 @@ extension StringUtils on String? {
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
     );
     return emailValid.hasMatch(this ?? "");
+  }
+
+  String getSubjectIconPath() {
+    switch(this) {
+      case "math": return "assets/images/math.png";
+      case "arabic": return "assets/images/arabic.png";
+      case "french": return "assets/images/french.png";
+      case "english": return "assets/images/english.png";
+      case "science": return "assets/images/science.png";
+      case "physics": return "assets/images/physics.png";
+      case "history": return "assets/images/history.png";
+      default: return "assets/images/other.png";
+    }
   }
 
   String firstLatter() {

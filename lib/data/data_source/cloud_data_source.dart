@@ -19,7 +19,7 @@ abstract class CloudDataSource {
   Future<bool> deleteRow(MTable table, {required String rowKey});
 }
 
-@LazySingleton(as: CloudDataSource)
+@Singleton(as: CloudDataSource)
 class GoogleSheetsCloudDataSource implements CloudDataSource {
   Worksheet? usersWorkSheet;
   Worksheet? classesWorkSheet;
@@ -57,56 +57,42 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
     }
   }
 
-  void changeCurrentWorkSheet(MTable table) {
+  Future<Worksheet> getWorkSheet(MTable table) async {
+    if (usersWorkSheet == null || classesWorkSheet == null) await connectToGoogleSheets();
     switch (table) {
       case MTable.usersTable:
-        currentWorkSheet = usersWorkSheet!;
-        break;
+        return usersWorkSheet!;
       case MTable.classesTable:
-        currentWorkSheet = classesWorkSheet!;
-        break;
+        return classesWorkSheet!;
     }
   }
 
+  @override
+  Future<bool> appendRow(Map<String, dynamic> data, MTable table) async =>
+      (await getWorkSheet(table)).values.map.appendRow(data, appendMissing: true);
 
   @override
-  Future<bool> appendRow(Map<String, dynamic> data, MTable table) {
-    changeCurrentWorkSheet(table);
-    return currentWorkSheet.values.map.appendRow(data, appendMissing: true);
-  }
+  Future<bool> deleteRow(MTable table, {required String rowKey}) async =>
+      (await getWorkSheet(table)).values.map.insertRowByKey(rowKey, {});
 
   @override
-  Future<bool> deleteRow(MTable table, {required String rowKey}) {
-    changeCurrentWorkSheet(table);
-    return currentWorkSheet.values.map.insertRowByKey(rowKey, {});
-  }
+  Future<List<Map<String, String>>?> getAllRows(MTable table) async => (await getWorkSheet(table)).values.map.allRows();
 
   @override
-  Future<List<Map<String, String>>?> getAllRows(MTable table) {
-    changeCurrentWorkSheet(table);
-    return currentWorkSheet.values.map.allRows();
-  }
+  Future<Map<String, String>?> getRow(MTable table, {required String rowKey}) async =>
+      (await getWorkSheet(table)).values.map.rowByKey(rowKey);
 
   @override
-  Future<Map<String, String>?> getRow(MTable table, {required String rowKey}) {
-    changeCurrentWorkSheet(table);
-    return currentWorkSheet.values.map.rowByKey(rowKey);
-  }
-
-  @override
-  Future<bool> updateValue(dynamic newValue, MTable table, {required String rowKey, required String columnKey}) {
-    changeCurrentWorkSheet(table);
-    return currentWorkSheet.values.insertValueByKeys(newValue.toString(), columnKey: columnKey, rowKey: rowKey);
-  }
+  Future<bool> updateValue(dynamic newValue, MTable table, {required String rowKey, required String columnKey}) async =>
+      (await getWorkSheet(table)).values.insertValueByKeys(newValue.toString(), columnKey: columnKey, rowKey: rowKey);
 
   @override
   Future<List<Map<String, String>>?> getRowsByValue(dynamic value, MTable table) async {
-    changeCurrentWorkSheet(table);
-    final cellsList = await currentWorkSheet.cells.findByValue(value.toString());
+    final cellsList = await (await getWorkSheet(table)).cells.findByValue(value.toString());
     final List<Future<Map<String, String>>> fetchTasks = [];
     final List<Map<String, String>> valuesMaps = [];
     for (final cell in cellsList) {
-      fetchTasks.add(currentWorkSheet.values.map.row(cell.row));
+      fetchTasks.add((await getWorkSheet(table)).values.map.row(cell.row));
     }
     for (final task in fetchTasks) {
       final data = await task;

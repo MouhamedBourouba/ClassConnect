@@ -20,7 +20,7 @@ class CreateClassPage extends StatelessWidget {
             hideLoading(context);
           }
           if (state.isSuccess) {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (ctx) => const HomePage()),
             );
@@ -106,7 +106,7 @@ class CreateClassBody extends StatelessWidget {
                   },
                   textFieldDecoration: const InputDecoration(filled: true, label: Text("Subject")),
                   dropDownList: const [
-                    DropDownValueModel(name: "match", value: 0),
+                    DropDownValueModel(name: "math", value: 0),
                     DropDownValueModel(name: "arabic", value: 1),
                     DropDownValueModel(name: "english", value: 2),
                     DropDownValueModel(name: "french", value: 3),
