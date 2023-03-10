@@ -1,10 +1,12 @@
+import 'package:ClassConnect/data/repository/settings_repository.dart';
+import 'package:ClassConnect/data/repository/user_repository.dart';
+import 'package:ClassConnect/di/di.dart';
+import 'package:ClassConnect/presentation/ui/pages/complete_account_page.dart';
+import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
+import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
+import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:school_app/data/repository/user_repository.dart';
-import 'package:school_app/di/di.dart';
-import 'package:school_app/ui/pages/complete_account_page.dart';
-import 'package:school_app/ui/pages/home_page.dart';
-import 'package:school_app/ui/pages/login_page.dart';
 
 void main() async {
   await init();
@@ -15,11 +17,13 @@ class App extends StatelessWidget {
   const App({super.key});
 
   StatelessWidget firstScreen() {
-    final user = getIt<UserRepository>().getCurrentUser();
-    if (user == null) {
+    final settingRepository = getIt<SettingsRepository>();
+    if (!settingRepository.isAuthenticated()) {
       return const LoginScreen();
-    } else if (user.firstName == null || user.lastName == null || user.parentPhone == null || user.grade == null) {
+    } else if (!settingRepository.isAccountCompleted()) {
       return const CompleteAccountPage();
+    } else if(!settingRepository.isEmailVerified()) {
+      return const EmailVerificationPage();
     } else {
       return const HomePage();
     }
@@ -28,7 +32,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
+      title: 'ClassConnect',
       debugShowCheckedModeBanner: false,
       home: firstScreen(),
       theme: ThemeData(

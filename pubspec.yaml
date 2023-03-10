@@ -1,4 +1,4 @@
-name: school_app
+name: ClassConnect
 description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -28,6 +28,8 @@ dependencies:
   injectable: ^2.1.0
   freezed_annotation: ^2.2.0
   multiple_result: ^4.0.0
+  http: ^0.13.5
+  flutter_otp_text_field: ^1.1.1
 
 dev_dependencies:
   build_runner:
@@ -37,7 +39,7 @@ dev_dependencies:
   lint: ^2.0.1
   flutter_test:
     sdk: flutter
-#
+
 flutter_native_splash:
   color: "#ffffff"
   image: assets/images/logo.png

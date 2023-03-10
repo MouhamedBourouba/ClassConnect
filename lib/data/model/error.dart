@@ -5,7 +5,7 @@ class MException {
   MException(this.errorMessage, {this.errorCode});
 
   MException.unknown()
-      : errorMessage = "Unknown error, please try again later",
+      : errorMessage = "An unknown error occurred. Please try again later.",
         errorCode = null;
 
   MException.noInternetConnection()

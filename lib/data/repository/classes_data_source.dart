@@ -1,17 +1,17 @@
 import 'dart:io';
 
+import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
+import 'package:ClassConnect/data/data_source/local_data_source.dart';
+import 'package:ClassConnect/data/model/class.dart';
+import 'package:ClassConnect/data/model/error.dart';
+import 'package:ClassConnect/data/model/source.dart';
+import 'package:ClassConnect/data/model/user.dart';
+import 'package:ClassConnect/data/repository/user_repository.dart';
+import 'package:ClassConnect/utils/extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
 import 'package:multiple_result/multiple_result.dart';
-import 'package:school_app/data/data_source/cloud_data_source.dart';
-import 'package:school_app/data/data_source/local_data_source.dart';
-import 'package:school_app/data/model/Error.dart';
-import 'package:school_app/data/model/class.dart';
-import 'package:school_app/data/model/source.dart';
-import 'package:school_app/data/model/user.dart';
-import 'package:school_app/data/repository/user_repository.dart';
-import 'package:school_app/domain/utils/extension.dart';
 import 'package:uuid/uuid.dart';
 
 abstract class ClassesRepository {
@@ -23,7 +23,7 @@ abstract class ClassesRepository {
 
   Future<Result<Unit, MException>> joinClass(String classId);
 
-  Future<Result<List<User>, MException>> getCurrentUserTeachers();
+  Future<Result<List<User>, MException>> getCurrentUserTeachers([DataSource? source]);
 }
 
 @LazySingleton(as: ClassesRepository)
@@ -78,9 +78,14 @@ class ClassesRepositoryImp extends ClassesRepository {
     try {
       final currentUser = localDataSource.getCurrentUser()!;
       final class_ = await cloudDataSource.getRowsByValue(classId, MTable.classesTable).timeout(7.seconds());
-      if (class_?.isEmpty == true) return Result.error(MException("Class dose not exist please check the code"));
+      if (class_.isEmpty == true) return Result.error(MException("Class dose not exist please check the code"));
       final classes = currentUser.classes;
       if (classes?.contains(classId) == true) return Result.error(MException("Your already joined this class"));
+      if (currentUser.teachingClasses?.contains(classId) == true) {
+        return Result.error(
+          MException("You are the teacher of this class you cant join it as student"),
+        );
+      }
       classes?.add(classId);
       final updatingUserTask = cloudDataSource.updateValue(
         classes ?? [classId],
@@ -90,7 +95,7 @@ class ClassesRepositoryImp extends ClassesRepository {
       );
       if (await updatingUserTask) {
         await localDataSource.updateCurrentUser(classes: classes ?? [classId]);
-        await localDataSource.addClass(class_!.first.toClass());
+        await localDataSource.addClass(class_.first.toClass());
         return Result.success(unit);
       } else {
         return Result.error(MException.unknown());
@@ -107,27 +112,20 @@ class ClassesRepositoryImp extends ClassesRepository {
   List<Class> getClasses() => localDataSource.getClasses();
 
   @override
-  Future<Result<List<User>, MException>> getCurrentUserTeachers() async {
-    try {
-      final classes = getClasses();
-      final users = await userRepository.getAllUsers(DataSource.local);
-      final teachersFromLocalDB = users.tryGetSuccess()?.where(
-            (user) => classes.any((class_) => class_.creatorId == user.id),
-          );
-      if ((teachersFromLocalDB?.length ?? -1) == classes.length) {
-        return Result.success(teachersFromLocalDB!.toList());
-      } else {
-        final usersFromCloud = await userRepository.getAllUsers(DataSource.remote);
-        return usersFromCloud.when(
-          (users) =>
-              Result.success(users.where((user) => classes.any((class_) => class_.creatorId == user.id)).toList()),
-          (error) => Result.error(
-            MException("Field to connect to the server please check your internet connection and try later"),
-          ),
-        );
-      }
-    } catch (e) {
-      return Result.error(MException.unknown());
+  Future<Result<List<User>, MException>> getCurrentUserTeachers([DataSource? source]) async {
+    final classes = localDataSource.getClasses();
+    if (source == DataSource.remote) {
+      return (await userRepository.getAllUsers(DataSource.remote)).when(
+        (users) {
+          final teachers = users.where((user) => classes.any((class_) => class_.creatorId == user.id));
+          return Result.success(teachers.toList());
+        },
+        (error) => Result.error(error),
+      );
+    }
+    else {
+      final users = localDataSource.getUsers();
+      ree
     }
   }
 }

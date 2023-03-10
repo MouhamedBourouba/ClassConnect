@@ -3,14 +3,14 @@ import 'dart:developer';
 import 'package:gsheets/gsheets.dart';
 import 'package:injectable/injectable.dart';
 
-enum MTable { usersTable, classesTable }
+enum MTable { usersTable, classesTable, emailOtpTabel }
 
 abstract class CloudDataSource {
   Future<Map<String, String>?> getRow(MTable table, {required String rowKey});
 
   Future<List<Map<String, String>>?> getAllRows(MTable table);
 
-  Future<List<Map<String, String>>?> getRowsByValue(dynamic value, MTable table);
+  Future<List<Map<String, String>>> getRowsByValue(dynamic value, MTable table);
 
   Future<bool> appendRow(Map<String, dynamic> data, MTable table);
 
@@ -23,6 +23,7 @@ abstract class CloudDataSource {
 class GoogleSheetsCloudDataSource implements CloudDataSource {
   Worksheet? usersWorkSheet;
   Worksheet? classesWorkSheet;
+  Worksheet? emailOtpWorkSheet;
   late Worksheet currentWorkSheet;
 
   @PostConstruct(preResolve: true)
@@ -51,6 +52,7 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
       final gSheetsClient = await gSheets.spreadsheet(spreadSheetId);
       usersWorkSheet = gSheetsClient.worksheetByTitle("Users");
       classesWorkSheet = gSheetsClient.worksheetByTitle("Classes");
+      emailOtpWorkSheet = gSheetsClient.worksheetByTitle("OTP");
     } catch (e) {
       log(e.toString());
       return;
@@ -64,6 +66,8 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
         return usersWorkSheet!;
       case MTable.classesTable:
         return classesWorkSheet!;
+      case MTable.emailOtpTabel:
+        return emailOtpWorkSheet!;
     }
   }
 
@@ -87,7 +91,7 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
       (await getWorkSheet(table)).values.insertValueByKeys(newValue.toString(), columnKey: columnKey, rowKey: rowKey);
 
   @override
-  Future<List<Map<String, String>>?> getRowsByValue(dynamic value, MTable table) async {
+  Future<List<Map<String, String>>> getRowsByValue(dynamic value, MTable table) async {
     final cellsList = await (await getWorkSheet(table)).cells.findByValue(value.toString());
     final List<Future<Map<String, String>>> fetchTasks = [];
     final List<Map<String, String>> valuesMaps = [];

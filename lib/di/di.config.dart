@@ -5,15 +5,15 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:ClassConnect/data/data_source/cloud_data_source.dart' as _i3;
+import 'package:ClassConnect/data/data_source/local_data_source.dart' as _i6;
+import 'package:ClassConnect/data/repository/settings_repository.dart' as _i7;
+import 'package:ClassConnect/data/repository/user_repository.dart' as _i9;
+import 'package:ClassConnect/data/services/hashing_service.dart' as _i5;
+import 'package:ClassConnect/utils/error_logger.dart' as _i4;
 import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
-import 'package:school_app/data/data_source/cloud_data_source.dart' as _i3;
-import 'package:school_app/data/data_source/local_data_source.dart' as _i6;
-import 'package:school_app/data/repository/classes_data_source.dart' as _i9;
-import 'package:school_app/data/repository/user_repository.dart' as _i8;
-import 'package:school_app/domain/services/hashing_service.dart' as _i5;
-import 'package:school_app/domain/utils/error_logger.dart' as _i4;
-import 'package:uuid/uuid.dart' as _i7;
+import 'package:uuid/uuid.dart' as _i8;
 
 import 'app_module.dart' as _i10;
 
@@ -47,18 +47,16 @@ extension GetItInjectableX on _i1.GetIt {
       },
       preResolve: true,
     );
-    gh.lazySingleton<_i7.Uuid>(() => appModule.uuid);
-    gh.lazySingleton<_i8.UserRepository>(() => _i8.UserRepositoryImp(
+    gh.singleton<_i7.SettingsRepository>(_i7.SettingsRepositoryImp(
+      gh<_i3.CloudDataSource>(),
+      gh<_i6.LocalDataSource>(),
+    ));
+    gh.lazySingleton<_i8.Uuid>(() => appModule.uuid);
+    gh.lazySingleton<_i9.UserRepository>(() => _i9.UserRepositoryImp(
           gh<_i5.HashingService>(),
-          gh<_i7.Uuid>(),
+          gh<_i8.Uuid>(),
           gh<_i6.LocalDataSource>(),
           gh<_i3.CloudDataSource>(),
-        ));
-    gh.lazySingleton<_i9.ClassesRepository>(() => _i9.ClassesRepositoryImp(
-          gh<_i6.LocalDataSource>(),
-          gh<_i3.CloudDataSource>(),
-          gh<_i7.Uuid>(),
-          gh<_i8.UserRepository>(),
         ));
     return this;
   }

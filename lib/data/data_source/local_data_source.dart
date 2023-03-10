@@ -1,8 +1,8 @@
+import 'package:ClassConnect/data/model/class.dart';
+import 'package:ClassConnect/data/model/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
-import 'package:school_app/data/model/class.dart';
-import 'package:school_app/data/model/user.dart';
 
 abstract class LocalDataSource {
   Future<void> putDataToAppBox(String key, dynamic value);
@@ -30,6 +30,11 @@ abstract class LocalDataSource {
   });
 
   List<Class> getClasses();
+
+  void setValueToAppBox(String key, dynamic value);
+
+  dynamic getValueFromAppBox(String key, {dynamic defaultValue});
+  Stream<BoxEvent> getCurrentUserUpdates();
 }
 
 @Singleton(as: LocalDataSource)
@@ -47,6 +52,12 @@ class HiveLocalDataBase implements LocalDataSource {
     usersBox = await Hive.openBox("users");
     classesBox = await Hive.openBox("classes");
   }
+
+  @override
+  dynamic getValueFromAppBox(String key, {dynamic defaultValue}) => appBox.get(key, defaultValue: defaultValue);
+
+  @override
+  void setValueToAppBox(String key, dynamic value) => appBox.put(key, value);
 
   @override
   User? getCurrentUser() => appBox.get("current_user") as User?;
@@ -92,4 +103,7 @@ class HiveLocalDataBase implements LocalDataSource {
 
   @override
   ValueListenable<Box<Class>> getClassesValueListener() => classesBox.listenable();
+
+  @override
+  Stream<BoxEvent> getCurrentUserUpdates() => appBox.watch();
 }
