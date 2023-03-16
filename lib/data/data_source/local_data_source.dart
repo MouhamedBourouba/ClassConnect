@@ -31,9 +31,12 @@ abstract class LocalDataSource {
 
   List<Class> getClasses();
 
+  void clearAllData();
+
   void setValueToAppBox(String key, dynamic value);
 
   dynamic getValueFromAppBox(String key, {dynamic defaultValue});
+
   Stream<BoxEvent> getCurrentUserUpdates();
 }
 
@@ -106,4 +109,11 @@ class HiveLocalDataBase implements LocalDataSource {
 
   @override
   Stream<BoxEvent> getCurrentUserUpdates() => appBox.watch();
+
+  @override
+  void clearAllData() {
+    appBox.clear();
+    classesBox.clear();
+    usersBox.clear();
+  }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/data/repository/user_repository.dart';
 import 'package:ClassConnect/di/di.dart';
@@ -11,6 +10,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:multiple_result/multiple_result.dart';
 
 part 'email_verification_cubit.freezed.dart';
 
@@ -31,7 +31,10 @@ class EmailVerificationCubit extends Cubit<EmailVerificationState> {
   Future<void> sendEmailVerificationMessage() async {
     await checkInternetConnection();
     emit(state.copyWith(loadingEmail: true));
-    final sendingEmailResult = await userRepository.sendEmailVerificationMessage();
+    final sendingEmailResult = await userRepository
+        .sendEmailVerificationMessage()
+        .timeout(25.seconds())
+        .onError((error, stackTrace) => Result.error(unit));
     sendingEmailResult.when(
       (success) {
         Fluttertoast.showToast(msg: "Message sent successfully", backgroundColor: Colors.green);

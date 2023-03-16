@@ -1,5 +1,7 @@
 import 'package:ClassConnect/presentation/cubit/home/join_class/join_class_cubit.dart';
+import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/outlined_text_field.dart';
+import 'package:ClassConnect/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,13 +15,14 @@ class JoinClassDialog extends StatelessWidget {
       listener: (context, state) {
         if (state.isSuccess) {
           Navigator.pop(context);
+          Navigator.push(context, const HomePage().asRoute());
         }
       },
       child: Dialog(
         insetPadding: EdgeInsets.zero,
         child: SizedBox(
           width: MediaQuery.of(context).size.width / 1.1,
-          height: 270,
+          height: 290,
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,
@@ -43,7 +46,9 @@ class JoinClassDialog extends StatelessWidget {
                       style: Theme.of(context).textTheme.headline5,
                     ),
                     const SizedBox(height: 16),
-                    TextField(
+                    TextFormField(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) => value?.length == 5 ? null : "Class code must be 5 character long",
                       onChanged: joinClassCubit.onClassIdChange,
                       decoration: const InputDecoration(
                         hintText: "Class code",
@@ -60,7 +65,11 @@ class JoinClassDialog extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: joinClassCubit.state.classId.isNotEmpty && !joinClassCubit.state.isLoading ? joinClassCubit.joinClass : null,
+                        onPressed: joinClassCubit.state.classId.isNotEmpty &&
+                                !joinClassCubit.state.isLoading &&
+                                joinClassCubit.state.classId.length == 5
+                            ? joinClassCubit.joinClass
+                            : null,
                         child: const Text("join"),
                       ),
                     ),

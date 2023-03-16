@@ -5,6 +5,7 @@ import 'package:ClassConnect/data/data_source/local_data_source.dart';
 import 'package:ClassConnect/data/model/error.dart';
 import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user.dart';
+import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/data/services/hashing_service.dart';
 import 'package:ClassConnect/utils/extension.dart';
 import 'package:hive/hive.dart';
@@ -48,8 +49,10 @@ class UserRepositoryImp extends UserRepository {
   final CloudDataSource cloudDataSource;
   final HashingService hashingService;
   final Uuid uuid;
+  final SettingsRepository settingsRepository;
 
-  UserRepositoryImp(this.hashingService, this.uuid, this.localDataSource, this.cloudDataSource);
+  UserRepositoryImp(
+      this.hashingService, this.uuid, this.localDataSource, this.cloudDataSource, this.settingsRepository);
 
   Result<Unit, MException> checkUserDetails(String username, String email, List<User> users) {
     if (users.any((user) => user.username == username)) {
@@ -64,7 +67,7 @@ class UserRepositoryImp extends UserRepository {
   @override
   Future<Result<List<User>, MException>> saveUsersToLocalDataSource() async {
     try {
-      final allUsersMap = await cloudDataSource.getAllRows(MTable.usersTable).timeout(7.seconds());
+      final allUsersMap = await cloudDataSource.getAllRows(MTable.usersTable);
       final List<User> allUsers = [];
       for (final userMap in allUsersMap!) {
         allUsers.add(userMap.toUser());
@@ -83,11 +86,11 @@ class UserRepositoryImp extends UserRepository {
   Future<Result<Unit, MException>> registerUser(String username, String email, String password) async {
     try {
       final user = User(id: uuid.v1(), username: username, password: hashingService.hash(password), email: email);
-      final allUsers = await getAllUsers(DataSource.remote).timeout(20.seconds());
+      final allUsers = await getAllUsers(DataSource.remote);
       if (allUsers.isError()) return Error(allUsers.tryGetError()!);
       final isUserValidResult = checkUserDetails(username, email, allUsers.tryGetSuccess()!);
       if (isUserValidResult.isError()) return Result.error(isUserValidResult.tryGetError()!);
-      await cloudDataSource.appendRow(user.toMap(), MTable.usersTable).timeout(20.seconds());
+      await cloudDataSource.appendRow(user.toMap(), MTable.usersTable);
       await localDataSource.putDataToAppBox("current_user", user);
       return const Success(unit);
     } catch (e) {
@@ -106,16 +109,24 @@ class UserRepositoryImp extends UserRepository {
   @override
   Future<Result<User, MException>> loginUser(String usernameOrEmail, String password) async {
     try {
-      final userResult = await fetchUserByEmailOrUsername(usernameOrEmail).timeout(const Duration(seconds: 10));
+      final userResult = await fetchUserByEmailOrUsername(usernameOrEmail);
       if (userResult.isError()) return Result.error(userResult.tryGetError()!);
       final user = userResult.tryGetSuccess()!;
       final isPasswordCorrect = hashingService.verify(password, user.password);
       if (!isPasswordCorrect) return Result.error(MException("Incorrect password. Please try again"));
       await localDataSource.putDataToAppBox("current_user", user);
+      final isEmailVerified = await checkEmailVerification(user);
+      settingsRepository.setIsEmailVerified(isEmailVerified: isEmailVerified);
       return Result.success(user);
     } catch (e) {
       return Result.error(MException.unknown());
     }
+  }
+
+  Future<bool> checkEmailVerification(User user) async {
+    final otpList = await cloudDataSource.getAllRows(MTable.emailOtpTabel);
+    final isVerified = otpList?.any((element) => element["isVerified"] == "true" && element["userId"] == user.id);
+    return isVerified == true;
   }
 
   Future<Result<User, MException>> fetchUserById(String id) async {
@@ -130,16 +141,19 @@ class UserRepositoryImp extends UserRepository {
       return Result.success(localDataSource.getUsers());
     } else {
       try {
-        final usersJson = await cloudDataSource.getAllRows(MTable.usersTable).timeout(10.seconds());
+        final usersJson = await cloudDataSource.getAllRows(MTable.usersTable);
         if (usersJson == null || usersJson.isEmpty) return Result.error(MException.unknown());
         final List<User> users = [];
         for (final userJson in usersJson) {
           users.add(userJson.toUser());
         }
+        for (final user in users) {
+          localDataSource.addUserToUsersBox(user);
+        }
         return Result.success(users);
       } on SocketException {
         return Result.error(MException.noInternetConnection());
-      } catch(e) {
+      } catch (e) {
         return Result.error(MException.unknown());
       }
     }
@@ -152,9 +166,8 @@ class UserRepositoryImp extends UserRepository {
       final username = user!.username;
       final email = user.email;
       final userId = user.id;
-      final response = await http
-          .get(Uri.parse("http://192.168.1.16:8080/email_verification/$email/$username/$userId"))
-          .timeout(30.seconds());
+      final response =
+          await http.get(Uri.parse("http://192.168.1.16:8080/email_verification/$email/$username/$userId"));
       if (response.statusCode == 200) {
         return Result.success(unit);
       } else {
@@ -171,8 +184,14 @@ class UserRepositoryImp extends UserRepository {
       final otpMap = await cloudDataSource.getRowsByValue(code, MTable.emailOtpTabel);
       if (otpMap.isEmpty) return Result.error("code does not exist. Please double-check and try again");
       final isCodeCorrect =
-          otpMap.any((element) => element["userId"] == localDataSource.getCurrentUser()!.id && element["otp"] == code);
+          otpMap.any((element) => element["userId"] == localDataSource.getCurrentUser()!.id && element["code"] == code);
       if (isCodeCorrect) {
+        await cloudDataSource.updateValues(
+          true,
+          MTable.emailOtpTabel,
+          rowKey: localDataSource.getCurrentUser()!.id,
+          column: 3,
+        );
         return Result.success(unit);
       } else {
         return Result.error("code does not exist. Please double-check and try again");
@@ -216,7 +235,7 @@ class UserRepositoryImp extends UserRepository {
     if (firstName != null) {
       tasksList.add(
         cloudDataSource.updateValue(
-          firstName,
+          firstName.replaceAll(" ", ""),
           MTable.usersTable,
           rowKey: userId,
           columnKey: "firstName",
@@ -227,7 +246,7 @@ class UserRepositoryImp extends UserRepository {
     if (lastName != null) {
       tasksList.add(
         cloudDataSource.updateValue(
-          lastName,
+          lastName.replaceAll(" ", ""),
           MTable.usersTable,
           rowKey: userId,
           columnKey: "lastName",
@@ -249,7 +268,7 @@ class UserRepositoryImp extends UserRepository {
       } else {
         return Result.error(
           MException(
-            'The email address is already associated with an account. Please log in',
+            'The email address is already associated with another account',
           ),
         );
       }
@@ -300,7 +319,7 @@ class UserRepositoryImp extends UserRepository {
     }
     try {
       for (final task in tasksList) {
-        await task.timeout(7.seconds());
+        await task;
       }
       return Result.success(unit);
     } catch (e) {

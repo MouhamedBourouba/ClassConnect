@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive/hive.dart';
 
 part 'user.g.dart';
@@ -55,8 +57,8 @@ class User {
         "parentPhone": parentPhone.toString(),
         "firstName": firstName.toString(),
         "lastName": lastName.toString(),
-        "teachingClasses": teachingClasses.toString(),
-        "classes": classes.toString()
+        "teachingClasses": jsonEncode(teachingClasses),
+        "classes": jsonEncode(classes)
       };
 
   bool isAccountCompleted() => firstName != "null" && grade != "null" && parentPhone != "null" && lastName != "null";

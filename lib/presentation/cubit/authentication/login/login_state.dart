@@ -7,6 +7,7 @@ class LoginState with _$LoginState {
     @Default("") String password,
     @Default(false) bool isSuccess,
     @Default(false) bool isLoading,
+    @Default(false) bool isEmailVerified,
     User? user,
   }) = _Initial;
 }

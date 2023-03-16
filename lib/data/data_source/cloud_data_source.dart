@@ -17,6 +17,13 @@ abstract class CloudDataSource {
   Future<bool> updateValue(dynamic newValue, MTable table, {required String rowKey, required String columnKey});
 
   Future<bool> deleteRow(MTable table, {required String rowKey});
+
+  Future<bool> updateValues(
+    dynamic newValue,
+    MTable table, {
+    required String rowKey,
+    required int column,
+  });
 }
 
 @Singleton(as: CloudDataSource)
@@ -88,7 +95,26 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
 
   @override
   Future<bool> updateValue(dynamic newValue, MTable table, {required String rowKey, required String columnKey}) async =>
-      (await getWorkSheet(table)).values.insertValueByKeys(newValue.toString(), columnKey: columnKey, rowKey: rowKey);
+      (await getWorkSheet(table)).values.insertValueByKeys(
+            newValue.toString(),
+            columnKey: columnKey,
+            rowKey: rowKey,
+          );
+
+  @override
+  Future<bool> updateValues(
+    dynamic newValue,
+    MTable table, {
+    required String rowKey,
+    required int column,
+  }) async {
+    final Worksheet worksheet = await getWorkSheet(table);
+    final rows = await worksheet.cells.findByValue(rowKey);
+    for (final row in rows) {
+      await worksheet.values.insertValue(newValue.toString(), column: column, row: row.row);
+    }
+    return true;
+  }
 
   @override
   Future<List<Map<String, String>>> getRowsByValue(dynamic value, MTable table) async {

@@ -9,6 +9,6 @@ class MException {
         errorCode = null;
 
   MException.noInternetConnection()
-      : errorMessage = "Unknown error, please try again later",
+      : errorMessage = "Please check your internet connection",
         errorCode = null;
 }

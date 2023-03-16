@@ -45,7 +45,7 @@ class RegisterScreen extends StatelessWidget {
                     tag: "logo",
                     child: SvgPicture.asset(
                       "assets/images/logo_no_text.svg",
-                      width: 200,
+                      width: MediaQuery.of(context).size.height / 4,
                     ),
                   ),
                   Text(

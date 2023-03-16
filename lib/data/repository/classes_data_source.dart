@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
@@ -17,7 +18,7 @@ import 'package:uuid/uuid.dart';
 abstract class ClassesRepository {
   ValueListenable<Box<Class>> getClassesValueListener();
 
-  List<Class> getClasses();
+  Future<List<Class>> getClasses(DataSource source);
 
   Future<Result<Unit, MException>> createClass(String className, String classSubject);
 
@@ -77,9 +78,12 @@ class ClassesRepositoryImp extends ClassesRepository {
   Future<Result<Unit, MException>> joinClass(String classId) async {
     try {
       final currentUser = localDataSource.getCurrentUser()!;
-      final class_ = await cloudDataSource.getRowsByValue(classId, MTable.classesTable).timeout(7.seconds());
-      if (class_.isEmpty == true) return Result.error(MException("Class dose not exist please check the code"));
+      final searchingForClass = await cloudDataSource.getRowsByValue(classId, MTable.classesTable);
+      if (searchingForClass.isEmpty == true) {
+        return Result.error(MException("Class dose not exist please check the code"));
+      }
       final classes = currentUser.classes;
+      final classMap = searchingForClass.first;
       if (classes?.contains(classId) == true) return Result.error(MException("Your already joined this class"));
       if (currentUser.teachingClasses?.contains(classId) == true) {
         return Result.error(
@@ -87,16 +91,22 @@ class ClassesRepositoryImp extends ClassesRepository {
         );
       }
       classes?.add(classId);
-      final updatingUserTask = cloudDataSource.updateValue(
-        classes ?? [classId],
-        MTable.usersTable,
-        rowKey: currentUser.id,
-        columnKey: "classes",
+      final students = classMap["studentsIds"].toString().toList();
+      students.add(currentUser.id);
+      final updatingClassTask = cloudDataSource.updateValue(
+        jsonEncode(students),
+        MTable.classesTable,
+        rowKey: classId,
+        columnKey: "studentsIds",
       );
-      if (await updatingUserTask) {
-        await localDataSource.updateCurrentUser(classes: classes ?? [classId]);
-        await localDataSource.addClass(class_.first.toClass());
-        return Result.success(unit);
+      if (await updatingClassTask) {
+        final updatingUserTask = userRepository.updateUser(classes: classes ?? [classId]);
+        if ((await updatingUserTask).isSuccess()) {
+          await localDataSource.addClass(classMap.toClass());
+          return Result.success(unit);
+        } else {
+          return Result.error(MException.unknown());
+        }
       } else {
         return Result.error(MException.unknown());
       }
@@ -109,23 +119,54 @@ class ClassesRepositoryImp extends ClassesRepository {
   ValueListenable<Box<Class>> getClassesValueListener() => localDataSource.getClassesValueListener();
 
   @override
-  List<Class> getClasses() => localDataSource.getClasses();
+  Future<List<Class>> getClasses(DataSource source) async {
+    try {
+      if (source == DataSource.local) {
+        return localDataSource.getClasses();
+      } else {
+        final classesMap = await cloudDataSource.getAllRows(MTable.usersTable);
+        final List<Class> classes = [];
+        classesMap?.forEach((class_) {
+          final List<String> students = class_["studentsIds"].toString().toList();
+          if (students.any((id) => id == localDataSource.getCurrentUser()!.id) == true ||
+              class_["creatorId"] == localDataSource.getCurrentUser()!.id) {
+            classes.add(class_.toClass());
+            localDataSource.addClass(class_.toClass());
+          }
+        });
+        return classes;
+      }
+    } catch (e) {
+      return [];
+    }
+  }
 
   @override
   Future<Result<List<User>, MException>> getCurrentUserTeachers([DataSource? source]) async {
-    final classes = localDataSource.getClasses();
-    if (source == DataSource.remote) {
-      return (await userRepository.getAllUsers(DataSource.remote)).when(
-        (users) {
-          final teachers = users.where((user) => classes.any((class_) => class_.creatorId == user.id));
-          return Result.success(teachers.toList());
-        },
-        (error) => Result.error(error),
-      );
-    }
-    else {
+    try {
+      final classes = localDataSource.getClasses();
+      Future<Result<List<User>, MException>> getTeachersFromCloud() async {
+        return (await userRepository.getAllUsers(DataSource.remote)).when(
+          (users) {
+            final teachers = users.where((user) => classes.any((class_) => class_.creatorId == user.id));
+            return Result.success(teachers.toList());
+          },
+          (error) => Result.error(error),
+        );
+      }
+
+      if (source == DataSource.remote) {
+        return getTeachersFromCloud();
+      }
       final users = localDataSource.getUsers();
-      ree
+      final teachers = users.where((user) => classes.any((class_) => class_.creatorId == user.id));
+      if (classes.every((class_) => teachers.any((teacher) => class_.creatorId == teacher.id))) {
+        return Result.success(teachers.toList());
+      } else {
+        return getCurrentUserTeachers();
+      }
+    } catch (e) {
+      return Result.error(MException.unknown());
     }
   }
 }

@@ -20,25 +20,26 @@ mixin _$LoginState {
   String get password => throw _privateConstructorUsedError;
   bool get isSuccess => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
+  bool get isEmailVerified => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String email, String password, bool isSuccess,
-            bool isLoading, User? user)
+            bool isLoading, bool isEmailVerified, User? user)
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String email, String password, bool isSuccess,
-            bool isLoading, User? user)?
+            bool isLoading, bool isEmailVerified, User? user)?
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String email, String password, bool isSuccess,
-            bool isLoading, User? user)?
+            bool isLoading, bool isEmailVerified, User? user)?
         initial,
     required TResult orElse(),
   }) =>
@@ -76,6 +77,7 @@ abstract class $LoginStateCopyWith<$Res> {
       String password,
       bool isSuccess,
       bool isLoading,
+      bool isEmailVerified,
       User? user});
 }
 
@@ -96,6 +98,7 @@ class _$LoginStateCopyWithImpl<$Res, $Val extends LoginState>
     Object? password = null,
     Object? isSuccess = null,
     Object? isLoading = null,
+    Object? isEmailVerified = null,
     Object? user = freezed,
   }) {
     return _then(_value.copyWith(
@@ -114,6 +117,10 @@ class _$LoginStateCopyWithImpl<$Res, $Val extends LoginState>
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isEmailVerified: null == isEmailVerified
+          ? _value.isEmailVerified
+          : isEmailVerified // ignore: cast_nullable_to_non_nullable
               as bool,
       user: freezed == user
           ? _value.user
@@ -135,6 +142,7 @@ abstract class _$$_InitialCopyWith<$Res> implements $LoginStateCopyWith<$Res> {
       String password,
       bool isSuccess,
       bool isLoading,
+      bool isEmailVerified,
       User? user});
 }
 
@@ -152,6 +160,7 @@ class __$$_InitialCopyWithImpl<$Res>
     Object? password = null,
     Object? isSuccess = null,
     Object? isLoading = null,
+    Object? isEmailVerified = null,
     Object? user = freezed,
   }) {
     return _then(_$_Initial(
@@ -171,6 +180,10 @@ class __$$_InitialCopyWithImpl<$Res>
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      isEmailVerified: null == isEmailVerified
+          ? _value.isEmailVerified
+          : isEmailVerified // ignore: cast_nullable_to_non_nullable
+              as bool,
       user: freezed == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
@@ -187,6 +200,7 @@ class _$_Initial implements _Initial {
       this.password = "",
       this.isSuccess = false,
       this.isLoading = false,
+      this.isEmailVerified = false,
       this.user});
 
   @override
@@ -202,11 +216,14 @@ class _$_Initial implements _Initial {
   @JsonKey()
   final bool isLoading;
   @override
+  @JsonKey()
+  final bool isEmailVerified;
+  @override
   final User? user;
 
   @override
   String toString() {
-    return 'LoginState.initial(email: $email, password: $password, isSuccess: $isSuccess, isLoading: $isLoading, user: $user)';
+    return 'LoginState.initial(email: $email, password: $password, isSuccess: $isSuccess, isLoading: $isLoading, isEmailVerified: $isEmailVerified, user: $user)';
   }
 
   @override
@@ -221,12 +238,14 @@ class _$_Initial implements _Initial {
                 other.isSuccess == isSuccess) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
+            (identical(other.isEmailVerified, isEmailVerified) ||
+                other.isEmailVerified == isEmailVerified) &&
             (identical(other.user, user) || other.user == user));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, email, password, isSuccess, isLoading, user);
+  int get hashCode => Object.hash(runtimeType, email, password, isSuccess,
+      isLoading, isEmailVerified, user);
 
   @JsonKey(ignore: true)
   @override
@@ -238,32 +257,35 @@ class _$_Initial implements _Initial {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String email, String password, bool isSuccess,
-            bool isLoading, User? user)
+            bool isLoading, bool isEmailVerified, User? user)
         initial,
   }) {
-    return initial(email, password, isSuccess, isLoading, user);
+    return initial(
+        email, password, isSuccess, isLoading, isEmailVerified, user);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String email, String password, bool isSuccess,
-            bool isLoading, User? user)?
+            bool isLoading, bool isEmailVerified, User? user)?
         initial,
   }) {
-    return initial?.call(email, password, isSuccess, isLoading, user);
+    return initial?.call(
+        email, password, isSuccess, isLoading, isEmailVerified, user);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String email, String password, bool isSuccess,
-            bool isLoading, User? user)?
+            bool isLoading, bool isEmailVerified, User? user)?
         initial,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(email, password, isSuccess, isLoading, user);
+      return initial(
+          email, password, isSuccess, isLoading, isEmailVerified, user);
     }
     return orElse();
   }
@@ -303,6 +325,7 @@ abstract class _Initial implements LoginState {
       final String password,
       final bool isSuccess,
       final bool isLoading,
+      final bool isEmailVerified,
       final User? user}) = _$_Initial;
 
   @override
@@ -313,6 +336,8 @@ abstract class _Initial implements LoginState {
   bool get isSuccess;
   @override
   bool get isLoading;
+  @override
+  bool get isEmailVerified;
   @override
   User? get user;
   @override

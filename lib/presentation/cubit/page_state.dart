@@ -1,6 +1,6 @@
 enum PageState {
+  init,
   loading,
   success,
-  init,
   error,
 }

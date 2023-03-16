@@ -1,4 +1,5 @@
 import 'package:ClassConnect/presentation/cubit/authentication/login/login_cubit.dart';
+import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,10 +32,12 @@ class LoginScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  if (state.user?.isAccountCompleted() == true) {
-                    return const HomePage();
-                  } else {
+                  if (state.user?.isAccountCompleted() == false) {
                     return const CompleteAccountPage();
+                  } else if(!state.isEmailVerified){
+                    return const EmailVerificationPage();
+                  } else {
+                    return const HomePage();
                   }
                 },
               ),
@@ -129,7 +132,7 @@ class LoginForm extends StatelessWidget {
               decoration: const InputDecoration(
                 hintText: "email/username",
                 border: outlinedInputBorder,
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: Icon(Icons.person),
               ),
               onChanged: loginCubit.onEmailChanged,
             ),

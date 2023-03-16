@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive/hive.dart';
 
 part 'class.g.dart';
@@ -25,9 +27,9 @@ class Class {
         "id": id,
         "creatorId": creatorId,
         "streamMessagesId": streamMessagesId,
-        "studentsIds": studentsIds.toString(),
+        "studentsIds": jsonEncode(studentsIds),
         "homeWorkId": homeWorkId,
-        "bannedStudents": bannedStudents.toString(),
+        "bannedStudents": jsonEncode(bannedStudents),
         "className": className,
         "subject": subject  ,
       };

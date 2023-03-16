@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 extension UserFromList on List<String> {
   User toUser() {
@@ -18,26 +21,28 @@ extension UserFromList on List<String> {
 }
 
 extension UserFromMap on Map<String, dynamic> {
-  User toUser() => User(
-        id: this["id"].toString(),
-        username: this["username"].toString(),
-        password: this["hashedPassword"].toString(),
-        email: this["email"].toString(),
-        firstName: this["firstName"].toString(),
-        lastName: this["lastName"].toString(),
-        grade: this["grade"].toString(),
-        parentPhone: this["parentPhone"].toString(),
-        classes: this["classes"].toString().toList(),
-        teachingClasses: this["teachingClasses"].toString().toList(),
-      );
+  User toUser() {
+    return User(
+      id: this["id"].toString(),
+      username: this["username"].toString(),
+      password: this["hashedPassword"].toString(),
+      email: this["email"].toString(),
+      firstName: this["firstName"].toString(),
+      lastName: this["lastName"].toString(),
+      grade: this["grade"].toString(),
+      parentPhone: this["parentPhone"].toString(),
+      classes: this["studentsIds"].toString().toList(),
+      teachingClasses: this["studentsIds"].toString().toList(),
+    );
+  }
 
   Class toClass() => Class(
         id: this["id"].toString(),
         creatorId: this["creatorId"].toString(),
         streamMessagesId: this["streamMessagesId"].toString(),
-        studentsIds: [],
+        studentsIds: this["studentsIds"].toString().toList(),
         homeWorkId: this["homeWorkId"].toString(),
-        bannedStudents: [],
+        bannedStudents: this["bannedStudents"].toString().toList(),
         className: this["className"].toString(),
         subject: this["subject"].toString(),
       );
@@ -96,11 +101,9 @@ extension StringUtils on String? {
 
   List<String> toList() {
     try {
-      final listOfChar = this!.split("");
-      listOfChar[0] = "";
-      listOfChar[listOfChar.length] = "";
-      return listOfChar.toString().split(",");
-    } catch(e) {
+      final listDynamic = jsonDecode(toString()) as List;
+      return listDynamic.map((e) => e as String).toList();
+    } catch (e) {
       return [];
     }
   }

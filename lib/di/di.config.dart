@@ -7,6 +7,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart' as _i3;
 import 'package:ClassConnect/data/data_source/local_data_source.dart' as _i6;
+import 'package:ClassConnect/data/repository/classes_data_source.dart' as _i10;
 import 'package:ClassConnect/data/repository/settings_repository.dart' as _i7;
 import 'package:ClassConnect/data/repository/user_repository.dart' as _i9;
 import 'package:ClassConnect/data/services/hashing_service.dart' as _i5;
@@ -15,7 +16,7 @@ import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
 import 'package:uuid/uuid.dart' as _i8;
 
-import 'app_module.dart' as _i10;
+import 'app_module.dart' as _i11;
 
 /// ignore_for_file: unnecessary_lambdas
 /// ignore_for_file: lines_longer_than_80_chars
@@ -57,9 +58,16 @@ extension GetItInjectableX on _i1.GetIt {
           gh<_i8.Uuid>(),
           gh<_i6.LocalDataSource>(),
           gh<_i3.CloudDataSource>(),
+          gh<_i7.SettingsRepository>(),
+        ));
+    gh.lazySingleton<_i10.ClassesRepository>(() => _i10.ClassesRepositoryImp(
+          gh<_i6.LocalDataSource>(),
+          gh<_i3.CloudDataSource>(),
+          gh<_i8.Uuid>(),
+          gh<_i9.UserRepository>(),
         ));
     return this;
   }
 }
 
-class _$AppModule extends _i10.AppModule {}
+class _$AppModule extends _i11.AppModule {}
