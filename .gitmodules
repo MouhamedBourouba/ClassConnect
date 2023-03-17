@@ -1,0 +1,3 @@
+[submodule "python_email_verification"]
+	path = python_email_verification
+	url = https://github.com/MouhamedBourouba/python_email_verification
