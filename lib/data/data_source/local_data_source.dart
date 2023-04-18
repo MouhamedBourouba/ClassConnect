@@ -19,12 +19,9 @@ abstract class LocalDataSource {
   ValueListenable<Box<Class>> getClassesValueListener();
 
   Future<void> updateCurrentUser({
-    String username,
-    String firstName,
-    String lastName,
+    String fullName,
     String email,
-    String grade,
-    String parentPhone,
+    String phoneNumber,
     List<String> classes,
     List<String> teachingClasses,
   });
@@ -82,25 +79,19 @@ class HiveLocalDataBase implements LocalDataSource {
 
   @override
   Future<void> updateCurrentUser({
-    String? username,
-    String? firstName,
-    String? lastName,
+    String? fullName,
     String? email,
-    String? grade,
-    String? parentPhone,
+    String? phoneNumber,
     List<String>? classes,
     List<String>? teachingClasses,
   }) {
     final currentUser = getCurrentUser()!;
     currentUser
-      ..username = username ?? currentUser.username
-      ..firstName = firstName ?? currentUser.firstName
-      ..lastName = lastName ?? currentUser.lastName
+      ..fullName = fullName ?? currentUser.fullName
       ..email = email ?? currentUser.email
-      ..grade = grade ?? currentUser.grade
-      ..parentPhone = parentPhone ?? currentUser.parentPhone
       ..classes = classes ?? currentUser.classes
-      ..teachingClasses = teachingClasses ?? currentUser.teachingClasses;
+      ..teachingClasses = teachingClasses ?? currentUser.teachingClasses
+      ..phoneNumber = phoneNumber ?? currentUser.phoneNumber;
     return appBox.put("current_user", currentUser);
   }
 

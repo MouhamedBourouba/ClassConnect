@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
@@ -19,17 +20,19 @@ abstract class UserRepository {
 
   Stream<BoxEvent> getUserUpdates();
 
-  Future<Result<void, MException>> registerUser(String username, String email, String password);
+  Future<Result<void, MException>> registerUser(
+    String fullName,
+    String email,
+    String password,
+    String phoneNumber,
+  );
 
   Future<Result<User, MException>> loginUser(String usernameOrEmail, String password);
 
   Future<Result<Unit, MException>> updateUser({
-    String? username,
-    String? firstName,
-    String? lastName,
+    String? fullName,
     String? email,
-    String? grade,
-    String? parentPhone,
+    String? phoneNumber,
     List<String>? classes,
     List<String>? teachingClasses,
   });
@@ -51,11 +54,10 @@ class UserRepositoryImp extends UserRepository {
   final Uuid uuid;
   final SettingsRepository settingsRepository;
 
-  UserRepositoryImp(
-      this.hashingService, this.uuid, this.localDataSource, this.cloudDataSource, this.settingsRepository);
+  UserRepositoryImp(this.hashingService, this.uuid, this.localDataSource, this.cloudDataSource, this.settingsRepository);
 
   Result<Unit, MException> checkUserDetails(String username, String email, List<User> users) {
-    if (users.any((user) => user.username == username)) {
+    if (users.any((user) => user.fullName == username)) {
       return Error(MException("This username is already taken. Please choose a different username"));
     } else if (users.any((user) => user.email == email)) {
       return Error(MException("The email address is already associated with an account. Please log in"));
@@ -83,12 +85,20 @@ class UserRepositoryImp extends UserRepository {
   User? getCurrentUser() => localDataSource.getCurrentUser();
 
   @override
-  Future<Result<Unit, MException>> registerUser(String username, String email, String password) async {
+  Future<Result<Unit, MException>> registerUser(String fullName, String email, String password, String phoneNumber) async {
     try {
-      final user = User(id: uuid.v1(), username: username, password: hashingService.hash(password), email: email);
+      final user = User(
+        id: uuid.v1(),
+        fullName: fullName,
+        password: hashingService.hash(password),
+        email: email,
+        phoneNumber: phoneNumber,
+        classes: [],
+        teachingClasses: [],
+      );
       final allUsers = await getAllUsers(DataSource.remote);
       if (allUsers.isError()) return Error(allUsers.tryGetError()!);
-      final isUserValidResult = checkUserDetails(username, email, allUsers.tryGetSuccess()!);
+      final isUserValidResult = checkUserDetails(fullName, email, allUsers.tryGetSuccess()!);
       if (isUserValidResult.isError()) return Result.error(isUserValidResult.tryGetError()!);
       await cloudDataSource.appendRow(user.toMap(), MTable.usersTable);
       await localDataSource.putDataToAppBox("current_user", user);
@@ -162,13 +172,34 @@ class UserRepositoryImp extends UserRepository {
   @override
   Future<Result<Unit, Unit>> sendEmailVerificationMessage() async {
     try {
+      String getEmailVerificationMessage(String username) {
+        return """
+Dear $username, 
+Thank you for registering in our app, ClassConnect is an online platform designed to enhance your learning experience.
+We are thrilled to have you on board! To activate your account, we need you to confirm your email address.
+Here is your code: ___code___,
+once you Confirmed Your Email will have full access to our App, where you can connect with your teachers and classmates, participate in discussions, access course
+materials, and submit assignments.
+We look forward to seeing you on the app and providing you with an engaging and interactive learning environment. Thank you for choosing our App.
+If you have any questions or concerns, please don't hesitate to contact our support team at ClassConnect@gmail.com.
+Best regards,
+Bourouba Mouhamed
+ClassConnect APP""";
+      }
+
       final user = localDataSource.getCurrentUser();
-      final username = user!.username;
+      final username = user!.fullName;
       final email = user.email;
-      final userId = user.id;
-      final response =
-          await http.get(Uri.parse("http://192.168.1.16:8080/email_verification/$email/$username/$userId"));
+      final response = await http.get(
+        Uri.parse(
+          "https://mouhamed22.pythonanywhere.com/email_verification/$email/${getEmailVerificationMessage(username)}/ClassConnect email verification",
+        ),
+      );
       if (response.statusCode == 200) {
+        cloudDataSource.appendRow(
+          {"userId": localDataSource.getCurrentUser()!.id, "code": jsonDecode(response.body) as String, "isVerified": false},
+          MTable.emailOtpTabel,
+        );
         return Result.success(unit);
       } else {
         return Result.error(unit);
@@ -183,8 +214,7 @@ class UserRepositoryImp extends UserRepository {
     try {
       final otpMap = await cloudDataSource.getRowsByValue(code, MTable.emailOtpTabel);
       if (otpMap.isEmpty) return Result.error("code does not exist. Please double-check and try again");
-      final isCodeCorrect =
-          otpMap.any((element) => element["userId"] == localDataSource.getCurrentUser()!.id && element["code"] == code);
+      final isCodeCorrect = otpMap.any((element) => element["userId"] == localDataSource.getCurrentUser()!.id && element["code"] == code);
       if (isCodeCorrect) {
         await cloudDataSource.updateValues(
           true,
@@ -206,53 +236,28 @@ class UserRepositoryImp extends UserRepository {
 
   @override
   Future<Result<Unit, MException>> updateUser({
-    String? username,
-    String? firstName,
-    String? lastName,
+    String? fullName,
     String? email,
-    String? grade,
-    String? parentPhone,
+    String? phoneNumber,
     List<String>? classes,
     List<String>? teachingClasses,
   }) async {
     final userId = localDataSource.getCurrentUser()!.id;
     final List<Future<bool>> tasksList = [];
-    if (username != null) {
-      if ((await cloudDataSource.getRowsByValue(username, MTable.usersTable)).isEmpty) {
+    if (fullName != null) {
+      if ((await cloudDataSource.getRowsByValue(fullName, MTable.usersTable)).isEmpty) {
         tasksList.add(
           cloudDataSource.updateValue(
-            username,
+            fullName,
             MTable.usersTable,
             rowKey: userId,
-            columnKey: "username",
+            columnKey: "fullName",
           ),
         );
-        localDataSource.updateCurrentUser(username: username);
+        localDataSource.updateCurrentUser(fullName: fullName);
       } else {
         return Result.error(MException("This username is already taken. Please choose a different username."));
       }
-    }
-    if (firstName != null) {
-      tasksList.add(
-        cloudDataSource.updateValue(
-          firstName.replaceAll(" ", ""),
-          MTable.usersTable,
-          rowKey: userId,
-          columnKey: "firstName",
-        ),
-      );
-      localDataSource.updateCurrentUser(firstName: firstName);
-    }
-    if (lastName != null) {
-      tasksList.add(
-        cloudDataSource.updateValue(
-          lastName.replaceAll(" ", ""),
-          MTable.usersTable,
-          rowKey: userId,
-          columnKey: "lastName",
-        ),
-      );
-      localDataSource.updateCurrentUser(lastName: lastName);
     }
     if (email != null) {
       if ((await cloudDataSource.getRowsByValue(email, MTable.usersTable)).isEmpty) {
@@ -273,27 +278,16 @@ class UserRepositoryImp extends UserRepository {
         );
       }
     }
-    if (grade != null) {
+    if (phoneNumber != null) {
       tasksList.add(
         cloudDataSource.updateValue(
-          grade,
+          phoneNumber,
           MTable.usersTable,
           rowKey: userId,
-          columnKey: "grade",
+          columnKey: "phoneNumber",
         ),
       );
-      localDataSource.updateCurrentUser(grade: grade);
-    }
-    if (parentPhone != null) {
-      tasksList.add(
-        cloudDataSource.updateValue(
-          parentPhone,
-          MTable.usersTable,
-          rowKey: userId,
-          columnKey: "parentPhone",
-        ),
-      );
-      localDataSource.updateCurrentUser(parentPhone: parentPhone);
+      localDataSource.updateCurrentUser(phoneNumber: phoneNumber);
     }
     if (classes != null) {
       tasksList.add(

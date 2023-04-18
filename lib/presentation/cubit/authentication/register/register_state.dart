@@ -4,7 +4,8 @@ part of 'register_cubit.dart';
 class RegisterState with _$RegisterState {
   const factory RegisterState.initial({
     @Default("") String email,
-    @Default("") String username,
+    @Default("") String phoneNumber,
+    @Default("") String fullName,
     @Default("") String password,
     @Default("") String conformPassword,
     @Default(false) bool isLoading,

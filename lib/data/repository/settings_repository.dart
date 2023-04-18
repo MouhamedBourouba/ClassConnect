@@ -9,7 +9,6 @@ abstract class SettingsRepository {
 
   void setIsEmailVerified({required bool isEmailVerified});
 
-  bool isAccountCompleted();
 }
 
 @Singleton(as: SettingsRepository)
@@ -18,20 +17,6 @@ class SettingsRepositoryImp extends SettingsRepository {
   final LocalDataSource localDataSource;
 
   SettingsRepositoryImp(this.cloudDataSource, this.localDataSource);
-
-  @override
-  bool isAccountCompleted() {
-    final user = localDataSource.getCurrentUser();
-    if (user == null ||
-        user.firstName == null ||
-        user.lastName == null ||
-        user.parentPhone == null ||
-        user.grade == null) {
-      return false;
-    } else {
-      return true;
-    }
-  }
 
   @override
   bool isAuthenticated() => localDataSource.getCurrentUser() != null;

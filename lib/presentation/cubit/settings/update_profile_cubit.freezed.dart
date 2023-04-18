@@ -17,56 +17,29 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$UpdateProfileState {
   User get currentUser => throw _privateConstructorUsedError;
-  String get firstName => throw _privateConstructorUsedError;
-  String get lastName => throw _privateConstructorUsedError;
+  String get fullName => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
-  String get parentPhone => throw _privateConstructorUsedError;
-  String get username => throw _privateConstructorUsedError;
-  String get grade => throw _privateConstructorUsedError;
+  String get phoneNumber => throw _privateConstructorUsedError;
   String get errorMessage => throw _privateConstructorUsedError;
   PageState get pageState => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(
-            User currentUser,
-            String firstName,
-            String lastName,
-            String email,
-            String parentPhone,
-            String username,
-            String grade,
-            String errorMessage,
-            PageState pageState)
+    required TResult Function(User currentUser, String fullName, String email,
+            String phoneNumber, String errorMessage, PageState pageState)
         init,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(
-            User currentUser,
-            String firstName,
-            String lastName,
-            String email,
-            String parentPhone,
-            String username,
-            String grade,
-            String errorMessage,
-            PageState pageState)?
+    TResult? Function(User currentUser, String fullName, String email,
+            String phoneNumber, String errorMessage, PageState pageState)?
         init,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            User currentUser,
-            String firstName,
-            String lastName,
-            String email,
-            String parentPhone,
-            String username,
-            String grade,
-            String errorMessage,
-            PageState pageState)?
+    TResult Function(User currentUser, String fullName, String email,
+            String phoneNumber, String errorMessage, PageState pageState)?
         init,
     required TResult orElse(),
   }) =>
@@ -101,12 +74,9 @@ abstract class $UpdateProfileStateCopyWith<$Res> {
   @useResult
   $Res call(
       {User currentUser,
-      String firstName,
-      String lastName,
+      String fullName,
       String email,
-      String parentPhone,
-      String username,
-      String grade,
+      String phoneNumber,
       String errorMessage,
       PageState pageState});
 }
@@ -125,12 +95,9 @@ class _$UpdateProfileStateCopyWithImpl<$Res, $Val extends UpdateProfileState>
   @override
   $Res call({
     Object? currentUser = null,
-    Object? firstName = null,
-    Object? lastName = null,
+    Object? fullName = null,
     Object? email = null,
-    Object? parentPhone = null,
-    Object? username = null,
-    Object? grade = null,
+    Object? phoneNumber = null,
     Object? errorMessage = null,
     Object? pageState = null,
   }) {
@@ -139,29 +106,17 @@ class _$UpdateProfileStateCopyWithImpl<$Res, $Val extends UpdateProfileState>
           ? _value.currentUser
           : currentUser // ignore: cast_nullable_to_non_nullable
               as User,
-      firstName: null == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as String,
-      lastName: null == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
+      fullName: null == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
               as String,
       email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      parentPhone: null == parentPhone
-          ? _value.parentPhone
-          : parentPhone // ignore: cast_nullable_to_non_nullable
-              as String,
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
-              as String,
-      grade: null == grade
-          ? _value.grade
-          : grade // ignore: cast_nullable_to_non_nullable
+      phoneNumber: null == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String,
       errorMessage: null == errorMessage
           ? _value.errorMessage
@@ -185,12 +140,9 @@ abstract class _$$UpdateProfileStateInitCopyWith<$Res>
   @useResult
   $Res call(
       {User currentUser,
-      String firstName,
-      String lastName,
+      String fullName,
       String email,
-      String parentPhone,
-      String username,
-      String grade,
+      String phoneNumber,
       String errorMessage,
       PageState pageState});
 }
@@ -207,12 +159,9 @@ class __$$UpdateProfileStateInitCopyWithImpl<$Res>
   @override
   $Res call({
     Object? currentUser = null,
-    Object? firstName = null,
-    Object? lastName = null,
+    Object? fullName = null,
     Object? email = null,
-    Object? parentPhone = null,
-    Object? username = null,
-    Object? grade = null,
+    Object? phoneNumber = null,
     Object? errorMessage = null,
     Object? pageState = null,
   }) {
@@ -221,29 +170,17 @@ class __$$UpdateProfileStateInitCopyWithImpl<$Res>
           ? _value.currentUser
           : currentUser // ignore: cast_nullable_to_non_nullable
               as User,
-      firstName: null == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as String,
-      lastName: null == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
+      fullName: null == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
               as String,
       email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      parentPhone: null == parentPhone
-          ? _value.parentPhone
-          : parentPhone // ignore: cast_nullable_to_non_nullable
-              as String,
-      username: null == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
-              as String,
-      grade: null == grade
-          ? _value.grade
-          : grade // ignore: cast_nullable_to_non_nullable
+      phoneNumber: null == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String,
       errorMessage: null == errorMessage
           ? _value.errorMessage
@@ -262,12 +199,9 @@ class __$$UpdateProfileStateInitCopyWithImpl<$Res>
 class _$UpdateProfileStateInit implements UpdateProfileStateInit {
   const _$UpdateProfileStateInit(
       {required this.currentUser,
-      this.firstName = "",
-      this.lastName = "",
+      this.fullName = "",
       this.email = "",
-      this.parentPhone = "",
-      this.username = "",
-      this.grade = "",
+      this.phoneNumber = "",
       this.errorMessage = "",
       this.pageState = PageState.init});
 
@@ -275,22 +209,13 @@ class _$UpdateProfileStateInit implements UpdateProfileStateInit {
   final User currentUser;
   @override
   @JsonKey()
-  final String firstName;
-  @override
-  @JsonKey()
-  final String lastName;
+  final String fullName;
   @override
   @JsonKey()
   final String email;
   @override
   @JsonKey()
-  final String parentPhone;
-  @override
-  @JsonKey()
-  final String username;
-  @override
-  @JsonKey()
-  final String grade;
+  final String phoneNumber;
   @override
   @JsonKey()
   final String errorMessage;
@@ -300,7 +225,7 @@ class _$UpdateProfileStateInit implements UpdateProfileStateInit {
 
   @override
   String toString() {
-    return 'UpdateProfileState.init(currentUser: $currentUser, firstName: $firstName, lastName: $lastName, email: $email, parentPhone: $parentPhone, username: $username, grade: $grade, errorMessage: $errorMessage, pageState: $pageState)';
+    return 'UpdateProfileState.init(currentUser: $currentUser, fullName: $fullName, email: $email, phoneNumber: $phoneNumber, errorMessage: $errorMessage, pageState: $pageState)';
   }
 
   @override
@@ -310,16 +235,11 @@ class _$UpdateProfileStateInit implements UpdateProfileStateInit {
             other is _$UpdateProfileStateInit &&
             (identical(other.currentUser, currentUser) ||
                 other.currentUser == currentUser) &&
-            (identical(other.firstName, firstName) ||
-                other.firstName == firstName) &&
-            (identical(other.lastName, lastName) ||
-                other.lastName == lastName) &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.parentPhone, parentPhone) ||
-                other.parentPhone == parentPhone) &&
-            (identical(other.username, username) ||
-                other.username == username) &&
-            (identical(other.grade, grade) || other.grade == grade) &&
+            (identical(other.phoneNumber, phoneNumber) ||
+                other.phoneNumber == phoneNumber) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage) &&
             (identical(other.pageState, pageState) ||
@@ -327,8 +247,8 @@ class _$UpdateProfileStateInit implements UpdateProfileStateInit {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentUser, firstName, lastName,
-      email, parentPhone, username, grade, errorMessage, pageState);
+  int get hashCode => Object.hash(runtimeType, currentUser, fullName, email,
+      phoneNumber, errorMessage, pageState);
 
   @JsonKey(ignore: true)
   @override
@@ -340,60 +260,36 @@ class _$UpdateProfileStateInit implements UpdateProfileStateInit {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(
-            User currentUser,
-            String firstName,
-            String lastName,
-            String email,
-            String parentPhone,
-            String username,
-            String grade,
-            String errorMessage,
-            PageState pageState)
+    required TResult Function(User currentUser, String fullName, String email,
+            String phoneNumber, String errorMessage, PageState pageState)
         init,
   }) {
-    return init(currentUser, firstName, lastName, email, parentPhone, username,
-        grade, errorMessage, pageState);
+    return init(
+        currentUser, fullName, email, phoneNumber, errorMessage, pageState);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(
-            User currentUser,
-            String firstName,
-            String lastName,
-            String email,
-            String parentPhone,
-            String username,
-            String grade,
-            String errorMessage,
-            PageState pageState)?
+    TResult? Function(User currentUser, String fullName, String email,
+            String phoneNumber, String errorMessage, PageState pageState)?
         init,
   }) {
-    return init?.call(currentUser, firstName, lastName, email, parentPhone,
-        username, grade, errorMessage, pageState);
+    return init?.call(
+        currentUser, fullName, email, phoneNumber, errorMessage, pageState);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            User currentUser,
-            String firstName,
-            String lastName,
-            String email,
-            String parentPhone,
-            String username,
-            String grade,
-            String errorMessage,
-            PageState pageState)?
+    TResult Function(User currentUser, String fullName, String email,
+            String phoneNumber, String errorMessage, PageState pageState)?
         init,
     required TResult orElse(),
   }) {
     if (init != null) {
-      return init(currentUser, firstName, lastName, email, parentPhone,
-          username, grade, errorMessage, pageState);
+      return init(
+          currentUser, fullName, email, phoneNumber, errorMessage, pageState);
     }
     return orElse();
   }
@@ -430,29 +326,20 @@ class _$UpdateProfileStateInit implements UpdateProfileStateInit {
 abstract class UpdateProfileStateInit implements UpdateProfileState {
   const factory UpdateProfileStateInit(
       {required final User currentUser,
-      final String firstName,
-      final String lastName,
+      final String fullName,
       final String email,
-      final String parentPhone,
-      final String username,
-      final String grade,
+      final String phoneNumber,
       final String errorMessage,
       final PageState pageState}) = _$UpdateProfileStateInit;
 
   @override
   User get currentUser;
   @override
-  String get firstName;
-  @override
-  String get lastName;
+  String get fullName;
   @override
   String get email;
   @override
-  String get parentPhone;
-  @override
-  String get username;
-  @override
-  String get grade;
+  String get phoneNumber;
   @override
   String get errorMessage;
   @override

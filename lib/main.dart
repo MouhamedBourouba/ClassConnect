@@ -1,12 +1,6 @@
-import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
-import 'package:ClassConnect/data/model/source.dart';
-import 'package:ClassConnect/data/model/user.dart';
-import 'package:ClassConnect/data/repository/classes_data_source.dart';
 import 'package:ClassConnect/data/repository/settings_repository.dart';
-import 'package:ClassConnect/data/repository/user_repository.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/settings/update_profile_cubit.dart';
-import 'package:ClassConnect/presentation/ui/pages/complete_account_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
@@ -26,8 +20,6 @@ class App extends StatelessWidget {
     final settingRepository = getIt<SettingsRepository>();
     if (!settingRepository.isAuthenticated()) {
       return const LoginScreen();
-    } else if (!settingRepository.isAccountCompleted()) {
-      return const CompleteAccountPage();
     } else if (!settingRepository.isEmailVerified()) {
       return const EmailVerificationPage();
     } else {

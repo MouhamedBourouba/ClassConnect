@@ -1,5 +1,5 @@
 import 'package:ClassConnect/presentation/cubit/authentication/register/register_cubit.dart';
-import 'package:ClassConnect/presentation/ui/pages/complete_account_page.dart';
+import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/authentication_scaffold.dart';
 import 'package:ClassConnect/presentation/ui/widgets/button.dart';
@@ -9,6 +9,7 @@ import 'package:ClassConnect/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -29,7 +30,7 @@ class RegisterScreen extends StatelessWidget {
           if (state.isSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (ctx) => const CompleteAccountPage()),
+              MaterialPageRoute(builder: (ctx) => const HomePage()),
               (route) => false,
             );
           }
@@ -39,15 +40,9 @@ class RegisterScreen extends StatelessWidget {
             child: SingleChildScrollView(
               reverse: true,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Hero(
-                    tag: "logo",
-                    child: SvgPicture.asset(
-                      "assets/images/logo_no_text.svg",
-                      width: MediaQuery.of(context).size.height / 4,
-                    ),
-                  ),
                   Text(
                     "Register",
                     style: theme.textTheme.headline4?.copyWith(color: theme.colorScheme.primary),
@@ -104,9 +99,10 @@ class RegisterForm extends StatelessWidget {
     final canRegister = registerCubit.state.conformPassword.isNotEmpty &&
         registerCubit.state.password.isNotEmpty &&
         registerCubit.state.email.isNotEmpty &&
-        registerCubit.state.username.isNotEmpty &&
+        registerCubit.state.fullName.isNotEmpty &&
         registerCubit.state.password.length > 8 &&
         registerCubit.state.conformPassword == registerCubit.state.password &&
+        registerCubit.state.phoneNumber.isNotEmpty &&
         registerCubit.state.email.isEmail();
 
     return Form(
@@ -117,19 +113,18 @@ class RegisterForm extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
-              initialValue: registerCubit.state.username,
-              onChanged: registerCubit.onUsernameChanged,
               decoration: const InputDecoration(
-                hintText: "username",
+                hintText: "Full name",
                 border: outlinedInputBorder,
                 prefixIcon: Icon(Icons.person),
               ),
+              onChanged: registerCubit.onFullNameChanged,
             ),
             const SizedBox(height: 4),
             TextFormField(
               initialValue: registerCubit.state.email,
               decoration: const InputDecoration(
-                hintText: "email",
+                hintText: "Email",
                 border: outlinedInputBorder,
                 prefixIcon: Icon(Icons.email),
               ),
@@ -159,7 +154,23 @@ class RegisterForm extends StatelessWidget {
                 return "Password dose not match";
               },
             ),
-            const MDivider(),
+            const SizedBox(height: 4),
+            InternationalPhoneNumberInput(
+             validator: (val) => null,
+              inputDecoration: const InputDecoration(
+                hintText:"Phone number",
+                border: outlinedInputBorder,
+                prefixIcon: Icon(Icons.phone),
+              ),
+              selectorConfig: const SelectorConfig(
+                selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+              ),
+              initialValue: PhoneNumber(isoCode: "DZ"),
+              onInputChanged: (PhoneNumber value) {
+                registerCubit.onPhoneNumberChanged(value);
+              },
+            ),
+            const Divider(),
             MButton(
               onClick: canRegister ? registerCubit.register : null,
               title: "SingUp",

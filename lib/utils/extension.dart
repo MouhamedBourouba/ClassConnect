@@ -3,36 +3,17 @@ import 'dart:convert';
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-extension UserFromList on List<String> {
-  User toUser() {
-    return User(
-      id: first,
-      username: this[1],
-      password: this[3],
-      email: this[2],
-      parentPhone: this[5],
-      firstName: this[6],
-      lastName: this[7],
-      grade: this[4],
-    );
-  }
-}
 
 extension UserFromMap on Map<String, dynamic> {
   User toUser() {
     return User(
       id: this["id"].toString(),
-      username: this["username"].toString(),
+      fullName: this["fullName"].toString(),
       password: this["hashedPassword"].toString(),
       email: this["email"].toString(),
-      firstName: this["firstName"].toString(),
-      lastName: this["lastName"].toString(),
-      grade: this["grade"].toString(),
-      parentPhone: this["parentPhone"].toString(),
-      classes: this["studentsIds"].toString().toList(),
-      teachingClasses: this["studentsIds"].toString().toList(),
+      phoneNumber: this["phoneNumber"].toString(),
+      classes: this["classes"].toString().toList(),
+      teachingClasses: this["teachingClasses"].toString().toList(),
     );
   }
 

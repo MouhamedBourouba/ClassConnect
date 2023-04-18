@@ -1,6 +1,5 @@
 import 'package:ClassConnect/presentation/cubit/authentication/email_verification/email_verification_cubit.dart';
 import 'package:ClassConnect/presentation/cubit/authentication/email_verification/update_email_cubit.dart';
-import 'package:ClassConnect/presentation/ui/pages/complete_account_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/loading.dart';
 import 'package:ClassConnect/utils/extension.dart';
@@ -141,7 +140,7 @@ class EmailVerificationPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const MDivider(),
+                      const Divider(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: SizedBox(

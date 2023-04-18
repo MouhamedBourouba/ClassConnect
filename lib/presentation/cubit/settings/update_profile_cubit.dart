@@ -19,17 +19,11 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
 
   final UserRepository userRepository = getIt();
 
-  void onUsernameChanged(String value) => emit(state.copyWith(username: value));
+  void onFullNameChanged(String value) => emit(state.copyWith(fullName: value));
 
-  void onFirstNameChanged(String value) => emit(state.copyWith(firstName: value));
+  void onPhoneNumberChanged(String value) => emit(state.copyWith(phoneNumber: value));
 
-  void onLastNameChanged(String value) => emit(state.copyWith(lastName: value));
-
-  void onGradeChanged(String value) => emit(state.copyWith(grade: value));
-
-  void onParentPhoneChanged(String value) => emit(state.copyWith(parentPhone: value));
-
-  void onEmailChanged(String value) => emit(state.copyWith(parentPhone: value));
+  void onEmailChanged(String value) => emit(state.copyWith(email: value));
 
   Future<void> update(UserField field) async {
     await checkInternetConnection();
@@ -37,17 +31,14 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
     late Result<Unit, MException> updatingTask;
 
     switch (field) {
-      case UserField.firstAndLastName:
-        updatingTask = await userRepository.updateUser(firstName: state.firstName, lastName: state.lastName);
-        break;
-      case UserField.parentPhone:
-        updatingTask = await userRepository.updateUser(parentPhone: state.parentPhone);
+      case UserField.fullName:
+        updatingTask = await userRepository.updateUser(fullName: state.fullName);
         break;
       case UserField.email:
         updatingTask = await userRepository.updateUser(email: state.email);
         break;
-      case UserField.grade:
-        updatingTask = await userRepository.updateUser(grade: state.grade);
+      case UserField.phoneNumber:
+        updatingTask = await userRepository.updateUser(phoneNumber: state.phoneNumber);
         break;
     }
 
@@ -62,4 +53,4 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
   void setToInit() => emit(state.copyWith(pageState: PageState.init));
 }
 
-enum UserField { firstAndLastName, parentPhone, email, grade }
+enum UserField { fullName, phoneNumber, email }

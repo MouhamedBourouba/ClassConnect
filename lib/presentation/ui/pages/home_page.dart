@@ -72,8 +72,8 @@ class HomeBody extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.blueGrey,
                 child: Text(
-                  homeState.currentUser.firstName.firstLatter().toUpperCase(),
-                  style: theme.textTheme.headline6!.copyWith(color: Colors.white),
+                  homeState.currentUser.fullName.firstLatter().toUpperCase(),
+                  style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
                 ),
               ),
             ),
@@ -107,9 +107,9 @@ class HomeBody extends StatelessWidget {
                 backgroundColor: Colors.transparent,
               ),
               subtitle: Text(
-                "Teacher: ${context.read<HomeCubit>().getTeacher(class_).username}",
+                "Teacher: ${context.read<HomeCubit>().getTeacher(class_).fullName}",
                 maxLines: 1,
-                style: theme.textTheme.caption,
+                style: theme.textTheme.bodySmall,
                 overflow: TextOverflow.ellipsis,
               ),
               title: Text(
@@ -161,7 +161,7 @@ class HomeDrawer extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: Colors.blueGrey,
                   child: Text(
-                    currentUser.firstName.firstLatter().toUpperCase(),
+                    currentUser.fullName.firstLatter().toUpperCase(),
                     style: theme.textTheme.bodyLarge!.copyWith(
                       color: Colors.white,
                       fontSize: 20,
@@ -172,7 +172,7 @@ class HomeDrawer extends StatelessWidget {
                   width: 8,
                 ),
                 Text(
-                  currentUser.username,
+                  currentUser.fullName,
                   style: theme.textTheme.headline6,
                 ),
               ],

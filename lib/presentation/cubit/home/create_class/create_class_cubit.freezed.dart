@@ -17,27 +17,45 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$CreateClassState {
   String get className => throw _privateConstructorUsedError;
+  String get customSubject => throw _privateConstructorUsedError;
   String get classSubject => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   bool get isSuccess => throw _privateConstructorUsedError;
+  List<DropDownValueModel> get dropDownList =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String className, String classSubject,
-            bool isLoading, bool isSuccess)
+    required TResult Function(
+            String className,
+            String customSubject,
+            String classSubject,
+            bool isLoading,
+            bool isSuccess,
+            List<DropDownValueModel> dropDownList)
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String className, String classSubject, bool isLoading,
-            bool isSuccess)?
+    TResult? Function(
+            String className,
+            String customSubject,
+            String classSubject,
+            bool isLoading,
+            bool isSuccess,
+            List<DropDownValueModel> dropDownList)?
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String className, String classSubject, bool isLoading,
-            bool isSuccess)?
+    TResult Function(
+            String className,
+            String customSubject,
+            String classSubject,
+            bool isLoading,
+            bool isSuccess,
+            List<DropDownValueModel> dropDownList)?
         initial,
     required TResult orElse(),
   }) =>
@@ -71,7 +89,12 @@ abstract class $CreateClassStateCopyWith<$Res> {
       _$CreateClassStateCopyWithImpl<$Res, CreateClassState>;
   @useResult
   $Res call(
-      {String className, String classSubject, bool isLoading, bool isSuccess});
+      {String className,
+      String customSubject,
+      String classSubject,
+      bool isLoading,
+      bool isSuccess,
+      List<DropDownValueModel> dropDownList});
 }
 
 /// @nodoc
@@ -88,14 +111,20 @@ class _$CreateClassStateCopyWithImpl<$Res, $Val extends CreateClassState>
   @override
   $Res call({
     Object? className = null,
+    Object? customSubject = null,
     Object? classSubject = null,
     Object? isLoading = null,
     Object? isSuccess = null,
+    Object? dropDownList = null,
   }) {
     return _then(_value.copyWith(
       className: null == className
           ? _value.className
           : className // ignore: cast_nullable_to_non_nullable
+              as String,
+      customSubject: null == customSubject
+          ? _value.customSubject
+          : customSubject // ignore: cast_nullable_to_non_nullable
               as String,
       classSubject: null == classSubject
           ? _value.classSubject
@@ -109,6 +138,10 @@ class _$CreateClassStateCopyWithImpl<$Res, $Val extends CreateClassState>
           ? _value.isSuccess
           : isSuccess // ignore: cast_nullable_to_non_nullable
               as bool,
+      dropDownList: null == dropDownList
+          ? _value.dropDownList
+          : dropDownList // ignore: cast_nullable_to_non_nullable
+              as List<DropDownValueModel>,
     ) as $Val);
   }
 }
@@ -122,7 +155,12 @@ abstract class _$$_InitialCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String className, String classSubject, bool isLoading, bool isSuccess});
+      {String className,
+      String customSubject,
+      String classSubject,
+      bool isLoading,
+      bool isSuccess,
+      List<DropDownValueModel> dropDownList});
 }
 
 /// @nodoc
@@ -136,14 +174,20 @@ class __$$_InitialCopyWithImpl<$Res>
   @override
   $Res call({
     Object? className = null,
+    Object? customSubject = null,
     Object? classSubject = null,
     Object? isLoading = null,
     Object? isSuccess = null,
+    Object? dropDownList = null,
   }) {
     return _then(_$_Initial(
       className: null == className
           ? _value.className
           : className // ignore: cast_nullable_to_non_nullable
+              as String,
+      customSubject: null == customSubject
+          ? _value.customSubject
+          : customSubject // ignore: cast_nullable_to_non_nullable
               as String,
       classSubject: null == classSubject
           ? _value.classSubject
@@ -157,6 +201,10 @@ class __$$_InitialCopyWithImpl<$Res>
           ? _value.isSuccess
           : isSuccess // ignore: cast_nullable_to_non_nullable
               as bool,
+      dropDownList: null == dropDownList
+          ? _value._dropDownList
+          : dropDownList // ignore: cast_nullable_to_non_nullable
+              as List<DropDownValueModel>,
     ));
   }
 }
@@ -166,13 +214,28 @@ class __$$_InitialCopyWithImpl<$Res>
 class _$_Initial implements _Initial {
   const _$_Initial(
       {this.className = "",
+      this.customSubject = "",
       this.classSubject = "match",
       this.isLoading = false,
-      this.isSuccess = false});
+      this.isSuccess = false,
+      final List<DropDownValueModel> dropDownList = const [
+        DropDownValueModel(name: "math", value: 0),
+        DropDownValueModel(name: "arabic", value: 1),
+        DropDownValueModel(name: "english", value: 2),
+        DropDownValueModel(name: "french", value: 3),
+        DropDownValueModel(name: "history", value: 4),
+        DropDownValueModel(name: "physics", value: 5),
+        DropDownValueModel(name: "science", value: 6),
+        DropDownValueModel(name: "other", value: 7)
+      ]})
+      : _dropDownList = dropDownList;
 
   @override
   @JsonKey()
   final String className;
+  @override
+  @JsonKey()
+  final String customSubject;
   @override
   @JsonKey()
   final String classSubject;
@@ -182,10 +245,18 @@ class _$_Initial implements _Initial {
   @override
   @JsonKey()
   final bool isSuccess;
+  final List<DropDownValueModel> _dropDownList;
+  @override
+  @JsonKey()
+  List<DropDownValueModel> get dropDownList {
+    if (_dropDownList is EqualUnmodifiableListView) return _dropDownList;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_dropDownList);
+  }
 
   @override
   String toString() {
-    return 'CreateClassState.initial(className: $className, classSubject: $classSubject, isLoading: $isLoading, isSuccess: $isSuccess)';
+    return 'CreateClassState.initial(className: $className, customSubject: $customSubject, classSubject: $classSubject, isLoading: $isLoading, isSuccess: $isSuccess, dropDownList: $dropDownList)';
   }
 
   @override
@@ -195,17 +266,27 @@ class _$_Initial implements _Initial {
             other is _$_Initial &&
             (identical(other.className, className) ||
                 other.className == className) &&
+            (identical(other.customSubject, customSubject) ||
+                other.customSubject == customSubject) &&
             (identical(other.classSubject, classSubject) ||
                 other.classSubject == classSubject) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.isSuccess, isSuccess) ||
-                other.isSuccess == isSuccess));
+                other.isSuccess == isSuccess) &&
+            const DeepCollectionEquality()
+                .equals(other._dropDownList, _dropDownList));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, className, classSubject, isLoading, isSuccess);
+  int get hashCode => Object.hash(
+      runtimeType,
+      className,
+      customSubject,
+      classSubject,
+      isLoading,
+      isSuccess,
+      const DeepCollectionEquality().hash(_dropDownList));
 
   @JsonKey(ignore: true)
   @override
@@ -216,33 +297,51 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String className, String classSubject,
-            bool isLoading, bool isSuccess)
+    required TResult Function(
+            String className,
+            String customSubject,
+            String classSubject,
+            bool isLoading,
+            bool isSuccess,
+            List<DropDownValueModel> dropDownList)
         initial,
   }) {
-    return initial(className, classSubject, isLoading, isSuccess);
+    return initial(className, customSubject, classSubject, isLoading, isSuccess,
+        dropDownList);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String className, String classSubject, bool isLoading,
-            bool isSuccess)?
+    TResult? Function(
+            String className,
+            String customSubject,
+            String classSubject,
+            bool isLoading,
+            bool isSuccess,
+            List<DropDownValueModel> dropDownList)?
         initial,
   }) {
-    return initial?.call(className, classSubject, isLoading, isSuccess);
+    return initial?.call(className, customSubject, classSubject, isLoading,
+        isSuccess, dropDownList);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String className, String classSubject, bool isLoading,
-            bool isSuccess)?
+    TResult Function(
+            String className,
+            String customSubject,
+            String classSubject,
+            bool isLoading,
+            bool isSuccess,
+            List<DropDownValueModel> dropDownList)?
         initial,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(className, classSubject, isLoading, isSuccess);
+      return initial(className, customSubject, classSubject, isLoading,
+          isSuccess, dropDownList);
     }
     return orElse();
   }
@@ -279,18 +378,24 @@ class _$_Initial implements _Initial {
 abstract class _Initial implements CreateClassState {
   const factory _Initial(
       {final String className,
+      final String customSubject,
       final String classSubject,
       final bool isLoading,
-      final bool isSuccess}) = _$_Initial;
+      final bool isSuccess,
+      final List<DropDownValueModel> dropDownList}) = _$_Initial;
 
   @override
   String get className;
+  @override
+  String get customSubject;
   @override
   String get classSubject;
   @override
   bool get isLoading;
   @override
   bool get isSuccess;
+  @override
+  List<DropDownValueModel> get dropDownList;
   @override
   @JsonKey(ignore: true)
   _$$_InitialCopyWith<_$_Initial> get copyWith =>

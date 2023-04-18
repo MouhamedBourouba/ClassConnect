@@ -25,6 +25,8 @@ abstract class ClassesRepository {
   Future<Result<Unit, MException>> joinClass(String classId);
 
   Future<Result<List<User>, MException>> getCurrentUserTeachers([DataSource? source]);
+
+  // Future<Result<Unit, String>> send
 }
 
 @LazySingleton(as: ClassesRepository)

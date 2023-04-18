@@ -3,8 +3,6 @@ import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:ClassConnect/presentation/cubit/authentication/login/login_cubit.dart';
-import 'package:ClassConnect/presentation/ui/pages/complete_account_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/register_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/authentication_scaffold.dart';
@@ -32,9 +30,7 @@ class LoginScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  if (state.user?.isAccountCompleted() == false) {
-                    return const CompleteAccountPage();
-                  } else if(!state.isEmailVerified){
+                  if(!state.isEmailVerified){
                     return const EmailVerificationPage();
                   } else {
                     return const HomePage();
@@ -141,7 +137,7 @@ class LoginForm extends StatelessWidget {
               onChange: loginCubit.onPasswordChanged,
               initValue: context.read<LoginCubit>().state.password,
             ),
-            const MDivider(),
+            const Divider(),
             MButton(
               onClick: canRegister ? loginCubit.login : null,
               title: "SingIn",

@@ -47,6 +47,7 @@ class UpdateProfileBody extends StatelessWidget {
     final UpdateProfileState state = updateProfileCubit.state;
     final theme = Theme.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // ignore: use_colored_box
@@ -92,7 +93,7 @@ class UpdateProfileBody extends StatelessWidget {
             top: 37,
             child: Text(
               "Profile",
-              style: theme.textTheme.headline5!.copyWith(color: Colors.white),
+              style: theme.textTheme.headlineSmall!.copyWith(color: Colors.white),
               textAlign: TextAlign.center,
             ),
           ),
@@ -122,7 +123,7 @@ class UpdateProfileBody extends StatelessWidget {
                 children: [
                   const SizedBox(height: 30),
                   Text(
-                    state.currentUser.username,
+                    state.currentUser.fullName,
                     style: theme.textTheme.headline5!.copyWith(fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
                   ),
@@ -151,7 +152,7 @@ class UpdateProfileBody extends StatelessWidget {
                 radius: 30,
                 backgroundColor: theme.colorScheme.secondary,
                 child: Text(
-                  state.currentUser.firstName.firstLatter().toUpperCase(),
+                  state.currentUser.fullName.firstLatter().toUpperCase(),
                   style: theme.textTheme.headline5!.copyWith(
                     color: Colors.white,
                   ),
@@ -178,77 +179,20 @@ class UpdateProfileBody extends StatelessWidget {
           buildAccountInfoTile(
             theme,
             infoName: "Full Name",
-            value: "${state.currentUser.firstName!} ${state.currentUser.lastName!}",
+            value: state.currentUser.fullName,
             icon: Icons.person,
             onTap: () {
               showUpdateDialog(
                 "Edit name",
                 context,
-                SizedBox(
-                  height: 132,
-                  child: Column(
-                    children: [
-                      TextField(
-                        decoration: const InputDecoration(filled: true, label: Text("First name")),
-                        onChanged: (value) {
-                          updateProfileCubit.onFirstNameChanged(value);
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        decoration: const InputDecoration(filled: true, label: Text("Last name")),
-                        onChanged: (value) {
-                          updateProfileCubit.onLastNameChanged(value);
-                        },
-                      ),
-                    ],
-                  ),
+                TextField(
+                  decoration: const InputDecoration(filled: true, label: Text("Full name")),
+                  onChanged: updateProfileCubit.onFullNameChanged,
                 ),
               ).then((value) {
                 if (value) {
-                  if (context.read<UpdateProfileCubit>().state.firstName.isNotEmpty &&
-                      context.read<UpdateProfileCubit>().state.lastName.isNotEmpty) {
-                    updateProfileCubit.update(UserField.firstAndLastName);
-                  } else {
-                    getIt<ErrorLogger>().showError("Invalid input");
-                  }
-                }
-              });
-            },
-          ),
-          buildAccountInfoTile(
-            theme,
-            icon: Icons.grade,
-            infoName: "Grade",
-            value: state.currentUser.grade!,
-            onTap: () {
-              showUpdateDialog(
-                "Edit grade",
-                context,
-                DropDownTextField(
-                  onChanged: (value) {
-                    if (value == "") {
-                      context.read<UpdateProfileCubit>().onGradeChanged("");
-                    } else {
-                      value as DropDownValueModel;
-                      context.read<UpdateProfileCubit>().onGradeChanged(value.name);
-                    }
-                  },
-                  initialValue: "First Grade",
-                  textFieldDecoration: const InputDecoration(
-                    label: Text("Grade"),
-                    filled: true,
-                  ),
-                  dropDownList: const [
-                    DropDownValueModel(name: "First Grade", value: 1),
-                    DropDownValueModel(name: "Second Grade", value: 2),
-                    DropDownValueModel(name: "Third Grade", value: 3),
-                  ],
-                ),
-              ).then((value) {
-                if (value) {
-                  if (context.read<UpdateProfileCubit>().state.grade.isNotEmpty) {
-                    updateProfileCubit.update(UserField.grade);
+                  if (context.read<UpdateProfileCubit>().state.fullName.isNotEmpty) {
+                    updateProfileCubit.update(UserField.fullName);
                   } else {
                     getIt<ErrorLogger>().showError("Invalid input");
                   }
@@ -287,28 +231,28 @@ class UpdateProfileBody extends StatelessWidget {
           buildAccountInfoTile(
             theme,
             icon: Icons.phone,
-            infoName: "Parent Phone",
-            value: state.currentUser.parentPhone!,
+            infoName: "Phone number",
+            value: state.currentUser.phoneNumber,
             onTap: () {
               showUpdateDialog(
-                "Edit parent phone",
+                "Edit phone number",
                 context,
                 TextField(
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
-                    updateProfileCubit.onParentPhoneChanged(value);
+                    updateProfileCubit.onPhoneNumberChanged(value);
                   },
                   decoration: const InputDecoration(
-                    label: Text('Parent phone'),
+                    label: Text('Phone number'),
                     filled: true,
                     prefixIcon: Icon(Icons.phone),
                   ),
                 ),
               ).then((value) {
                 if (value) {
-                  if (context.read<UpdateProfileCubit>().state.parentPhone.length < 11 &&
-                      context.read<UpdateProfileCubit>().state.parentPhone.length > 9) {
-                    updateProfileCubit.update(UserField.parentPhone);
+                  if (context.read<UpdateProfileCubit>().state.phoneNumber.length < 11 &&
+                      context.read<UpdateProfileCubit>().state.phoneNumber.length > 9) {
+                    updateProfileCubit.update(UserField.phoneNumber);
                   } else {
                     getIt<ErrorLogger>().showError("Invalid input");
                   }

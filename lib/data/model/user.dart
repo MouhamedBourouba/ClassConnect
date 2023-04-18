@@ -8,58 +8,45 @@ part 'user.g.dart';
 class User {
   User({
     required this.id,
-    required this.username,
+    required this.fullName,
     required this.password,
     required this.email,
-    this.firstName,
-    this.lastName,
-    this.grade,
-    this.parentPhone,
-    this.classes,
-    this.teachingClasses,
+    required this.phoneNumber,
+    required this.classes,
+    required this.teachingClasses,
   });
 
   @HiveField(0)
   String id;
   @HiveField(1)
-  String username;
+  String fullName;
   @HiveField(2)
   String password;
   @HiveField(3)
   String email;
   @HiveField(4)
-  String? firstName;
+  String phoneNumber;
   @HiveField(5)
-  String? lastName;
+  List<String> classes;
   @HiveField(6)
-  String? grade;
-  @HiveField(7)
-  String? parentPhone;
-  @HiveField(8)
-  List<String>? classes;
-  @HiveField(9)
-  List<String>? teachingClasses;
+  List<String> teachingClasses;
 
   User.defaultUser()
       : id = "",
-        username = "",
+        fullName = "",
         password = "",
-        email = "";
-
-  List<dynamic> toList() => [id, username, email, password, grade, parentPhone, firstName, lastName, classes];
+        phoneNumber = "",
+        email = "",
+        classes = [],
+        teachingClasses = [];
 
   Map<String, dynamic> toMap() => {
         "id": id,
-        "username": username,
+        "fullName": fullName,
         "email": email,
         "hashedPassword": password,
-        "grade": grade.toString(),
-        "parentPhone": parentPhone.toString(),
-        "firstName": firstName.toString(),
-        "lastName": lastName.toString(),
+        "phoneNumber": phoneNumber,
         "teachingClasses": jsonEncode(teachingClasses),
         "classes": jsonEncode(classes)
       };
-
-  bool isAccountCompleted() => firstName != "null" && grade != "null" && parentPhone != "null" && lastName != "null";
 }

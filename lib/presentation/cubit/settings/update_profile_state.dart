@@ -4,12 +4,9 @@ part of 'update_profile_cubit.dart';
 class UpdateProfileState with _$UpdateProfileState {
   const factory UpdateProfileState.init({
     required User currentUser,
-    @Default("") String firstName,
-    @Default("") String lastName,
+    @Default("") String fullName,
     @Default("") String email,
-    @Default("") String parentPhone,
-    @Default("") String username,
-    @Default("") String grade,
+    @Default("") String phoneNumber,
     @Default("") String errorMessage,
     @Default(PageState.init) PageState pageState,
   }) = UpdateProfileStateInit;
