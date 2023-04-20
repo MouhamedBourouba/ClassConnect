@@ -44,7 +44,7 @@ class User {
         "id": id,
         "fullName": fullName,
         "email": email,
-        "hashedPassword": password,
+        "password": password,
         "phoneNumber": phoneNumber,
         "teachingClasses": jsonEncode(teachingClasses),
         "classes": jsonEncode(classes)

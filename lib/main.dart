@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/settings/update_profile_cubit.dart';
@@ -9,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
+  final list = ["df9490", "df944", "e5c1d", "f72bf"];
   await init();
   runApp(const App());
 }

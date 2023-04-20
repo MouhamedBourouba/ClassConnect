@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:gsheets/gsheets.dart';
@@ -14,7 +15,7 @@ abstract class CloudDataSource {
 
   Future<bool> appendRow(Map<String, dynamic> data, MTable table);
 
-  Future<bool> updateValue(dynamic newValue, MTable table, {required String rowKey, required String columnKey});
+  Future<bool> updateValue(Object newValue, MTable table, {required String rowKey, required String columnKey});
 
   Future<bool> deleteRow(MTable table, {required String rowKey});
 
@@ -94,9 +95,9 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
       (await getWorkSheet(table)).values.map.rowByKey(rowKey);
 
   @override
-  Future<bool> updateValue(dynamic newValue, MTable table, {required String rowKey, required String columnKey}) async =>
+  Future<bool> updateValue(Object newValue, MTable table, {required String rowKey, required String columnKey}) async =>
       (await getWorkSheet(table)).values.insertValueByKeys(
-            newValue.toString(),
+            jsonEncode(newValue),
             columnKey: columnKey,
             rowKey: rowKey,
           );

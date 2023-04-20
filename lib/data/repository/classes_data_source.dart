@@ -26,7 +26,7 @@ abstract class ClassesRepository {
 
   Future<Result<List<User>, MException>> getCurrentUserTeachers([DataSource? source]);
 
-  // Future<Result<Unit, String>> send
+  Future<Result<Unit, MException>> inviteTeacher(String classId, String teacherEmail);
 }
 
 @LazySingleton(as: ClassesRepository)
@@ -44,7 +44,7 @@ class ClassesRepositoryImp extends ClassesRepository {
       final classId = uuid.v1().substring(0, 5);
       final currentUser = localDataSource.getCurrentUser()!;
       final currentUserTeachingClasses = currentUser.teachingClasses;
-      currentUserTeachingClasses?.add(classId);
+      currentUserTeachingClasses.add(classId);
       final class_ = Class(
         id: classId,
         creatorId: currentUser.id,
@@ -57,14 +57,14 @@ class ClassesRepositoryImp extends ClassesRepository {
       );
       final addingClassTask = cloudDataSource.appendRow(class_.toMap(), MTable.classesTable);
       final updatingUserTask = cloudDataSource.updateValue(
-        currentUserTeachingClasses ?? [classId],
+        currentUserTeachingClasses,
         MTable.usersTable,
         rowKey: currentUser.id,
         columnKey: "teachingClasses",
       );
       if (await addingClassTask && await updatingUserTask) {
         await localDataSource.addClass(class_);
-        await localDataSource.updateCurrentUser(teachingClasses: currentUserTeachingClasses ?? [classId]);
+        await localDataSource.updateCurrentUser(teachingClasses: currentUserTeachingClasses);
         return Result.success(unit);
       } else {
         return Result.error(MException.unknown());
@@ -86,13 +86,13 @@ class ClassesRepositoryImp extends ClassesRepository {
       }
       final classes = currentUser.classes;
       final classMap = searchingForClass.first;
-      if (classes?.contains(classId) == true) return Result.error(MException("Your already joined this class"));
-      if (currentUser.teachingClasses?.contains(classId) == true) {
+      if (classes.contains(classId) == true) return Result.error(MException("Your already joined this class"));
+      if (currentUser.teachingClasses.contains(classId) == true) {
         return Result.error(
           MException("You are the teacher of this class you cant join it as student"),
         );
       }
-      classes?.add(classId);
+      classes.add(classId);
       final students = classMap["studentsIds"].toString().toList();
       students.add(currentUser.id);
       final updatingClassTask = cloudDataSource.updateValue(
@@ -130,8 +130,7 @@ class ClassesRepositoryImp extends ClassesRepository {
         final List<Class> classes = [];
         classesMap?.forEach((class_) {
           final List<String> students = class_["studentsIds"].toString().toList();
-          if (students.any((id) => id == localDataSource.getCurrentUser()!.id) == true ||
-              class_["creatorId"] == localDataSource.getCurrentUser()!.id) {
+          if (students.any((id) => id == localDataSource.getCurrentUser()!.id) == true || class_["creatorId"] == localDataSource.getCurrentUser()!.id) {
             classes.add(class_.toClass());
             localDataSource.addClass(class_.toClass());
           }
@@ -167,6 +166,25 @@ class ClassesRepositoryImp extends ClassesRepository {
       } else {
         return getCurrentUserTeachers();
       }
+    } catch (e) {
+      return Result.error(MException.unknown());
+    }
+  }
+
+  @override
+  Future<Result<Unit, MException>> inviteTeacher(String classId, String teacherEmail) async {
+    try {
+      final searchingForTeacher = await cloudDataSource.getRowsByValue(teacherEmail, MTable.usersTable);
+      if (searchingForTeacher.isEmpty) return Result.error(MException("Can't find this teacher please double check the email address"));
+      final teacherData = searchingForTeacher.first.toUser();
+      teacherData.teachingClasses.add(classId);
+      final updatingTeacher = await cloudDataSource.updateValue(
+        teacherData.teachingClasses,
+        MTable.usersTable,
+        rowKey: teacherData.id,
+        columnKey: "teachingClasses",
+      );
+      return Result.success(unit);
     } catch (e) {
       return Result.error(MException.unknown());
     }

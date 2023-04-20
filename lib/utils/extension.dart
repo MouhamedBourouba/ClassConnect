@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/user.dart';
@@ -9,7 +10,7 @@ extension UserFromMap on Map<String, dynamic> {
     return User(
       id: this["id"].toString(),
       fullName: this["fullName"].toString(),
-      password: this["hashedPassword"].toString(),
+      password: this["password"].toString(),
       email: this["email"].toString(),
       phoneNumber: this["phoneNumber"].toString(),
       classes: this["classes"].toString().toList(),
@@ -93,3 +94,5 @@ extension StringUtils on String? {
 extension WidgetUtlis on StatelessWidget {
   MaterialPageRoute asRoute() => MaterialPageRoute(builder: (context) => this);
 }
+
+

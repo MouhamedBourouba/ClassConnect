@@ -17,20 +17,53 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$ClassState {
   String get classId => throw _privateConstructorUsedError;
+  String get teacherEmail => throw _privateConstructorUsedError;
+  String get errorMessage => throw _privateConstructorUsedError;
+  int get pageIndex => throw _privateConstructorUsedError;
+  List<User> get classMembers => throw _privateConstructorUsedError;
+  List<User> get teachers => throw _privateConstructorUsedError;
   PageState get pageState => throw _privateConstructorUsedError;
+  Class? get currentClass => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String classId, PageState pageState) initial,
+    required TResult Function(
+            String classId,
+            String teacherEmail,
+            String errorMessage,
+            int pageIndex,
+            List<User> classMembers,
+            List<User> teachers,
+            PageState pageState,
+            Class? currentClass)
+        initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String classId, PageState pageState)? initial,
+    TResult? Function(
+            String classId,
+            String teacherEmail,
+            String errorMessage,
+            int pageIndex,
+            List<User> classMembers,
+            List<User> teachers,
+            PageState pageState,
+            Class? currentClass)?
+        initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String classId, PageState pageState)? initial,
+    TResult Function(
+            String classId,
+            String teacherEmail,
+            String errorMessage,
+            int pageIndex,
+            List<User> classMembers,
+            List<User> teachers,
+            PageState pageState,
+            Class? currentClass)?
+        initial,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -62,7 +95,15 @@ abstract class $ClassStateCopyWith<$Res> {
           ClassState value, $Res Function(ClassState) then) =
       _$ClassStateCopyWithImpl<$Res, ClassState>;
   @useResult
-  $Res call({String classId, PageState pageState});
+  $Res call(
+      {String classId,
+      String teacherEmail,
+      String errorMessage,
+      int pageIndex,
+      List<User> classMembers,
+      List<User> teachers,
+      PageState pageState,
+      Class? currentClass});
 }
 
 /// @nodoc
@@ -79,17 +120,47 @@ class _$ClassStateCopyWithImpl<$Res, $Val extends ClassState>
   @override
   $Res call({
     Object? classId = null,
+    Object? teacherEmail = null,
+    Object? errorMessage = null,
+    Object? pageIndex = null,
+    Object? classMembers = null,
+    Object? teachers = null,
     Object? pageState = null,
+    Object? currentClass = freezed,
   }) {
     return _then(_value.copyWith(
       classId: null == classId
           ? _value.classId
           : classId // ignore: cast_nullable_to_non_nullable
               as String,
+      teacherEmail: null == teacherEmail
+          ? _value.teacherEmail
+          : teacherEmail // ignore: cast_nullable_to_non_nullable
+              as String,
+      errorMessage: null == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageIndex: null == pageIndex
+          ? _value.pageIndex
+          : pageIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      classMembers: null == classMembers
+          ? _value.classMembers
+          : classMembers // ignore: cast_nullable_to_non_nullable
+              as List<User>,
+      teachers: null == teachers
+          ? _value.teachers
+          : teachers // ignore: cast_nullable_to_non_nullable
+              as List<User>,
       pageState: null == pageState
           ? _value.pageState
           : pageState // ignore: cast_nullable_to_non_nullable
               as PageState,
+      currentClass: freezed == currentClass
+          ? _value.currentClass
+          : currentClass // ignore: cast_nullable_to_non_nullable
+              as Class?,
     ) as $Val);
   }
 }
@@ -101,7 +172,15 @@ abstract class _$$_InitialCopyWith<$Res> implements $ClassStateCopyWith<$Res> {
       __$$_InitialCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String classId, PageState pageState});
+  $Res call(
+      {String classId,
+      String teacherEmail,
+      String errorMessage,
+      int pageIndex,
+      List<User> classMembers,
+      List<User> teachers,
+      PageState pageState,
+      Class? currentClass});
 }
 
 /// @nodoc
@@ -115,17 +194,47 @@ class __$$_InitialCopyWithImpl<$Res>
   @override
   $Res call({
     Object? classId = null,
+    Object? teacherEmail = null,
+    Object? errorMessage = null,
+    Object? pageIndex = null,
+    Object? classMembers = null,
+    Object? teachers = null,
     Object? pageState = null,
+    Object? currentClass = freezed,
   }) {
     return _then(_$_Initial(
       classId: null == classId
           ? _value.classId
           : classId // ignore: cast_nullable_to_non_nullable
               as String,
+      teacherEmail: null == teacherEmail
+          ? _value.teacherEmail
+          : teacherEmail // ignore: cast_nullable_to_non_nullable
+              as String,
+      errorMessage: null == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageIndex: null == pageIndex
+          ? _value.pageIndex
+          : pageIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      classMembers: null == classMembers
+          ? _value._classMembers
+          : classMembers // ignore: cast_nullable_to_non_nullable
+              as List<User>,
+      teachers: null == teachers
+          ? _value._teachers
+          : teachers // ignore: cast_nullable_to_non_nullable
+              as List<User>,
       pageState: null == pageState
           ? _value.pageState
           : pageState // ignore: cast_nullable_to_non_nullable
               as PageState,
+      currentClass: freezed == currentClass
+          ? _value.currentClass
+          : currentClass // ignore: cast_nullable_to_non_nullable
+              as Class?,
     ));
   }
 }
@@ -133,18 +242,57 @@ class __$$_InitialCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Initial implements _Initial {
-  const _$_Initial({this.classId = "", this.pageState = PageState.init});
+  const _$_Initial(
+      {this.classId = "",
+      this.teacherEmail = "",
+      this.errorMessage = "",
+      this.pageIndex = 0,
+      final List<User> classMembers = const [],
+      final List<User> teachers = const [],
+      this.pageState = PageState.init,
+      this.currentClass})
+      : _classMembers = classMembers,
+        _teachers = teachers;
 
   @override
   @JsonKey()
   final String classId;
   @override
   @JsonKey()
+  final String teacherEmail;
+  @override
+  @JsonKey()
+  final String errorMessage;
+  @override
+  @JsonKey()
+  final int pageIndex;
+  final List<User> _classMembers;
+  @override
+  @JsonKey()
+  List<User> get classMembers {
+    if (_classMembers is EqualUnmodifiableListView) return _classMembers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_classMembers);
+  }
+
+  final List<User> _teachers;
+  @override
+  @JsonKey()
+  List<User> get teachers {
+    if (_teachers is EqualUnmodifiableListView) return _teachers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_teachers);
+  }
+
+  @override
+  @JsonKey()
   final PageState pageState;
+  @override
+  final Class? currentClass;
 
   @override
   String toString() {
-    return 'ClassState.initial(classId: $classId, pageState: $pageState)';
+    return 'ClassState.initial(classId: $classId, teacherEmail: $teacherEmail, errorMessage: $errorMessage, pageIndex: $pageIndex, classMembers: $classMembers, teachers: $teachers, pageState: $pageState, currentClass: $currentClass)';
   }
 
   @override
@@ -153,12 +301,32 @@ class _$_Initial implements _Initial {
         (other.runtimeType == runtimeType &&
             other is _$_Initial &&
             (identical(other.classId, classId) || other.classId == classId) &&
+            (identical(other.teacherEmail, teacherEmail) ||
+                other.teacherEmail == teacherEmail) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage) &&
+            (identical(other.pageIndex, pageIndex) ||
+                other.pageIndex == pageIndex) &&
+            const DeepCollectionEquality()
+                .equals(other._classMembers, _classMembers) &&
+            const DeepCollectionEquality().equals(other._teachers, _teachers) &&
             (identical(other.pageState, pageState) ||
-                other.pageState == pageState));
+                other.pageState == pageState) &&
+            (identical(other.currentClass, currentClass) ||
+                other.currentClass == currentClass));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, classId, pageState);
+  int get hashCode => Object.hash(
+      runtimeType,
+      classId,
+      teacherEmail,
+      errorMessage,
+      pageIndex,
+      const DeepCollectionEquality().hash(_classMembers),
+      const DeepCollectionEquality().hash(_teachers),
+      pageState,
+      currentClass);
 
   @JsonKey(ignore: true)
   @override
@@ -169,27 +337,57 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String classId, PageState pageState) initial,
+    required TResult Function(
+            String classId,
+            String teacherEmail,
+            String errorMessage,
+            int pageIndex,
+            List<User> classMembers,
+            List<User> teachers,
+            PageState pageState,
+            Class? currentClass)
+        initial,
   }) {
-    return initial(classId, pageState);
+    return initial(classId, teacherEmail, errorMessage, pageIndex, classMembers,
+        teachers, pageState, currentClass);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String classId, PageState pageState)? initial,
+    TResult? Function(
+            String classId,
+            String teacherEmail,
+            String errorMessage,
+            int pageIndex,
+            List<User> classMembers,
+            List<User> teachers,
+            PageState pageState,
+            Class? currentClass)?
+        initial,
   }) {
-    return initial?.call(classId, pageState);
+    return initial?.call(classId, teacherEmail, errorMessage, pageIndex,
+        classMembers, teachers, pageState, currentClass);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String classId, PageState pageState)? initial,
+    TResult Function(
+            String classId,
+            String teacherEmail,
+            String errorMessage,
+            int pageIndex,
+            List<User> classMembers,
+            List<User> teachers,
+            PageState pageState,
+            Class? currentClass)?
+        initial,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(classId, pageState);
+      return initial(classId, teacherEmail, errorMessage, pageIndex,
+          classMembers, teachers, pageState, currentClass);
     }
     return orElse();
   }
@@ -224,13 +422,32 @@ class _$_Initial implements _Initial {
 }
 
 abstract class _Initial implements ClassState {
-  const factory _Initial({final String classId, final PageState pageState}) =
-      _$_Initial;
+  const factory _Initial(
+      {final String classId,
+      final String teacherEmail,
+      final String errorMessage,
+      final int pageIndex,
+      final List<User> classMembers,
+      final List<User> teachers,
+      final PageState pageState,
+      final Class? currentClass}) = _$_Initial;
 
   @override
   String get classId;
   @override
+  String get teacherEmail;
+  @override
+  String get errorMessage;
+  @override
+  int get pageIndex;
+  @override
+  List<User> get classMembers;
+  @override
+  List<User> get teachers;
+  @override
   PageState get pageState;
+  @override
+  Class? get currentClass;
   @override
   @JsonKey(ignore: true)
   _$$_InitialCopyWith<_$_Initial> get copyWith =>

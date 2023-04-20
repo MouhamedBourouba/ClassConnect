@@ -35,8 +35,7 @@ class CreateClassBody extends StatelessWidget {
         ),
       ),
       body: BlocListener<CreateClassCubit, CreateClassState>(
-        listenWhen: (previous, current) =>
-            previous.isLoading != current.isLoading,
+        listenWhen: (previous, current) => previous.isLoading != current.isLoading,
         listener: (context, state) {
           if (state.isLoading) {
             showLoading(context);
@@ -105,37 +104,6 @@ class CreateClassBody extends StatelessWidget {
                       return;
                     }
                     value as DropDownValueModel;
-                    if (value.name == "other") {
-                      showDialog<String>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Add subject"),
-                          content: TextField(
-                            onChanged: homeCubit.onCustomSubjectChanged,
-                            decoration: const InputDecoration(
-                              label: Text("Subject Name"),
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(
-                                context,
-                                homeCubit.state.customSubject,
-                              ),
-                              child: const Text("ADD"),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(
-                                context,
-                                homeCubit.state.customSubject,
-                              ),
-                              child: const Text("Cancel"),
-                            ),
-                          ],
-                        ),
-                      ).then((value) => homeCubit.addSubject(value ?? ""));
-                      return;
-                    }
                     homeCubit.onClassSubjectChanged(value.name);
                   },
                 ),
@@ -157,19 +125,14 @@ class CreateButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final homeCubit = context.watch<CreateClassCubit>();
     final state = homeCubit.state;
-    final canCreate = state.className.isNotEmpty &&
-        state.classSubject != "" &&
-        !state.className.contains(',');
+    final canCreate = state.className.isNotEmpty && state.classSubject != "" && !state.className.contains(',');
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton(
         onPressed: canCreate ? homeCubit.createClass : null,
         child: Text(
           "create",
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: canCreate
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.grey),
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(color: canCreate ? Theme.of(context).colorScheme.primary : Colors.grey),
         ),
       ),
     );

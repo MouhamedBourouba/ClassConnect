@@ -33,7 +33,7 @@ class CreateClassCubit extends Cubit<CreateClassState> {
   }
 
   Future<void> createClass() async {
-    await isNotOnline();
+    await checkInternetConnection();
     emit(state.copyWith(isLoading: true));
     final creatingClassTask = await classesRepository.createClass(
         state.className, state.classSubject);
