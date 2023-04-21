@@ -1,10 +1,14 @@
 import 'package:ClassConnect/data/model/user.dart';
+import 'package:ClassConnect/data/repository/classes_data_source.dart';
+import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/class_page/class_cubit.dart';
 import 'package:ClassConnect/presentation/cubit/page_state.dart';
+import 'package:ClassConnect/presentation/ui/widgets/loading.dart';
+import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:ClassConnect/utils/extension.dart';
+import 'package:ClassConnect/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:math' as math;
 
 class ClassPage extends StatelessWidget {
   const ClassPage({super.key, required this.classId});
@@ -71,13 +75,26 @@ class _Members extends StatelessWidget {
     if (state.pageState == PageState.loading) {
       return const Center(child: CircularProgressIndicator());
     }
+    if (state.pageState == PageState.error) {
+      getIt<ErrorLogger>().showError(state.errorMessage);
+      cubit.setStateToInit();
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 8),
         buildMembersSeparator(
           context,
+          isAddIconVisible: state.currentUser?.teachingClasses.any((element) => element == state.currentClass?.id),
           onAddIconClicked: () async {
+            cubit.onTeacherEmailChanged("");
+          },
+          title: "Teachers",
+        ),
+        SizedBox(height: state.teachers.length * 56, child: buildListOfUsers(context, users: state.teachers)),
+        buildMembersSeparator(
+          context,
+          onAddIconClicked: () {
             showDialog(
               context: context,
               builder: (context) {
@@ -90,35 +107,34 @@ class _Members extends StatelessWidget {
                     onChanged: cubit.onTeacherEmailChanged,
                   ),
                   actions: [
-                    TextButton(onPressed: cubit.inviteTeacher, child: const Text("Invite"))
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("Invite"),
+                    )
                   ],
                 );
               },
-            );
+            ).then((value) => cubit.inviteMember(Role.teacher));
           },
-          title: "Teachers",
-        ),
-        SizedBox(height: state.teachers.length * 56, child: buildListOfUsers(context, users: state.teachers)),
-        buildMembersSeparator(
-          context,
-          onAddIconClicked: () => null,
           title: "Members",
         ),
-        Expanded(child: buildListOfUsers(context, users: state.classMembers)),
+        Expanded(child: buildListOfUsers(context, users: state.classMembers, colorsHash: state.teachers.length)),
       ],
     );
   }
 
-  Widget buildListOfUsers(BuildContext context, {required List<User> users}) {
+  Widget buildListOfUsers(BuildContext context, {required List<User> users, int? colorsHash}) {
     return ListView.builder(
       itemBuilder: (context, index) {
         final currentUser = users[index];
-        final avatarColor = Colors.primaries[math.Random().nextInt(Colors.primaries.length)];
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: avatarColor,
+            backgroundColor: getIt<RandomColorGenerator>().getColorHash(index + (colorsHash ?? 0)),
             foregroundColor: Colors.white,
-            child: Text(currentUser.fullName.firstLatter()),
+            child: Text(
+              currentUser.fullName.firstLatter().toUpperCase(),
+              textScaleFactor: 1.3,
+            ),
           ),
           title: Text(currentUser.fullName),
         );
@@ -127,7 +143,12 @@ class _Members extends StatelessWidget {
     );
   }
 
-  Widget buildMembersSeparator(BuildContext context, {required VoidCallback onAddIconClicked, required String title}) {
+  Widget buildMembersSeparator(
+    BuildContext context, {
+    required VoidCallback onAddIconClicked,
+    required String title,
+    bool? isAddIconVisible,
+  }) {
     return Column(
       children: [
         Padding(
@@ -144,12 +165,15 @@ class _Members extends StatelessWidget {
                       ),
                 ),
               ),
-              IconButton(
-                onPressed: () => onAddIconClicked(),
-                icon: const Icon(
-                  Icons.person_add_alt,
-                  color: Color.fromRGBO(0, 128, 0, 1),
-                  size: 24,
+              Visibility(
+                visible: isAddIconVisible ?? true,
+                child: IconButton(
+                  onPressed: () => onAddIconClicked(),
+                  icon: const Icon(
+                    Icons.person_add_alt,
+                    color: Color.fromRGBO(0, 128, 0, 1),
+                    size: 24,
+                  ),
                 ),
               ),
             ],

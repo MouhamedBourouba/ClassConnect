@@ -93,7 +93,7 @@ class HomeBody extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
-      drawer: HomeDrawer(theme: theme, currentUser: homeState.currentUser),
+      drawer: HomeDrawer(theme: theme, currentUser: homeState.currentUser, notificationCounter: homeState.notificationCounter),
       body: ListView.builder(
         itemCount: homeState.classes.length,
         itemBuilder: (context, index) {
@@ -145,10 +145,12 @@ class HomeDrawer extends StatelessWidget {
     super.key,
     required this.theme,
     required this.currentUser,
+    this.notificationCounter,
   });
 
   final ThemeData theme;
   final User currentUser;
+  final int? notificationCounter;
 
   @override
   Widget build(BuildContext context) {
@@ -156,15 +158,18 @@ class HomeDrawer extends StatelessWidget {
       child: ListView(
         children: [
           DrawerHeader(
-            child: Row(
+            decoration: BoxDecoration(color: theme.colorScheme.secondary),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
+                  radius: 25,
                   backgroundColor: Colors.blueGrey,
                   child: Text(
                     currentUser.fullName.firstLatter().toUpperCase(),
                     style: theme.textTheme.bodyLarge!.copyWith(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 25,
                     ),
                   ),
                 ),
@@ -173,9 +178,32 @@ class HomeDrawer extends StatelessWidget {
                 ),
                 Text(
                   currentUser.fullName,
-                  style: theme.textTheme.headline6,
+                  style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  currentUser.email,
+                  style: theme.textTheme.bodySmall!.copyWith(color: Colors.white),
                 ),
               ],
+            ),
+          ),
+          ListTile(
+            title: Text(
+              "Notifications",
+              style: theme.textTheme.bodyLarge!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            leading: Badge(
+              label: Text(notificationCounter.toString()),
+              isLabelVisible: notificationCounter != null,
+              child: Icon(
+                Icons.notifications,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
           const Divider(
@@ -187,10 +215,9 @@ class HomeDrawer extends StatelessWidget {
               "Sing Out",
               style: theme.textTheme.bodyLarge!.copyWith(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.primary,
               ),
             ),
-            trailing: Icon(
+            leading: Icon(
               Icons.logout,
               color: theme.colorScheme.primary,
             ),

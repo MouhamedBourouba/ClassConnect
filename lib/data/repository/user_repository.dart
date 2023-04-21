@@ -8,6 +8,7 @@ import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/data/services/hashing_service.dart';
+import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/utils/extension.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
@@ -44,6 +45,8 @@ abstract class UserRepository {
   Future<Result<Unit, Unit>> sendEmailVerificationMessage();
 
   Future<Result<Unit, String>> verifyEmail(String code);
+
+  Future<int> getNotificationCounter();
 }
 
 @LazySingleton(as: UserRepository)
@@ -270,6 +273,7 @@ ClassConnect APP""";
           ),
         );
         localDataSource.updateCurrentUser(email: email);
+        settingsRepository.setIsEmailVerified(isEmailVerified: false);
       } else {
         return Result.error(
           MException(
@@ -319,5 +323,11 @@ ClassConnect APP""";
     } catch (e) {
       return Result.error(MException.unknown());
     }
+  }
+
+  @override
+  Future<int> getNotificationCounter() async {
+    final requests = await cloudDataSource.getAllRows(MTable.inviteRequest);
+    return (requests?.where((element) => element["receiverId"] == localDataSource.getCurrentUser()?.id).length) ?? -1 + 1;
   }
 }

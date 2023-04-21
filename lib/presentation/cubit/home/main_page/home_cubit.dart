@@ -5,7 +5,6 @@ import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/repository/classes_data_source.dart';
 import 'package:ClassConnect/data/repository/user_repository.dart';
 import 'package:ClassConnect/di/di.dart';
-import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -19,7 +18,6 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   final UserRepository _userRepository = getIt();
-  final _errorLogger = getIt<ErrorLogger>();
   final ClassesRepository _classesRepository = getIt();
   final LocalDataSource _localDataSource = getIt();
   List<User> _users = [];
@@ -27,13 +25,27 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> _init() async {
     try {
       final currentUser = _userRepository.getCurrentUser()!;
-      final users = await _userRepository.getAllUsers(DataSource.local);
+      final usersResult = await _userRepository.getAllUsers(DataSource.local);
       List<Class> classes = await _classesRepository.getClasses(DataSource.local);
-      if (classes.isEmpty) classes = await _classesRepository.getClasses(DataSource.local);
-      users.when(
-        (success) {
-          _users = success;
-          emit(HomeState.loaded(currentUser: currentUser, classes: classes));
+      if (classes.isEmpty) classes = await _classesRepository.getClasses(DataSource.remote);
+      usersResult.when(
+        (data) {
+          _users = data;
+          emit(
+            HomeState.loaded(
+              currentUser: currentUser,
+              classes: classes,
+            ),
+          );
+          _userRepository.getNotificationCounter().then(
+                (notificationCounter) => emit(
+                  HomeState.loaded(
+                    currentUser: currentUser,
+                    classes: classes,
+                    notificationCounter: notificationCounter,
+                  ),
+                ),
+              );
         },
         (error) => emit(
           HomeState.error(
@@ -50,17 +62,14 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-
-  void singOut() {
-    _localDataSource.clearAllData();
+  Future<void> singOut() async {
+    await _localDataSource.clearAllData();
     emit(const HomeState.singOut());
   }
 
   User getTeacher(Class class_) {
     try {
-      return _users
-          .where((user) => class_.creatorId == user.id)
-          .first;
+      return _users.where((user) => class_.creatorId == user.id).first;
     } catch (e) {
       emit(const HomeState.loading());
       _userRepository.getAllUsers(DataSource.remote).then((user) {

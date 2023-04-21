@@ -19,7 +19,9 @@ mixin _$HomeState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User currentUser, List<Class> classes) loaded,
+    required TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)
+        loaded,
     required TResult Function(String errorMessage) error,
     required TResult Function() singOut,
   }) =>
@@ -27,7 +29,9 @@ mixin _$HomeState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User currentUser, List<Class> classes)? loaded,
+    TResult? Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult? Function(String errorMessage)? error,
     TResult? Function()? singOut,
   }) =>
@@ -35,7 +39,9 @@ mixin _$HomeState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User currentUser, List<Class> classes)? loaded,
+    TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult Function(String errorMessage)? error,
     TResult Function()? singOut,
     required TResult orElse(),
@@ -124,7 +130,9 @@ class _$HomeStateLoading implements HomeStateLoading {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User currentUser, List<Class> classes) loaded,
+    required TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)
+        loaded,
     required TResult Function(String errorMessage) error,
     required TResult Function() singOut,
   }) {
@@ -135,7 +143,9 @@ class _$HomeStateLoading implements HomeStateLoading {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User currentUser, List<Class> classes)? loaded,
+    TResult? Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult? Function(String errorMessage)? error,
     TResult? Function()? singOut,
   }) {
@@ -146,7 +156,9 @@ class _$HomeStateLoading implements HomeStateLoading {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User currentUser, List<Class> classes)? loaded,
+    TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult Function(String errorMessage)? error,
     TResult Function()? singOut,
     required TResult orElse(),
@@ -205,7 +217,7 @@ abstract class _$$HomeStateLoadedCopyWith<$Res> {
           _$HomeStateLoaded value, $Res Function(_$HomeStateLoaded) then) =
       __$$HomeStateLoadedCopyWithImpl<$Res>;
   @useResult
-  $Res call({User currentUser, List<Class> classes});
+  $Res call({User currentUser, List<Class> classes, int? notificationCounter});
 }
 
 /// @nodoc
@@ -221,6 +233,7 @@ class __$$HomeStateLoadedCopyWithImpl<$Res>
   $Res call({
     Object? currentUser = null,
     Object? classes = null,
+    Object? notificationCounter = freezed,
   }) {
     return _then(_$HomeStateLoaded(
       currentUser: null == currentUser
@@ -231,6 +244,10 @@ class __$$HomeStateLoadedCopyWithImpl<$Res>
           ? _value._classes
           : classes // ignore: cast_nullable_to_non_nullable
               as List<Class>,
+      notificationCounter: freezed == notificationCounter
+          ? _value.notificationCounter
+          : notificationCounter // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -239,7 +256,9 @@ class __$$HomeStateLoadedCopyWithImpl<$Res>
 
 class _$HomeStateLoaded implements HomeStateLoaded {
   const _$HomeStateLoaded(
-      {required this.currentUser, final List<Class> classes = const []})
+      {required this.currentUser,
+      final List<Class> classes = const [],
+      this.notificationCounter})
       : _classes = classes;
 
   @override
@@ -254,8 +273,11 @@ class _$HomeStateLoaded implements HomeStateLoaded {
   }
 
   @override
+  final int? notificationCounter;
+
+  @override
   String toString() {
-    return 'HomeState.loaded(currentUser: $currentUser, classes: $classes)';
+    return 'HomeState.loaded(currentUser: $currentUser, classes: $classes, notificationCounter: $notificationCounter)';
   }
 
   @override
@@ -265,12 +287,14 @@ class _$HomeStateLoaded implements HomeStateLoaded {
             other is _$HomeStateLoaded &&
             (identical(other.currentUser, currentUser) ||
                 other.currentUser == currentUser) &&
-            const DeepCollectionEquality().equals(other._classes, _classes));
+            const DeepCollectionEquality().equals(other._classes, _classes) &&
+            (identical(other.notificationCounter, notificationCounter) ||
+                other.notificationCounter == notificationCounter));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, currentUser, const DeepCollectionEquality().hash(_classes));
+  int get hashCode => Object.hash(runtimeType, currentUser,
+      const DeepCollectionEquality().hash(_classes), notificationCounter);
 
   @JsonKey(ignore: true)
   @override
@@ -282,35 +306,41 @@ class _$HomeStateLoaded implements HomeStateLoaded {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User currentUser, List<Class> classes) loaded,
+    required TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)
+        loaded,
     required TResult Function(String errorMessage) error,
     required TResult Function() singOut,
   }) {
-    return loaded(currentUser, classes);
+    return loaded(currentUser, classes, notificationCounter);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User currentUser, List<Class> classes)? loaded,
+    TResult? Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult? Function(String errorMessage)? error,
     TResult? Function()? singOut,
   }) {
-    return loaded?.call(currentUser, classes);
+    return loaded?.call(currentUser, classes, notificationCounter);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User currentUser, List<Class> classes)? loaded,
+    TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult Function(String errorMessage)? error,
     TResult Function()? singOut,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(currentUser, classes);
+      return loaded(currentUser, classes, notificationCounter);
     }
     return orElse();
   }
@@ -356,10 +386,12 @@ class _$HomeStateLoaded implements HomeStateLoaded {
 abstract class HomeStateLoaded implements HomeState {
   const factory HomeStateLoaded(
       {required final User currentUser,
-      final List<Class> classes}) = _$HomeStateLoaded;
+      final List<Class> classes,
+      final int? notificationCounter}) = _$HomeStateLoaded;
 
   User get currentUser;
   List<Class> get classes;
+  int? get notificationCounter;
   @JsonKey(ignore: true)
   _$$HomeStateLoadedCopyWith<_$HomeStateLoaded> get copyWith =>
       throw _privateConstructorUsedError;
@@ -432,7 +464,9 @@ class _$HomeStateError implements HomeStateError {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User currentUser, List<Class> classes) loaded,
+    required TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)
+        loaded,
     required TResult Function(String errorMessage) error,
     required TResult Function() singOut,
   }) {
@@ -443,7 +477,9 @@ class _$HomeStateError implements HomeStateError {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User currentUser, List<Class> classes)? loaded,
+    TResult? Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult? Function(String errorMessage)? error,
     TResult? Function()? singOut,
   }) {
@@ -454,7 +490,9 @@ class _$HomeStateError implements HomeStateError {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User currentUser, List<Class> classes)? loaded,
+    TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult Function(String errorMessage)? error,
     TResult Function()? singOut,
     required TResult orElse(),
@@ -551,7 +589,9 @@ class _$HomeStateSingedOut implements HomeStateSingedOut {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User currentUser, List<Class> classes) loaded,
+    required TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)
+        loaded,
     required TResult Function(String errorMessage) error,
     required TResult Function() singOut,
   }) {
@@ -562,7 +602,9 @@ class _$HomeStateSingedOut implements HomeStateSingedOut {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User currentUser, List<Class> classes)? loaded,
+    TResult? Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult? Function(String errorMessage)? error,
     TResult? Function()? singOut,
   }) {
@@ -573,7 +615,9 @@ class _$HomeStateSingedOut implements HomeStateSingedOut {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User currentUser, List<Class> classes)? loaded,
+    TResult Function(
+            User currentUser, List<Class> classes, int? notificationCounter)?
+        loaded,
     TResult Function(String errorMessage)? error,
     TResult Function()? singOut,
     required TResult orElse(),

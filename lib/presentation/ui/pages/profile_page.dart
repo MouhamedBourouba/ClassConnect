@@ -14,26 +14,33 @@ import 'package:flutter_svg/flutter_svg.dart';
 class UpdateProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocListener<UpdateProfileCubit, UpdateProfileState>(
-      listener: (context, state) {
-        switch (state.pageState) {
-          case PageState.init:
-            break;
-          case PageState.loading:
-            showLoading(context);
-            break;
-          case PageState.success:
-            hideLoading(context);
-            Navigator.push(context, const HomePage().asRoute());
-            context.read<UpdateProfileCubit>().setToInit();
-            break;
-          case PageState.error:
-            hideLoading(context);
-            getIt<ErrorLogger>().showError(state.errorMessage);
-            break;
-        }
-      },
-      child: const UpdateProfileBody(),
+    return BlocProvider(
+      create: (context) => UpdateProfileCubit(),
+      child: BlocListener<UpdateProfileCubit, UpdateProfileState>(
+        listener: (context, state) {
+          switch (state.pageState) {
+            case PageState.init:
+              break;
+            case PageState.loading:
+              showLoading(context);
+              break;
+            case PageState.success:
+              hideLoading(context);
+              Navigator.pushAndRemoveUntil(
+                context,
+                const HomePage().asRoute(),
+                (_) => false,
+              );
+              context.read<UpdateProfileCubit>().setToInit();
+              break;
+            case PageState.error:
+              hideLoading(context);
+              getIt<ErrorLogger>().showError(state.errorMessage);
+              break;
+          }
+        },
+        child: const UpdateProfileBody(),
+      ),
     );
   }
 }
@@ -250,8 +257,7 @@ class UpdateProfileBody extends StatelessWidget {
                 ),
               ).then((value) {
                 if (value) {
-                  if (context.read<UpdateProfileCubit>().state.phoneNumber.length < 11 &&
-                      context.read<UpdateProfileCubit>().state.phoneNumber.length > 9) {
+                  if (context.read<UpdateProfileCubit>().state.phoneNumber.length < 11 && context.read<UpdateProfileCubit>().state.phoneNumber.length > 9) {
                     updateProfileCubit.update(UserField.phoneNumber);
                   } else {
                     getIt<ErrorLogger>().showError("Invalid input");

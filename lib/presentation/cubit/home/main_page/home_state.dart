@@ -7,6 +7,7 @@ class HomeState with _$HomeState {
   const factory HomeState.loaded({
     required User currentUser,
     @Default([]) List<Class> classes,
+    int? notificationCounter,
   }) = HomeStateLoaded;
 
   const factory HomeState.error({

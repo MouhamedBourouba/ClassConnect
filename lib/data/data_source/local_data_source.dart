@@ -28,7 +28,7 @@ abstract class LocalDataSource {
 
   List<Class> getClasses();
 
-  void clearAllData();
+  Future<void> clearAllData();
 
   void setValueToAppBox(String key, dynamic value);
 
@@ -42,6 +42,7 @@ class HiveLocalDataBase implements LocalDataSource {
   late Box appBox;
   late Box<User> usersBox;
   late Box<Class> classesBox;
+  final User? currentUser = null;
 
   @PostConstruct(preResolve: true)
   Future<void> init() async {
@@ -60,7 +61,7 @@ class HiveLocalDataBase implements LocalDataSource {
   void setValueToAppBox(String key, dynamic value) => appBox.put(key, value);
 
   @override
-  User? getCurrentUser() => appBox.get("current_user") as User?;
+  User? getCurrentUser() =>appBox.get("current_user") as User?;
 
   @override
   Future<void> putDataToAppBox(String key, dynamic value) => appBox.put(key, value);
@@ -102,9 +103,9 @@ class HiveLocalDataBase implements LocalDataSource {
   Stream<BoxEvent> getCurrentUserUpdates() => appBox.watch();
 
   @override
-  void clearAllData() {
-    appBox.clear();
-    classesBox.clear();
-    usersBox.clear();
+  Future<void> clearAllData() async {
+    await appBox.clear();
+    await classesBox.clear();
+    await usersBox.clear();
   }
 }

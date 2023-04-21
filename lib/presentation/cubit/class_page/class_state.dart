@@ -6,6 +6,7 @@ class ClassState with _$ClassState {
     @Default("") String classId,
     @Default("") String teacherEmail,
     @Default("") String errorMessage,
+    User? currentUser,
     @Default(0) int pageIndex,
     @Default([]) List<User> classMembers,
     @Default([]) List<User> teachers,

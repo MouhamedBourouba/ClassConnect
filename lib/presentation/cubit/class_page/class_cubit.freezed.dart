@@ -19,6 +19,7 @@ mixin _$ClassState {
   String get classId => throw _privateConstructorUsedError;
   String get teacherEmail => throw _privateConstructorUsedError;
   String get errorMessage => throw _privateConstructorUsedError;
+  User? get currentUser => throw _privateConstructorUsedError;
   int get pageIndex => throw _privateConstructorUsedError;
   List<User> get classMembers => throw _privateConstructorUsedError;
   List<User> get teachers => throw _privateConstructorUsedError;
@@ -30,6 +31,7 @@ mixin _$ClassState {
             String classId,
             String teacherEmail,
             String errorMessage,
+            User? currentUser,
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
@@ -44,6 +46,7 @@ mixin _$ClassState {
             String classId,
             String teacherEmail,
             String errorMessage,
+            User? currentUser,
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
@@ -58,6 +61,7 @@ mixin _$ClassState {
             String classId,
             String teacherEmail,
             String errorMessage,
+            User? currentUser,
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
@@ -99,6 +103,7 @@ abstract class $ClassStateCopyWith<$Res> {
       {String classId,
       String teacherEmail,
       String errorMessage,
+      User? currentUser,
       int pageIndex,
       List<User> classMembers,
       List<User> teachers,
@@ -122,6 +127,7 @@ class _$ClassStateCopyWithImpl<$Res, $Val extends ClassState>
     Object? classId = null,
     Object? teacherEmail = null,
     Object? errorMessage = null,
+    Object? currentUser = freezed,
     Object? pageIndex = null,
     Object? classMembers = null,
     Object? teachers = null,
@@ -141,6 +147,10 @@ class _$ClassStateCopyWithImpl<$Res, $Val extends ClassState>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String,
+      currentUser: freezed == currentUser
+          ? _value.currentUser
+          : currentUser // ignore: cast_nullable_to_non_nullable
+              as User?,
       pageIndex: null == pageIndex
           ? _value.pageIndex
           : pageIndex // ignore: cast_nullable_to_non_nullable
@@ -176,6 +186,7 @@ abstract class _$$_InitialCopyWith<$Res> implements $ClassStateCopyWith<$Res> {
       {String classId,
       String teacherEmail,
       String errorMessage,
+      User? currentUser,
       int pageIndex,
       List<User> classMembers,
       List<User> teachers,
@@ -196,6 +207,7 @@ class __$$_InitialCopyWithImpl<$Res>
     Object? classId = null,
     Object? teacherEmail = null,
     Object? errorMessage = null,
+    Object? currentUser = freezed,
     Object? pageIndex = null,
     Object? classMembers = null,
     Object? teachers = null,
@@ -215,6 +227,10 @@ class __$$_InitialCopyWithImpl<$Res>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String,
+      currentUser: freezed == currentUser
+          ? _value.currentUser
+          : currentUser // ignore: cast_nullable_to_non_nullable
+              as User?,
       pageIndex: null == pageIndex
           ? _value.pageIndex
           : pageIndex // ignore: cast_nullable_to_non_nullable
@@ -246,6 +262,7 @@ class _$_Initial implements _Initial {
       {this.classId = "",
       this.teacherEmail = "",
       this.errorMessage = "",
+      this.currentUser,
       this.pageIndex = 0,
       final List<User> classMembers = const [],
       final List<User> teachers = const [],
@@ -263,6 +280,8 @@ class _$_Initial implements _Initial {
   @override
   @JsonKey()
   final String errorMessage;
+  @override
+  final User? currentUser;
   @override
   @JsonKey()
   final int pageIndex;
@@ -292,7 +311,7 @@ class _$_Initial implements _Initial {
 
   @override
   String toString() {
-    return 'ClassState.initial(classId: $classId, teacherEmail: $teacherEmail, errorMessage: $errorMessage, pageIndex: $pageIndex, classMembers: $classMembers, teachers: $teachers, pageState: $pageState, currentClass: $currentClass)';
+    return 'ClassState.initial(classId: $classId, teacherEmail: $teacherEmail, errorMessage: $errorMessage, currentUser: $currentUser, pageIndex: $pageIndex, classMembers: $classMembers, teachers: $teachers, pageState: $pageState, currentClass: $currentClass)';
   }
 
   @override
@@ -305,6 +324,8 @@ class _$_Initial implements _Initial {
                 other.teacherEmail == teacherEmail) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage) &&
+            (identical(other.currentUser, currentUser) ||
+                other.currentUser == currentUser) &&
             (identical(other.pageIndex, pageIndex) ||
                 other.pageIndex == pageIndex) &&
             const DeepCollectionEquality()
@@ -322,6 +343,7 @@ class _$_Initial implements _Initial {
       classId,
       teacherEmail,
       errorMessage,
+      currentUser,
       pageIndex,
       const DeepCollectionEquality().hash(_classMembers),
       const DeepCollectionEquality().hash(_teachers),
@@ -341,6 +363,7 @@ class _$_Initial implements _Initial {
             String classId,
             String teacherEmail,
             String errorMessage,
+            User? currentUser,
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
@@ -348,8 +371,8 @@ class _$_Initial implements _Initial {
             Class? currentClass)
         initial,
   }) {
-    return initial(classId, teacherEmail, errorMessage, pageIndex, classMembers,
-        teachers, pageState, currentClass);
+    return initial(classId, teacherEmail, errorMessage, currentUser, pageIndex,
+        classMembers, teachers, pageState, currentClass);
   }
 
   @override
@@ -359,6 +382,7 @@ class _$_Initial implements _Initial {
             String classId,
             String teacherEmail,
             String errorMessage,
+            User? currentUser,
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
@@ -366,8 +390,8 @@ class _$_Initial implements _Initial {
             Class? currentClass)?
         initial,
   }) {
-    return initial?.call(classId, teacherEmail, errorMessage, pageIndex,
-        classMembers, teachers, pageState, currentClass);
+    return initial?.call(classId, teacherEmail, errorMessage, currentUser,
+        pageIndex, classMembers, teachers, pageState, currentClass);
   }
 
   @override
@@ -377,6 +401,7 @@ class _$_Initial implements _Initial {
             String classId,
             String teacherEmail,
             String errorMessage,
+            User? currentUser,
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
@@ -386,8 +411,8 @@ class _$_Initial implements _Initial {
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(classId, teacherEmail, errorMessage, pageIndex,
-          classMembers, teachers, pageState, currentClass);
+      return initial(classId, teacherEmail, errorMessage, currentUser,
+          pageIndex, classMembers, teachers, pageState, currentClass);
     }
     return orElse();
   }
@@ -426,6 +451,7 @@ abstract class _Initial implements ClassState {
       {final String classId,
       final String teacherEmail,
       final String errorMessage,
+      final User? currentUser,
       final int pageIndex,
       final List<User> classMembers,
       final List<User> teachers,
@@ -438,6 +464,8 @@ abstract class _Initial implements ClassState {
   String get teacherEmail;
   @override
   String get errorMessage;
+  @override
+  User? get currentUser;
   @override
   int get pageIndex;
   @override

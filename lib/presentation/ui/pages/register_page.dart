@@ -1,4 +1,5 @@
 import 'package:ClassConnect/presentation/cubit/authentication/register/register_cubit.dart';
+import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/authentication_scaffold.dart';
@@ -8,7 +9,6 @@ import 'package:ClassConnect/presentation/ui/widgets/outlined_text_field.dart';
 import 'package:ClassConnect/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -30,7 +30,7 @@ class RegisterScreen extends StatelessWidget {
           if (state.isSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (ctx) => const HomePage()),
+              MaterialPageRoute(builder: (ctx) => const EmailVerificationPage()),
               (route) => false,
             );
           }

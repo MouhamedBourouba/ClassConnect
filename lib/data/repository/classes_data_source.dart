@@ -5,6 +5,7 @@ import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
 import 'package:ClassConnect/data/data_source/local_data_source.dart';
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/error.dart';
+import 'package:ClassConnect/data/model/invitation.dart';
 import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/repository/user_repository.dart';
@@ -15,6 +16,8 @@ import 'package:injectable/injectable.dart';
 import 'package:multiple_result/multiple_result.dart';
 import 'package:uuid/uuid.dart';
 
+enum Role { classMate, teacher }
+
 abstract class ClassesRepository {
   ValueListenable<Box<Class>> getClassesValueListener();
 
@@ -24,9 +27,7 @@ abstract class ClassesRepository {
 
   Future<Result<Unit, MException>> joinClass(String classId);
 
-  Future<Result<List<User>, MException>> getCurrentUserTeachers([DataSource? source]);
-
-  Future<Result<Unit, MException>> inviteTeacher(String classId, String teacherEmail);
+  Future<Result<Unit, MException>> inviteMember(String classId, String teacherEmail, Role role);
 }
 
 @LazySingleton(as: ClassesRepository)
@@ -143,48 +144,25 @@ class ClassesRepositoryImp extends ClassesRepository {
   }
 
   @override
-  Future<Result<List<User>, MException>> getCurrentUserTeachers([DataSource? source]) async {
+  Future<Result<Unit, MException>> inviteMember(String classId, String teacherEmail, Role role) async {
+    final currentUser = localDataSource.getCurrentUser()!;
+    if (currentUser.email == teacherEmail) return Result.error(MException("you can't invite yourself"));
     try {
-      final classes = localDataSource.getClasses();
-      Future<Result<List<User>, MException>> getTeachersFromCloud() async {
-        return (await userRepository.getAllUsers(DataSource.remote)).when(
-          (users) {
-            final teachers = users.where((user) => classes.any((class_) => class_.creatorId == user.id));
-            return Result.success(teachers.toList());
-          },
-          (error) => Result.error(error),
-        );
+      final searchingForUser = await cloudDataSource.getRowsByValue(teacherEmail, MTable.usersTable);
+      if (searchingForUser.isEmpty) {
+        return Result.error(MException("Can't find this ${role == Role.teacher ? "teacher" : "user"} please double check the email address"));
       }
-
-      if (source == DataSource.remote) {
-        return getTeachersFromCloud();
-      }
-      final users = localDataSource.getUsers();
-      final teachers = users.where((user) => classes.any((class_) => class_.creatorId == user.id));
-      if (classes.every((class_) => teachers.any((teacher) => class_.creatorId == teacher.id))) {
-        return Result.success(teachers.toList());
-      } else {
-        return getCurrentUserTeachers();
-      }
-    } catch (e) {
-      return Result.error(MException.unknown());
-    }
-  }
-
-  @override
-  Future<Result<Unit, MException>> inviteTeacher(String classId, String teacherEmail) async {
-    try {
-      final searchingForTeacher = await cloudDataSource.getRowsByValue(teacherEmail, MTable.usersTable);
-      if (searchingForTeacher.isEmpty) return Result.error(MException("Can't find this teacher please double check the email address"));
-      final teacherData = searchingForTeacher.first.toUser();
-      teacherData.teachingClasses.add(classId);
-      final updatingTeacher = await cloudDataSource.updateValue(
-        teacherData.teachingClasses,
-        MTable.usersTable,
-        rowKey: teacherData.id,
-        columnKey: "teachingClasses",
+      final userData = searchingForUser.first.toUser();
+      final sendingInvitationTask = await cloudDataSource.appendRow(
+        Invitation(
+          senderId: localDataSource.getCurrentUser()!.id,
+          receiverId: userData.id,
+          classId: classId,
+          role: role,
+        ).toMap(),
+        MTable.inviteRequest,
       );
-      return Result.success(unit);
+      return sendingInvitationTask ? Result.success(unit) : Result.error(MException.unknown());
     } catch (e) {
       return Result.error(MException.unknown());
     }

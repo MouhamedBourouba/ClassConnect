@@ -1,18 +1,20 @@
 import 'dart:convert';
 
+import 'package:ClassConnect/data/data_source/local_data_source.dart';
 import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/settings/update_profile_cubit.dart';
 import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
+import 'package:ClassConnect/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
-  final list = ["df9490", "df944", "e5c1d", "f72bf"];
   await init();
+  print(getIt<LocalDataSource>().getCurrentUser()!.fullName);
   runApp(const App());
 }
 
@@ -32,21 +34,18 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => UpdateProfileCubit(),
-      child: MaterialApp(
-        title: 'ClassConnect',
-        debugShowCheckedModeBanner: false,
-        home: firstScreen(),
-        theme: ThemeData(
-          colorScheme: const ColorScheme.light(
-            secondary: Color.fromRGBO(63, 114, 175, 1),
-            primary: Color.fromRGBO(17, 45, 78, 1),
-            background: Color.fromRGBO(219, 226, 239, 1),
-            onSecondary: Colors.white,
-          ),
-          textTheme: GoogleFonts.poppinsTextTheme(),
+    return MaterialApp(
+      title: 'ClassConnect',
+      debugShowCheckedModeBanner: false,
+      home: firstScreen(),
+      theme: ThemeData(
+        colorScheme: const ColorScheme.light(
+          secondary: Color.fromRGBO(63, 114, 175, 1),
+          primary: Color.fromRGBO(17, 45, 78, 1),
+          background: Color.fromRGBO(219, 226, 239, 1),
+          onSecondary: Colors.white,
         ),
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
     );
   }
