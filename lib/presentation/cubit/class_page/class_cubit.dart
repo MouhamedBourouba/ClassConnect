@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user.dart';
@@ -9,7 +7,6 @@ import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/page_state.dart';
 import 'package:ClassConnect/utils/utils.dart';
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'class_cubit.freezed.dart';
@@ -18,18 +15,14 @@ part 'class_state.dart';
 
 class ClassCubit extends Cubit<ClassState> {
   ClassCubit(String classId) : super(const ClassState.initial()) {
-    fetchClassMembers();
     emit(state.copyWith(classId: classId, currentUser: userRepository.getCurrentUser()));
-    classesRepository.getClasses(DataSource.local).then((classes) {
-      try {
-        final currentClass = classes.where((element) => element.id == classId).first;
-        emit(state.copyWith(currentClass: currentClass));
-      } catch (e) {
-        classesRepository.getClasses(DataSource.remote).then((classes) {
-          final currentClass = classes.where((element) => element.id == classId).first;
-          emit(state.copyWith(currentClass: currentClass));
-        });
-      }
+    late final Class currentClass;
+    isOnline().then((isOnline) async {
+      currentClass = (isOnline ? await classesRepository.getClasses(DataSource.remote) : await classesRepository.getClasses(DataSource.local))
+          .where((class_) => class_.id == state.classId)
+          .first;
+      emit(state.copyWith(currentClass: currentClass));
+      fetchClassMembers();
     });
   }
 
@@ -39,28 +32,17 @@ class ClassCubit extends Cubit<ClassState> {
   void navigate(int index) => emit(state.copyWith(pageIndex: index));
 
   Future<void> fetchClassMembers() async {
-    List<User> users = [];
     emit(state.copyWith(pageState: PageState.loading));
-    try {
-      if (!(await isOnline())) throw Exception();
-      (await userRepository.getAllUsers(DataSource.remote)).when(
-        (data) => users = data,
-        (error) => throw Exception(),
-      );
-    } catch (e) {
-      (await userRepository.getAllUsers(DataSource.local)).when(
-        (data) {
-          final List<User> users0 = [];
-          for (final user in data) {
-            if(!users0.any((element) => element.id == user.id)) users0.add(user);
-          }
-          users = users0;
-        },
-        (error) => null,
-      );
+    final List<User> classMates = [];
+    final List<User> teachers = [];
+    for (final element in state.currentClass!.studentsIds) {
+      final user = (await userRepository.fetchUserById(element)).tryGetSuccess();
+      if (user != null) classMates.add(user);
     }
-    final classMates = users.where((user) => user.classes.any((id) => id == state.classId)).toList();
-    final teachers = users.where((user) => user.teachingClasses.any((classId) => classId == state.classId)).toList();
+    for (final element in state.currentClass!.teachers) {
+      final user = (await userRepository.fetchUserById(element)).tryGetSuccess();
+      if (user != null) teachers.add(user);
+    }
     emit(
       state.copyWith(
         classMembers: classMates,
@@ -73,9 +55,9 @@ class ClassCubit extends Cubit<ClassState> {
   void onTeacherEmailChanged(String value) => emit(state.copyWith(teacherEmail: value));
 
   Future<void> inviteMember(Role role) async {
-    if(state.teacherEmail.isEmpty) return;
+    if (state.teacherEmail.isEmpty) return;
     emit(state.copyWith(pageState: PageState.loading));
-    (await classesRepository.inviteMember(state.classId, state.teacherEmail, role)).when(
+    (await classesRepository.inviteMember(state.currentClass!, state.teacherEmail, role)).when(
       (success) {
         fetchClassMembers();
         emit(state.copyWith(pageState: PageState.init));

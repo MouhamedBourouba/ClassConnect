@@ -1,20 +1,18 @@
 import 'dart:convert';
 
-import 'package:ClassConnect/data/data_source/local_data_source.dart';
+import 'package:ClassConnect/data/model/class.dart';
+import 'package:ClassConnect/data/model/user_event.dart';
+import 'package:ClassConnect/data/repository/classes_data_source.dart';
 import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/di/di.dart';
-import 'package:ClassConnect/presentation/cubit/settings/update_profile_cubit.dart';
 import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
-import 'package:ClassConnect/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   await init();
-  print(getIt<LocalDataSource>().getCurrentUser()!.fullName);
   runApp(const App());
 }
 

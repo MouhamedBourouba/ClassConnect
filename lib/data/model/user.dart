@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 
 part 'user.g.dart';
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 1)
 class User {
   User({
     required this.id,
@@ -12,8 +12,6 @@ class User {
     required this.password,
     required this.email,
     required this.phoneNumber,
-    required this.classes,
-    required this.teachingClasses,
   });
 
   @HiveField(0)
@@ -26,19 +24,13 @@ class User {
   String email;
   @HiveField(4)
   String phoneNumber;
-  @HiveField(5)
-  List<String> classes;
-  @HiveField(6)
-  List<String> teachingClasses;
 
   User.defaultUser()
       : id = "",
         fullName = "",
         password = "",
         phoneNumber = "",
-        email = "",
-        classes = [],
-        teachingClasses = [];
+        email = "";
 
   Map<String, dynamic> toMap() => {
         "id": id,
@@ -46,7 +38,5 @@ class User {
         "email": email,
         "password": password,
         "phoneNumber": phoneNumber,
-        "teachingClasses": jsonEncode(teachingClasses),
-        "classes": jsonEncode(classes)
       };
 }

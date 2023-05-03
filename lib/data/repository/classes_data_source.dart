@@ -1,13 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
 import 'package:ClassConnect/data/data_source/local_data_source.dart';
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/error.dart';
-import 'package:ClassConnect/data/model/invitation.dart';
 import 'package:ClassConnect/data/model/source.dart';
-import 'package:ClassConnect/data/model/user.dart';
+import 'package:ClassConnect/data/model/user_event.dart';
 import 'package:ClassConnect/data/repository/user_repository.dart';
 import 'package:ClassConnect/utils/extension.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +25,9 @@ abstract class ClassesRepository {
 
   Future<Result<Unit, MException>> joinClass(String classId);
 
-  Future<Result<Unit, MException>> inviteMember(String classId, String teacherEmail, Role role);
+  Future<Result<Unit, MException>> inviteMember(Class class_, String teacherEmail, Role role);
+
+  Future<Class> getClassById(String id);
 }
 
 @LazySingleton(as: ClassesRepository)
@@ -44,11 +44,9 @@ class ClassesRepositoryImp extends ClassesRepository {
     try {
       final classId = uuid.v1().substring(0, 5);
       final currentUser = localDataSource.getCurrentUser()!;
-      final currentUserTeachingClasses = currentUser.teachingClasses;
-      currentUserTeachingClasses.add(classId);
       final class_ = Class(
         id: classId,
-        creatorId: currentUser.id,
+        teachers: [currentUser.id],
         streamMessagesId: uuid.v1().substring(0, 6),
         studentsIds: [],
         homeWorkId: uuid.v1().substring(0, 7),
@@ -57,22 +55,13 @@ class ClassesRepositoryImp extends ClassesRepository {
         subject: classSubject,
       );
       final addingClassTask = cloudDataSource.appendRow(class_.toMap(), MTable.classesTable);
-      final updatingUserTask = cloudDataSource.updateValue(
-        currentUserTeachingClasses,
-        MTable.usersTable,
-        rowKey: currentUser.id,
-        columnKey: "teachingClasses",
-      );
-      if (await addingClassTask && await updatingUserTask) {
+      if (await addingClassTask) {
         await localDataSource.addClass(class_);
-        await localDataSource.updateCurrentUser(teachingClasses: currentUserTeachingClasses);
         return Result.success(unit);
       } else {
         return Result.error(MException.unknown());
       }
-    } on SocketException {
-      return Result.error(MException.noInternetConnection());
-    } on Exception {
+    } catch (e) {
       return Result.error(MException.unknown());
     }
   }
@@ -85,31 +74,22 @@ class ClassesRepositoryImp extends ClassesRepository {
       if (searchingForClass.isEmpty == true) {
         return Result.error(MException("Class dose not exist please check the code"));
       }
-      final classes = currentUser.classes;
-      final classMap = searchingForClass.first;
-      if (classes.contains(classId) == true) return Result.error(MException("Your already joined this class"));
-      if (currentUser.teachingClasses.contains(classId) == true) {
-        return Result.error(
-          MException("You are the teacher of this class you cant join it as student"),
-        );
+      final class_ = searchingForClass.first.toClass();
+      if (class_.teachers.contains(currentUser.id)) {
+        return Result.error(MException("You are the teacher of this class you cant join it as student"));
+      } else if (class_.studentsIds.contains(currentUser.id)) {
+        return Result.error(MException("you've already joined this class"));
       }
-      classes.add(classId);
-      final students = classMap["studentsIds"].toString().toList();
-      students.add(currentUser.id);
+      class_.studentsIds.add(currentUser.id);
       final updatingClassTask = cloudDataSource.updateValue(
-        jsonEncode(students),
+        jsonEncode(class_.studentsIds),
         MTable.classesTable,
         rowKey: classId,
         columnKey: "studentsIds",
       );
       if (await updatingClassTask) {
-        final updatingUserTask = userRepository.updateUser(classes: classes ?? [classId]);
-        if ((await updatingUserTask).isSuccess()) {
-          await localDataSource.addClass(classMap.toClass());
-          return Result.success(unit);
-        } else {
-          return Result.error(MException.unknown());
-        }
+        await localDataSource.addClass(class_);
+        return Result.success(unit);
       } else {
         return Result.error(MException.unknown());
       }
@@ -127,13 +107,13 @@ class ClassesRepositoryImp extends ClassesRepository {
       if (source == DataSource.local) {
         return localDataSource.getClasses();
       } else {
-        final classesMap = await cloudDataSource.getAllRows(MTable.usersTable);
+        final classesMap = await cloudDataSource.getAllRows(MTable.classesTable);
         final List<Class> classes = [];
-        classesMap?.forEach((class_) {
-          final List<String> students = class_["studentsIds"].toString().toList();
-          if (students.any((id) => id == localDataSource.getCurrentUser()!.id) == true || class_["creatorId"] == localDataSource.getCurrentUser()!.id) {
-            classes.add(class_.toClass());
-            localDataSource.addClass(class_.toClass());
+        classesMap?.forEach((classMap) {
+          final class_ = classMap.toClass();
+          if (class_.studentsIds.contains(localDataSource.getCurrentUser()!.id) || class_.teachers.contains(localDataSource.getCurrentUser()!.id)) {
+            classes.add(class_);
+            localDataSource.addClass(class_);
           }
         });
         return classes;
@@ -143,9 +123,11 @@ class ClassesRepositoryImp extends ClassesRepository {
     }
   }
 
+
   @override
-  Future<Result<Unit, MException>> inviteMember(String classId, String teacherEmail, Role role) async {
+  Future<Result<Unit, MException>> inviteMember(Class class_, String teacherEmail, Role role) async {
     final currentUser = localDataSource.getCurrentUser()!;
+    final updatedClass = await getClassById(class_.id);
     if (currentUser.email == teacherEmail) return Result.error(MException("you can't invite yourself"));
     try {
       final searchingForUser = await cloudDataSource.getRowsByValue(teacherEmail, MTable.usersTable);
@@ -153,18 +135,32 @@ class ClassesRepositoryImp extends ClassesRepository {
         return Result.error(MException("Can't find this ${role == Role.teacher ? "teacher" : "user"} please double check the email address"));
       }
       final userData = searchingForUser.first.toUser();
+      if (updatedClass.teachers.contains(userData.id)) return Result.error(MException("This user is already teacher in this class"));
       final sendingInvitationTask = await cloudDataSource.appendRow(
-        Invitation(
-          senderId: localDataSource.getCurrentUser()!.id,
-          receiverId: userData.id,
-          classId: classId,
-          role: role,
+        UserEvent(
+          eventType: EventType.classMemberShipInvitation,
+          eventReceiverId: userData.id,
+          eventSenderId: currentUser.id,
+          seen: false,
+          encodedContent: jsonEncode(
+            ClassInvitationEventData(
+              role: role,
+              senderName: currentUser.fullName,
+              classId: class_.id,
+            ).toMap(),
+          ),
         ).toMap(),
-        MTable.inviteRequest,
+        MTable.eventsTable,
       );
       return sendingInvitationTask ? Result.success(unit) : Result.error(MException.unknown());
     } catch (e) {
       return Result.error(MException.unknown());
     }
+  }
+
+  @override
+  Future<Class> getClassById(String id) async {
+    final classMap = await cloudDataSource.getRow(MTable.classesTable, rowKey: id);
+    return classMap!.toClass();
   }
 }

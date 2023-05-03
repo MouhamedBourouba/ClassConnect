@@ -85,24 +85,16 @@ class _Members extends StatelessWidget {
         const SizedBox(height: 8),
         buildMembersSeparator(
           context,
-          isAddIconVisible: state.currentUser?.teachingClasses.any((element) => element == state.currentClass?.id),
-          onAddIconClicked: () async {
-            cubit.onTeacherEmailChanged("");
-          },
-          title: "Teachers",
-        ),
-        SizedBox(height: state.teachers.length * 56, child: buildListOfUsers(context, users: state.teachers)),
-        buildMembersSeparator(
-          context,
+          isAddIconVisible: state.currentClass?.teachers.contains(state.currentUser?.id),
           onAddIconClicked: () {
             showDialog(
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  title: const Text("Add teacher"),
+                  title: const Text("invite teacher"),
                   content: TextField(
                     decoration: const InputDecoration(
-                      label: Text("Teacher email"),
+                      label: Text("teacher email"),
                     ),
                     onChanged: cubit.onTeacherEmailChanged,
                   ),
@@ -116,7 +108,34 @@ class _Members extends StatelessWidget {
               },
             ).then((value) => cubit.inviteMember(Role.teacher));
           },
-          title: "Members",
+          title: "Teachers",
+        ),
+        SizedBox(height: state.teachers.length * 56, child: buildListOfUsers(context, users: state.teachers)),
+        buildMembersSeparator(
+          context,
+          onAddIconClicked: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("invite class mate"),
+                  content: TextField(
+                    decoration: const InputDecoration(
+                      label: Text("class mate email"),
+                    ),
+                    onChanged: cubit.onTeacherEmailChanged,
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("Invite"),
+                    )
+                  ],
+                );
+              },
+            ).then((value) => cubit.inviteMember(Role.classMate));
+          },
+          title: "Class Mates",
         ),
         Expanded(child: buildListOfUsers(context, users: state.classMembers, colorsHash: state.teachers.length)),
       ],

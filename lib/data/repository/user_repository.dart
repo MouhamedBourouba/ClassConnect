@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
 import 'package:ClassConnect/data/data_source/local_data_source.dart';
@@ -8,8 +7,8 @@ import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/data/services/hashing_service.dart';
-import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/utils/extension.dart';
+import 'package:ClassConnect/utils/utils.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
@@ -34,8 +33,6 @@ abstract class UserRepository {
     String? fullName,
     String? email,
     String? phoneNumber,
-    List<String>? classes,
-    List<String>? teachingClasses,
   });
 
   Future<Result<List<User>, MException>> getAllUsers(DataSource dataSource);
@@ -46,7 +43,7 @@ abstract class UserRepository {
 
   Future<Result<Unit, String>> verifyEmail(String code);
 
-  Future<int> getNotificationCounter();
+  Future<Result<User, Unit>> fetchUserById(String id);
 }
 
 @LazySingleton(as: UserRepository)
@@ -96,8 +93,6 @@ class UserRepositoryImp extends UserRepository {
         password: hashingService.hash(password),
         email: email,
         phoneNumber: phoneNumber,
-        classes: [],
-        teachingClasses: [],
       );
       final allUsers = await getAllUsers(DataSource.remote);
       if (allUsers.isError()) return Error(allUsers.tryGetError()!);
@@ -142,10 +137,16 @@ class UserRepositoryImp extends UserRepository {
     return isVerified == true;
   }
 
-  Future<Result<User, MException>> fetchUserById(String id) async {
-    final userMapById = await cloudDataSource.getRow(MTable.usersTable, rowKey: id);
-    if (userMapById == null) return Result.error(MException.unknown());
-    return Result.success(userMapById.toUser());
+  @override
+  Future<Result<User, Unit>> fetchUserById(String id) async {
+    if (await isOnline()) {
+      final userMapById = await cloudDataSource.getRow(MTable.usersTable, rowKey: id);
+      if (userMapById == null) return Result.error(unit);
+      return Result.success(userMapById.toUser());
+    } else {
+      final userL = localDataSource.getUsers().where((element) => element.id == id);
+      return userL.isEmpty ? Result.error(unit) : Result.success(userL.first);
+    }
   }
 
   @override
@@ -156,16 +157,11 @@ class UserRepositoryImp extends UserRepository {
       try {
         final usersJson = await cloudDataSource.getAllRows(MTable.usersTable);
         if (usersJson == null || usersJson.isEmpty) return Result.error(MException.unknown());
-        final List<User> users = [];
-        for (final userJson in usersJson) {
-          users.add(userJson.toUser());
-        }
+        final List<User> users = usersJson.map((e) => e.toUser()).toList();
         for (final user in users) {
           localDataSource.addUserToUsersBox(user);
         }
         return Result.success(users);
-      } on SocketException {
-        return Result.error(MException.noInternetConnection());
       } catch (e) {
         return Result.error(MException.unknown());
       }
@@ -242,8 +238,6 @@ ClassConnect APP""";
     String? fullName,
     String? email,
     String? phoneNumber,
-    List<String>? classes,
-    List<String>? teachingClasses,
   }) async {
     final userId = localDataSource.getCurrentUser()!.id;
     final List<Future<bool>> tasksList = [];
@@ -293,28 +287,6 @@ ClassConnect APP""";
       );
       localDataSource.updateCurrentUser(phoneNumber: phoneNumber);
     }
-    if (classes != null) {
-      tasksList.add(
-        cloudDataSource.updateValue(
-          classes,
-          MTable.usersTable,
-          rowKey: userId,
-          columnKey: "classes",
-        ),
-      );
-      localDataSource.updateCurrentUser(classes: classes);
-    }
-    if (teachingClasses != null) {
-      tasksList.add(
-        cloudDataSource.updateValue(
-          teachingClasses,
-          MTable.usersTable,
-          rowKey: userId,
-          columnKey: "teachingClasses",
-        ),
-      );
-      localDataSource.updateCurrentUser(teachingClasses: teachingClasses);
-    }
     try {
       for (final task in tasksList) {
         await task;
@@ -323,11 +295,5 @@ ClassConnect APP""";
     } catch (e) {
       return Result.error(MException.unknown());
     }
-  }
-
-  @override
-  Future<int> getNotificationCounter() async {
-    final requests = await cloudDataSource.getAllRows(MTable.inviteRequest);
-    return (requests?.where((element) => element["receiverId"] == localDataSource.getCurrentUser()?.id).length) ?? -1 + 1;
   }
 }

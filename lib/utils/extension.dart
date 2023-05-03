@@ -13,14 +13,12 @@ extension UserFromMap on Map<String, dynamic> {
       password: this["password"].toString(),
       email: this["email"].toString(),
       phoneNumber: this["phoneNumber"].toString(),
-      classes: this["classes"].toString().toList(),
-      teachingClasses: this["teachingClasses"].toString().toList(),
     );
   }
 
   Class toClass() => Class(
         id: this["id"].toString(),
-        creatorId: this["creatorId"].toString(),
+        teachers: this["teachers"].toString().toList(),
         streamMessagesId: this["streamMessagesId"].toString(),
         studentsIds: this["studentsIds"].toString().toList(),
         homeWorkId: this["homeWorkId"].toString(),

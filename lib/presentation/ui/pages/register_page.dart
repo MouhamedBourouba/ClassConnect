@@ -154,21 +154,24 @@ class RegisterForm extends StatelessWidget {
                 return "Password dose not match";
               },
             ),
-            const SizedBox(height: 4),
-            InternationalPhoneNumberInput(
-             validator: (val) => null,
-              inputDecoration: const InputDecoration(
-                hintText:"Phone number",
-                border: outlinedInputBorder,
-                prefixIcon: Icon(Icons.phone),
+            const SizedBox(height: 5),
+            Padding(
+              padding: EdgeInsets.only(left: 12),
+              child: InternationalPhoneNumberInput(
+               validator: (val) => null,
+                inputDecoration: const InputDecoration(
+                  hintText:"Phone number",
+                  border: outlinedInputBorder,
+                  prefixIcon: Icon(Icons.phone),
+                ),
+                selectorConfig: const SelectorConfig(
+                  selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                ),
+                initialValue: PhoneNumber(isoCode: "DZ"),
+                onInputChanged: (PhoneNumber value) {
+                  registerCubit.onPhoneNumberChanged(value);
+                },
               ),
-              selectorConfig: const SelectorConfig(
-                selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-              ),
-              initialValue: PhoneNumber(isoCode: "DZ"),
-              onInputChanged: (PhoneNumber value) {
-                registerCubit.onPhoneNumberChanged(value);
-              },
             ),
             const Divider(),
             MButton(

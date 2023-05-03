@@ -3,8 +3,10 @@ import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/repository/classes_data_source.dart';
+import 'package:ClassConnect/data/repository/events_repository.dart';
 import 'package:ClassConnect/data/repository/user_repository.dart';
 import 'package:ClassConnect/di/di.dart';
+import 'package:ClassConnect/utils/utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -18,6 +20,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   final UserRepository _userRepository = getIt();
+  final EventsRepository _eventsRepository = getIt();
   final ClassesRepository _classesRepository = getIt();
   final LocalDataSource _localDataSource = getIt();
   List<User> _users = [];
@@ -26,8 +29,12 @@ class HomeCubit extends Cubit<HomeState> {
     try {
       final currentUser = _userRepository.getCurrentUser()!;
       final usersResult = await _userRepository.getAllUsers(DataSource.local);
-      List<Class> classes = await _classesRepository.getClasses(DataSource.local);
-      if (classes.isEmpty) classes = await _classesRepository.getClasses(DataSource.remote);
+      final List<Class> classes = (await isOnline())
+          ? await _classesRepository.getClasses(DataSource.remote)
+          : removeDuplicates<Class>(
+              await _classesRepository.getClasses(DataSource.local),
+              isClass: true,
+            );
       usersResult.when(
         (data) {
           _users = data;
@@ -37,7 +44,7 @@ class HomeCubit extends Cubit<HomeState> {
               classes: classes,
             ),
           );
-          _userRepository.getNotificationCounter().then(
+          _eventsRepository.getNotificationNumber().then(
                 (notificationCounter) => emit(
                   HomeState.loaded(
                     currentUser: currentUser,
@@ -69,7 +76,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   User getTeacher(Class class_) {
     try {
-      return _users.where((user) => class_.creatorId == user.id).first;
+      return _users.where((user) => class_.teachers.any((element) => element == user.id)).first;
     } catch (e) {
       emit(const HomeState.loading());
       _userRepository.getAllUsers(DataSource.remote).then((user) {
@@ -83,5 +90,9 @@ class HomeCubit extends Cubit<HomeState> {
       });
       return User.defaultUser();
     }
+  }
+
+  Future<void> refresh() async {
+    _init();
   }
 }

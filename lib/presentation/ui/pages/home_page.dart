@@ -4,6 +4,7 @@ import 'package:ClassConnect/presentation/cubit/home/main_page/home_cubit.dart';
 import 'package:ClassConnect/presentation/ui/pages/class_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/create_class_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
+import 'package:ClassConnect/presentation/ui/pages/notifications_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/profile_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/join_class_dialog.dart';
 import 'package:ClassConnect/utils/extension.dart';
@@ -94,47 +95,50 @@ class HomeBody extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       drawer: HomeDrawer(theme: theme, currentUser: homeState.currentUser, notificationCounter: homeState.notificationCounter),
-      body: ListView.builder(
-        itemCount: homeState.classes.length,
-        itemBuilder: (context, index) {
-          final class_ = homeState.classes[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            elevation: 6,
-            child: ListTile(
-              leading: CircleAvatar(
-                foregroundImage: AssetImage(class_.subject.getSubjectIconPath()),
-                backgroundColor: Colors.transparent,
+      body: RefreshIndicator(
+        onRefresh: context.read<HomeCubit>().refresh,
+        child: ListView.builder(
+          itemCount: homeState.classes.length,
+          itemBuilder: (context, index) {
+            final class_ = homeState.classes[index];
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              elevation: 6,
+              child: ListTile(
+                leading: CircleAvatar(
+                  foregroundImage: AssetImage(class_.subject.getSubjectIconPath()),
+                  backgroundColor: Colors.transparent,
+                ),
+                subtitle: Text(
+                  "Teacher: ${context.read<HomeCubit>().getTeacher(class_).fullName}",
+                  maxLines: 1,
+                  style: theme.textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                title: Text(
+                  class_.className,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Text(
+                  "code: ${class_.id}",
+                  style: theme.textTheme.caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return ClassPage(classId: class_.id);
+                    }),
+                  );
+                },
               ),
-              subtitle: Text(
-                "Teacher: ${context.read<HomeCubit>().getTeacher(class_).fullName}",
-                maxLines: 1,
-                style: theme.textTheme.bodySmall,
-                overflow: TextOverflow.ellipsis,
-              ),
-              title: Text(
-                class_.className,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: Text(
-                "code: ${class_.id}",
-                style: theme.textTheme.caption,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return ClassPage(classId: class_.id);
-                  }),
-                );
-              },
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -205,6 +209,7 @@ class HomeDrawer extends StatelessWidget {
                 color: theme.colorScheme.primary,
               ),
             ),
+            onTap: () =>  Navigator.of(context).push(NotificationsPage().asRoute()),
           ),
           const Divider(
             height: 2,

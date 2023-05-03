@@ -8,7 +8,7 @@ part of 'class.dart';
 
 class ClassAdapter extends TypeAdapter<Class> {
   @override
-  final int typeId = 3;
+  final int typeId = 2;
 
   @override
   Class read(BinaryReader reader) {
@@ -18,7 +18,7 @@ class ClassAdapter extends TypeAdapter<Class> {
     };
     return Class(
       id: fields[0] as String,
-      creatorId: fields[1] as String,
+      teachers: (fields[1] as List).cast<String>(),
       streamMessagesId: fields[2] as String,
       studentsIds: (fields[3] as List).cast<String>(),
       homeWorkId: fields[4] as String,
@@ -35,7 +35,7 @@ class ClassAdapter extends TypeAdapter<Class> {
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.creatorId)
+      ..write(obj.teachers)
       ..writeByte(2)
       ..write(obj.streamMessagesId)
       ..writeByte(3)

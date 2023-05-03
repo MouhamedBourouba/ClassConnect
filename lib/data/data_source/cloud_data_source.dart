@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:gsheets/gsheets.dart';
 import 'package:injectable/injectable.dart';
 
-enum MTable { usersTable, classesTable, emailOtpTabel, inviteRequest }
+enum MTable { usersTable, classesTable, emailOtpTabel, eventsTable }
 
 abstract class CloudDataSource {
   Future<Map<String, String>?> getRow(MTable table, {required String rowKey});
@@ -31,7 +31,7 @@ abstract class CloudDataSource {
 class GoogleSheetsCloudDataSource implements CloudDataSource {
   Worksheet? usersWorkSheet;
   Worksheet? classesWorkSheet;
-  Worksheet? inviteRequestsSheet;
+  Worksheet? eventsWorkSheet;
   Worksheet? emailOtpWorkSheet;
   late Worksheet currentWorkSheet;
 
@@ -62,7 +62,7 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
       usersWorkSheet = gSheetsClient.worksheetByTitle("Users");
       classesWorkSheet = gSheetsClient.worksheetByTitle("Classes");
       emailOtpWorkSheet = gSheetsClient.worksheetByTitle("OTP");
-      inviteRequestsSheet = gSheetsClient.worksheetByTitle("InviteRequest");
+      eventsWorkSheet = gSheetsClient.worksheetByTitle("Events");
     } catch (e) {
       log(e.toString());
       return;
@@ -78,8 +78,8 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
         return classesWorkSheet!;
       case MTable.emailOtpTabel:
         return emailOtpWorkSheet!;
-      case MTable.inviteRequest:
-        return inviteRequestsSheet!;
+      case MTable.eventsTable:
+        return eventsWorkSheet!;
     }
   }
 

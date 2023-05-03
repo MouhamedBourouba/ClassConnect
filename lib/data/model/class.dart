@@ -4,12 +4,12 @@ import 'package:hive/hive.dart';
 
 part 'class.g.dart';
 
-@HiveType(typeId: 3)
+@HiveType(typeId: 2)
 class Class {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String creatorId;
+  final List<String> teachers;
   @HiveField(2)
   final String streamMessagesId;
   @HiveField(3)
@@ -25,7 +25,7 @@ class Class {
 
   Map<String, String> toMap() => {
         "id": id,
-        "creatorId": creatorId,
+        "teachers": jsonEncode(teachers),
         "streamMessagesId": streamMessagesId,
         "studentsIds": jsonEncode(studentsIds),
         "homeWorkId": homeWorkId,
@@ -36,7 +36,7 @@ class Class {
 
   Class({
     required this.id,
-    required this.creatorId,
+    required this.teachers,
     required this.streamMessagesId,
     required this.studentsIds,
     required this.homeWorkId,
