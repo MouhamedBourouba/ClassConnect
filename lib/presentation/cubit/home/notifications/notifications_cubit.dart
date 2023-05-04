@@ -15,16 +15,21 @@ part 'notifications_state.dart';
 
 class NotificationsCubit extends Cubit<NotificationsState> {
   NotificationsCubit() : super(const NotificationsState.initial()) {
-    eventsRepository.getEvents().then((value) => emit(state.copyWith(pageState: PageState.init, events: value)));
-    for (final element in state.events) {
-      if (element.eventType == EventType.classMemberShipInvitation) {
-        // classesRepository.getClassById(jsonDecode(source))
-      }
-    }
+    _eventsRepository.getEvents().then((value) {
+      emit(state.copyWith(events: value));
+    });
   }
 
-  final EventsRepository eventsRepository = getIt();
-  final ClassesRepository classesRepository = getIt();
+  final _invitationContent = [];
+  final EventsRepository _eventsRepository = getIt();
+  final ClassesRepository _classesRepository = getIt();
 
-  // Class getClassById(String classId) {}
+  ClassInvitationEventData decodeClassInvitationEventData(String data) {
+    final classInvitationDataMap = (jsonDecode(data) as Map<String, dynamic>).map((key, value) => MapEntry(key, value.toString()));
+    return ClassInvitationEventData.fromMap(classInvitationDataMap);
+  }
+
+  acceptInvitation(ClassInvitationEventData data) {}
+
+  refuseInvitation(ClassInvitationEventData data) {}
 }

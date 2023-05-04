@@ -21,9 +21,18 @@ class EventsRepositoryImpl extends EventsRepository {
   EventsRepositoryImpl(this.cloudDataSource, this.localDataSource);
 
   @override
-  Future<List<UserEvent>> getEvents() async => (await isOnline())
-      ? (await cloudDataSource.getAllRows(MTable.eventsTable))?.map((e) => UserEvent.fromMap(e)).toList() ?? []
-      : localDataSource.getEvents();
+  Future<List<UserEvent>> getEvents() async {
+    if (await isOnline()) {
+      final events = (await cloudDataSource.getAllRows(MTable.eventsTable) ?? []).map((e) => UserEvent.fromMap(e));
+      final userRelatedEvents = events.where((element) => element.eventReceiverId == localDataSource.getCurrentUser()!.id);
+      for (final element in userRelatedEvents) {
+        localDataSource.addEvent(element);
+      }
+      return userRelatedEvents.toList();
+    } else {
+      return localDataSource.getEvents();
+    }
+  }
 
   @override
   Future<int> getNotificationNumber() async {

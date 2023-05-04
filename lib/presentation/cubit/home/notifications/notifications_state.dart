@@ -5,6 +5,6 @@ class NotificationsState with _$NotificationsState {
   const factory NotificationsState.initial({
     @Default([]) List<UserEvent> events,
     @Default([]) List<Class> classes,
-    @Default(PageState.loading) PageState pageState,
+    @Default(PageState.init) PageState pageState,
   }) = _Initial;
 }

@@ -1,9 +1,9 @@
-import 'dart:convert';
-
 import 'package:ClassConnect/data/model/user_event.dart';
-import 'package:ClassConnect/data/repository/classes_data_source.dart';
+import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/home/notifications/notifications_cubit.dart';
 import 'package:ClassConnect/presentation/cubit/page_state.dart';
+import 'package:ClassConnect/utils/extension.dart';
+import 'package:ClassConnect/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,36 +22,45 @@ class NotificationsPage extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: const Text("Notifications"),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
             ),
             body: ListView.builder(
+              padding: const EdgeInsets.only(top: 6),
               itemBuilder: (context, index) {
                 final currentEvent = state.events[index];
                 switch (currentEvent.eventType) {
                   case EventType.classMemberShipInvitation:
-                    final data = ClassInvitationEventData.fromMap((jsonDecode(currentEvent.encodedContent ?? "") as Map<String, dynamic>).map((key, value) => MapEntry(key, value.toString())));
-                    return ListTile(
-                      title: Text(
-                          "${data.senderName} has invited you to  ${data.role == Role.teacher ? "class to be a teacher" : ""}"),
-                      leading: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
+                    final data = cubit.decodeClassInvitationEventData(currentEvent.encodedContent!);
+                    return Dismissible(
+                      background: const ColoredBox(
+                        color: Colors.red,
+                        child: Padding(
+                          padding: EdgeInsets.only(right: 16),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.white,
                             ),
-                            child: const Text("Accept"),
                           ),
-                          ElevatedButton(
-                            onPressed: () => null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text("Refuse"),
-                          ),
-                        ],
+                        ),
+                      ),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (_) => cubit.refuseInvitation(data),
+                      key: ObjectKey(index),
+                      child: ListTile(
+                        title: const Text("Teaching invitation"),
+                        subtitle: Text("${data.senderName} invited you to ${data.className} class"),
+                        leading: CircleAvatar(
+                          backgroundColor: getIt<RandomColorGenerator>().getColorHash(index),
+                          foregroundColor: Colors.white,
+                          child: Text(data.senderName.firstLatter().toUpperCase()),
+                        ),
+                        trailing: IconButton(
+                          onPressed: () => cubit.acceptInvitation(data),
+                          icon: const Icon(Icons.check),
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
                       ),
                     );
                   case EventType.classMemberShipAccepted:

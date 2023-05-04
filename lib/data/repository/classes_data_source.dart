@@ -147,6 +147,7 @@ class ClassesRepositoryImp extends ClassesRepository {
               role: role,
               senderName: currentUser.fullName,
               classId: class_.id,
+              className: updatedClass.className,
             ).toMap(),
           ),
         ).toMap(),

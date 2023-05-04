@@ -15,19 +15,17 @@ class ClassInvitationEventData {
   final Role role;
   final String senderName;
   final String classId;
+  final String className;
 
-  Map<String, String> toMap() => {
-        "role": _encodeRole(role).toString(),
-        "senderName": senderName,
-        "classId": classId,
-      };
+  Map<String, String> toMap() => {"role": _encodeRole(role).toString(), "senderName": senderName, "classId": classId, "className": className};
 
-  ClassInvitationEventData({required this.role, required this.senderName, required this.classId});
+  ClassInvitationEventData({required this.role, required this.senderName, required this.classId, required this.className});
 
   ClassInvitationEventData.fromMap(Map<String, String> classInvitationMap)
       : role = _decodeRole(int.parse(classInvitationMap["role"]!)),
         classId = classInvitationMap["classId"]!,
-        senderName = classInvitationMap["senderName"]!;
+        senderName = classInvitationMap["senderName"]!,
+        className = classInvitationMap["className"]!;
 
   int _encodeRole(Role role) {
     switch (role) {
