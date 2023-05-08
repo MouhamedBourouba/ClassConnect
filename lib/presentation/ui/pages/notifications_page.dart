@@ -1,9 +1,10 @@
 import 'package:ClassConnect/data/model/user_event.dart';
+import 'package:ClassConnect/data/repository/classes_data_source.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/home/notifications/notifications_cubit.dart';
 import 'package:ClassConnect/presentation/cubit/page_state.dart';
-import 'package:ClassConnect/utils/extension.dart';
 import 'package:ClassConnect/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -24,50 +25,70 @@ class NotificationsPage extends StatelessWidget {
               title: const Text("Notifications"),
               backgroundColor: Theme.of(context).colorScheme.secondary,
             ),
-            body: ListView.builder(
-              padding: const EdgeInsets.only(top: 6),
-              itemBuilder: (context, index) {
-                final currentEvent = state.events[index];
-                switch (currentEvent.eventType) {
-                  case EventType.classMemberShipInvitation:
-                    final data = cubit.decodeClassInvitationEventData(currentEvent.encodedContent!);
-                    return Dismissible(
-                      background: const ColoredBox(
-                        color: Colors.red,
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 16),
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.white,
+            body: Column(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    separatorBuilder: (context, int index) {
+                      return const Divider(color: Colors.black);
+                    },
+                    padding: const EdgeInsets.only(top: 6),
+                    itemBuilder: (context, index) {
+                      final currentEvent = state.events[index];
+                      switch (currentEvent.eventType) {
+                        case EventType.classMemberShipInvitation:
+                          final data = cubit.decodeClassInvitationEventData(currentEvent.encodedContent!);
+                          return ListTile(
+                            title: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "${data.senderName} ",
+                                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w900),
+                                  ),
+                                  TextSpan(
+                                    text: data.role == Role.teacher ? "invited you to teach in " : "invited you to ",
+                                    style: Theme.of(context).textTheme.bodyLarge,
+                                  ),
+                                  TextSpan(
+                                    text: "${data.className} class",
+                                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w900),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                      direction: DismissDirection.endToStart,
-                      onDismissed: (_) => cubit.refuseInvitation(data),
-                      key: ObjectKey(index),
-                      child: ListTile(
-                        title: const Text("Teaching invitation"),
-                        subtitle: Text("${data.senderName} invited you to ${data.className} class"),
-                        leading: CircleAvatar(
-                          backgroundColor: getIt<RandomColorGenerator>().getColorHash(index),
-                          foregroundColor: Colors.white,
-                          child: Text(data.senderName.firstLatter().toUpperCase()),
-                        ),
-                        trailing: IconButton(
-                          onPressed: () => cubit.acceptInvitation(data),
-                          icon: const Icon(Icons.check),
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                      ),
-                    );
-                  case EventType.classMemberShipAccepted:
-                    return Placeholder();
-                }
-              },
-              itemCount: state.events.length,
+                            leading: CircleAvatar(
+                              foregroundColor: Colors.white,
+                              backgroundColor: getIt<RandomColorGenerator>().getColorHash(index),
+                              child: Text(data.senderName[0].toUpperCase()),
+                            ),
+                            subtitle: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.secondary),
+                                  onPressed: () => cubit.acceptInvitation(data),
+                                  child: const Text("Join"),
+                                ),
+                                const SizedBox(width: 12),
+                                TextButton(
+                                  onPressed: () => cubit.acceptInvitation(data),
+                                  child: const Text(
+                                    "Decline",
+                                    style: TextStyle(color: CupertinoColors.inactiveGray),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        case EventType.classMemberShipAccepted:
+                          return Placeholder();
+                      }
+                    },
+                    itemCount: state.events.length,
+                  ),
+                ),
+              ],
             ),
           );
         },
