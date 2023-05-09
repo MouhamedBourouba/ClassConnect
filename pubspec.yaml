@@ -30,6 +30,7 @@ dependencies:
   multiple_result: ^4.0.0
   http: ^0.13.5
   flutter_otp_text_field: ^1.1.1
+  intl: ^0.18.1
 
 dev_dependencies:
   build_runner:

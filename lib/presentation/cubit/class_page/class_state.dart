@@ -10,6 +10,7 @@ class ClassState with _$ClassState {
     @Default(0) int pageIndex,
     @Default([]) List<User> classMembers,
     @Default([]) List<User> teachers,
+    @Default([]) List<ClassMessage> streamMessages,
     @Default(PageState.init) PageState pageState,
     Class? currentClass,
   }) = _Initial;

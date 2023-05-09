@@ -31,7 +31,9 @@ abstract class ClassesRepository {
 
   Future<Class> getClassById(String id);
 
-  // Future<Result<Unit, String>> sendMessage(ClassMessage classMessage);
+  Future<Result<Unit, String>> sendMessage(ClassMessage classMessage);
+
+  Future<Result<List<ClassMessage>, String>> getClassMessages(String streamMessagesId);
 
   Future<Result<Unit, String>> acceptInvitation(ClassInvitationEventData data);
 }
@@ -204,9 +206,20 @@ class ClassesRepositoryImp extends ClassesRepository {
       return Result.error("An unknown error occurred. Please try again later.");
     }
   }
-  //
-  // @override
-  // Future<Result<Unit, String>> sendMessage(ClassMessage classMessage) async {
-  //   cloudDataSource.appendRow(classMessage.toMap(), MTable.)
-  // }
+
+  @override
+  Future<Result<Unit, String>> sendMessage(ClassMessage classMessage) async {
+    final isSuccess = await cloudDataSource.appendRow(classMessage.toMap(), MTable.streamMessagesTable);
+    return isSuccess ? Result.success(unit) : Result.error("An unknown error occurred. Please try again later.");
+  }
+
+  @override
+  Future<Result<List<ClassMessage>, String>> getClassMessages(String streamMessagesId) async {
+    final allMessages =
+        (await cloudDataSource.getAllRows(MTable.streamMessagesTable))?.map((e) => ClassMessage.fromMap(e)) ?? localDataSource.getClassMessages();
+    for (final message in allMessages) {
+      localDataSource.addClassMessage(message);
+    }
+    return Result.success(allMessages.where((element) => element.streamMessagesId == streamMessagesId).toList());
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:ClassConnect/data/model/class.dart';
+import 'package:ClassConnect/data/model/class_message.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/model/user_event.dart';
 import 'package:flutter/foundation.dart';
@@ -39,7 +40,11 @@ abstract class LocalDataSource {
 
   List<UserEvent> getEvents();
 
+  Future<void> addClassMessage(ClassMessage classMessage);
+
   void removeEvent(String eventId);
+
+  Iterable<ClassMessage> getClassMessages();
 }
 
 @Singleton(as: LocalDataSource)
@@ -47,6 +52,7 @@ class HiveLocalDataBase implements LocalDataSource {
   late Box appBox;
   late Box<User> usersBox;
   late Box<Class> classesBox;
+  late Box<ClassMessage> classMessagesBox;
   late Box<UserEvent> eventBox;
   final User? currentUser = null;
 
@@ -55,11 +61,13 @@ class HiveLocalDataBase implements LocalDataSource {
     await Hive.initFlutter();
     Hive.registerAdapter(UserAdapter());
     Hive.registerAdapter(ClassAdapter());
+    Hive.registerAdapter(ClassMessageAdapter());
     Hive.registerAdapter(EventTypeAdapter());
     Hive.registerAdapter(UserEventAdapter());
     appBox = await Hive.openBox("app_box");
     usersBox = await Hive.openBox("users");
     classesBox = await Hive.openBox("classes");
+    classMessagesBox = await Hive.openBox("class_messages");
     eventBox = await Hive.openBox("events");
   }
 
@@ -125,6 +133,11 @@ class HiveLocalDataBase implements LocalDataSource {
     final updatedList = List<UserEvent>.from(eventBox.values)..removeWhere((element) => element.id == eventId);
     await eventBox.clear();
     await eventBox.putAll(Map.fromIterable(updatedList));
-
   }
+
+  @override
+  Future<void> addClassMessage(ClassMessage classMessage) => classMessagesBox.add(classMessage);
+
+  @override
+  Iterable<ClassMessage> getClassMessages() => classMessagesBox.values;
 }

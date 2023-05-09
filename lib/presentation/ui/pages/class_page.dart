@@ -9,6 +9,7 @@ import 'package:ClassConnect/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class ClassPage extends StatelessWidget {
   const ClassPage({super.key, required this.classId});
@@ -54,26 +55,87 @@ class _MessagesStream extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.watch<ClassCubit>();
     final state = cubit.state;
+    if (state.pageState == PageState.loading) return const Center(child: CircularProgressIndicator());
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Column(
-        children: [
-          Card(
-            elevation: 4,
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              title: Text(
-                "Share with your class ...",
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: CupertinoColors.inactiveGray),
-              ),
-              leading: CircleAvatar(
-                foregroundColor: Colors.white,
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                child: Text(state.currentUser?.fullName[0].toUpperCase() ?? "A"),
+      child: RefreshIndicator(
+        onRefresh: cubit.fetchStreamMessages,
+        child: Column(
+          children: [
+            Card(
+              elevation: 4,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                title: Text(
+                  "Share with your class ...",
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: CupertinoColors.inactiveGray),
+                ),
+                leading: CircleAvatar(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  child: Text(state.currentUser?.fullName[0].toUpperCase() ?? "A"),
+                ),
+                onTap: () => cubit.sendStreamMessage(),
               ),
             ),
-          )
-        ],
+            Expanded(
+              child: ListView.builder(
+                itemCount: state.streamMessages.length,
+                itemBuilder: (context, index) {
+                  final message = state.streamMessages[index];
+                  return Card(
+                    elevation: 4,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ListTile(
+                          contentPadding: const EdgeInsets.only(left: 16, right: 8),
+                          title: Text(message.senderName),
+                          leading: CircleAvatar(
+                            backgroundColor: getIt<RandomColorGenerator>().getColorHash(index),
+                            foregroundColor: Colors.white,
+                            child: Text(message.senderName[0].toUpperCase()),
+                          ),
+                          subtitle: Text(
+                            DateFormat("MMMM, d").format(DateTime.fromMillisecondsSinceEpoch(int.parse(message.sentTimeMS))),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          trailing: GestureDetector(
+                            onTapDown: (tapDownDetails) {
+                              final left = tapDownDetails.globalPosition.dx;
+                              final top = tapDownDetails.globalPosition.dy;
+                              final position = RelativeRect.fromLTRB(left, top + 10, 0, 0);
+                              showMenu(
+                                context: context,
+                                position: position,
+                                items: [
+                                  const PopupMenuItem(
+                                    child: Text("Report Abuse"),
+                                  )
+                                ],
+                              );
+                            },
+                            child: Icon(
+                              Icons.more_vert,
+                              color: Colors.black.withOpacity(0.8),
+                            ),
+                          ),
+                        ),
+                        Text(message.content ?? ""),
+                        const Divider(thickness: 1),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16),
+                          child: Text("Add class comment ...", textAlign: TextAlign.left, style: Theme.of(context).textTheme.bodySmall,),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

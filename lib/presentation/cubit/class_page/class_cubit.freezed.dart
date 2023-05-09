@@ -23,6 +23,7 @@ mixin _$ClassState {
   int get pageIndex => throw _privateConstructorUsedError;
   List<User> get classMembers => throw _privateConstructorUsedError;
   List<User> get teachers => throw _privateConstructorUsedError;
+  List<ClassMessage> get streamMessages => throw _privateConstructorUsedError;
   PageState get pageState => throw _privateConstructorUsedError;
   Class? get currentClass => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -35,6 +36,7 @@ mixin _$ClassState {
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
+            List<ClassMessage> streamMessages,
             PageState pageState,
             Class? currentClass)
         initial,
@@ -50,6 +52,7 @@ mixin _$ClassState {
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
+            List<ClassMessage> streamMessages,
             PageState pageState,
             Class? currentClass)?
         initial,
@@ -65,6 +68,7 @@ mixin _$ClassState {
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
+            List<ClassMessage> streamMessages,
             PageState pageState,
             Class? currentClass)?
         initial,
@@ -107,6 +111,7 @@ abstract class $ClassStateCopyWith<$Res> {
       int pageIndex,
       List<User> classMembers,
       List<User> teachers,
+      List<ClassMessage> streamMessages,
       PageState pageState,
       Class? currentClass});
 }
@@ -131,6 +136,7 @@ class _$ClassStateCopyWithImpl<$Res, $Val extends ClassState>
     Object? pageIndex = null,
     Object? classMembers = null,
     Object? teachers = null,
+    Object? streamMessages = null,
     Object? pageState = null,
     Object? currentClass = freezed,
   }) {
@@ -163,6 +169,10 @@ class _$ClassStateCopyWithImpl<$Res, $Val extends ClassState>
           ? _value.teachers
           : teachers // ignore: cast_nullable_to_non_nullable
               as List<User>,
+      streamMessages: null == streamMessages
+          ? _value.streamMessages
+          : streamMessages // ignore: cast_nullable_to_non_nullable
+              as List<ClassMessage>,
       pageState: null == pageState
           ? _value.pageState
           : pageState // ignore: cast_nullable_to_non_nullable
@@ -190,6 +200,7 @@ abstract class _$$_InitialCopyWith<$Res> implements $ClassStateCopyWith<$Res> {
       int pageIndex,
       List<User> classMembers,
       List<User> teachers,
+      List<ClassMessage> streamMessages,
       PageState pageState,
       Class? currentClass});
 }
@@ -211,6 +222,7 @@ class __$$_InitialCopyWithImpl<$Res>
     Object? pageIndex = null,
     Object? classMembers = null,
     Object? teachers = null,
+    Object? streamMessages = null,
     Object? pageState = null,
     Object? currentClass = freezed,
   }) {
@@ -243,6 +255,10 @@ class __$$_InitialCopyWithImpl<$Res>
           ? _value._teachers
           : teachers // ignore: cast_nullable_to_non_nullable
               as List<User>,
+      streamMessages: null == streamMessages
+          ? _value._streamMessages
+          : streamMessages // ignore: cast_nullable_to_non_nullable
+              as List<ClassMessage>,
       pageState: null == pageState
           ? _value.pageState
           : pageState // ignore: cast_nullable_to_non_nullable
@@ -266,10 +282,12 @@ class _$_Initial implements _Initial {
       this.pageIndex = 0,
       final List<User> classMembers = const [],
       final List<User> teachers = const [],
+      final List<ClassMessage> streamMessages = const [],
       this.pageState = PageState.init,
       this.currentClass})
       : _classMembers = classMembers,
-        _teachers = teachers;
+        _teachers = teachers,
+        _streamMessages = streamMessages;
 
   @override
   @JsonKey()
@@ -303,6 +321,15 @@ class _$_Initial implements _Initial {
     return EqualUnmodifiableListView(_teachers);
   }
 
+  final List<ClassMessage> _streamMessages;
+  @override
+  @JsonKey()
+  List<ClassMessage> get streamMessages {
+    if (_streamMessages is EqualUnmodifiableListView) return _streamMessages;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_streamMessages);
+  }
+
   @override
   @JsonKey()
   final PageState pageState;
@@ -311,7 +338,7 @@ class _$_Initial implements _Initial {
 
   @override
   String toString() {
-    return 'ClassState.initial(classId: $classId, teacherEmail: $teacherEmail, errorMessage: $errorMessage, currentUser: $currentUser, pageIndex: $pageIndex, classMembers: $classMembers, teachers: $teachers, pageState: $pageState, currentClass: $currentClass)';
+    return 'ClassState.initial(classId: $classId, teacherEmail: $teacherEmail, errorMessage: $errorMessage, currentUser: $currentUser, pageIndex: $pageIndex, classMembers: $classMembers, teachers: $teachers, streamMessages: $streamMessages, pageState: $pageState, currentClass: $currentClass)';
   }
 
   @override
@@ -331,6 +358,8 @@ class _$_Initial implements _Initial {
             const DeepCollectionEquality()
                 .equals(other._classMembers, _classMembers) &&
             const DeepCollectionEquality().equals(other._teachers, _teachers) &&
+            const DeepCollectionEquality()
+                .equals(other._streamMessages, _streamMessages) &&
             (identical(other.pageState, pageState) ||
                 other.pageState == pageState) &&
             (identical(other.currentClass, currentClass) ||
@@ -347,6 +376,7 @@ class _$_Initial implements _Initial {
       pageIndex,
       const DeepCollectionEquality().hash(_classMembers),
       const DeepCollectionEquality().hash(_teachers),
+      const DeepCollectionEquality().hash(_streamMessages),
       pageState,
       currentClass);
 
@@ -367,12 +397,13 @@ class _$_Initial implements _Initial {
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
+            List<ClassMessage> streamMessages,
             PageState pageState,
             Class? currentClass)
         initial,
   }) {
     return initial(classId, teacherEmail, errorMessage, currentUser, pageIndex,
-        classMembers, teachers, pageState, currentClass);
+        classMembers, teachers, streamMessages, pageState, currentClass);
   }
 
   @override
@@ -386,12 +417,22 @@ class _$_Initial implements _Initial {
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
+            List<ClassMessage> streamMessages,
             PageState pageState,
             Class? currentClass)?
         initial,
   }) {
-    return initial?.call(classId, teacherEmail, errorMessage, currentUser,
-        pageIndex, classMembers, teachers, pageState, currentClass);
+    return initial?.call(
+        classId,
+        teacherEmail,
+        errorMessage,
+        currentUser,
+        pageIndex,
+        classMembers,
+        teachers,
+        streamMessages,
+        pageState,
+        currentClass);
   }
 
   @override
@@ -405,14 +446,24 @@ class _$_Initial implements _Initial {
             int pageIndex,
             List<User> classMembers,
             List<User> teachers,
+            List<ClassMessage> streamMessages,
             PageState pageState,
             Class? currentClass)?
         initial,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(classId, teacherEmail, errorMessage, currentUser,
-          pageIndex, classMembers, teachers, pageState, currentClass);
+      return initial(
+          classId,
+          teacherEmail,
+          errorMessage,
+          currentUser,
+          pageIndex,
+          classMembers,
+          teachers,
+          streamMessages,
+          pageState,
+          currentClass);
     }
     return orElse();
   }
@@ -455,6 +506,7 @@ abstract class _Initial implements ClassState {
       final int pageIndex,
       final List<User> classMembers,
       final List<User> teachers,
+      final List<ClassMessage> streamMessages,
       final PageState pageState,
       final Class? currentClass}) = _$_Initial;
 
@@ -472,6 +524,8 @@ abstract class _Initial implements ClassState {
   List<User> get classMembers;
   @override
   List<User> get teachers;
+  @override
+  List<ClassMessage> get streamMessages;
   @override
   PageState get pageState;
   @override

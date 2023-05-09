@@ -1,4 +1,5 @@
 import 'package:ClassConnect/data/model/class.dart';
+import 'package:ClassConnect/data/model/class_message.dart';
 import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/repository/classes_data_source.dart';
@@ -10,6 +11,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'class_cubit.freezed.dart';
 
@@ -24,6 +26,7 @@ class ClassCubit extends Cubit<ClassState> {
           .where((class_) => class_.id == state.classId)
           .first;
       emit(state.copyWith(currentClass: currentClass));
+      fetchStreamMessages();
       fetchClassMembers();
     });
   }
@@ -69,4 +72,27 @@ class ClassCubit extends Cubit<ClassState> {
   }
 
   void setStateToInit() => emit(state.copyWith(pageState: PageState.init));
+
+  Future<void> sendStreamMessage() async {
+    await checkInternetConnection();
+    await classesRepository.sendMessage(
+      ClassMessage(
+        id: getIt<Uuid>().v1(),
+        streamMessagesId: state.currentClass!.streamMessagesId,
+        senderId: state.currentUser!.id,
+        senderName: state.currentUser!.fullName,
+        sentTimeMS: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: "example",
+      ),
+    );
+  }
+
+  Future<void> fetchStreamMessages() async {
+    emit(state.copyWith(pageState: PageState.loading));
+    (await classesRepository.getClassMessages(state.currentClass!.streamMessagesId)).when(
+      (data) => emit(state.copyWith(streamMessages: data)),
+      (error) => null,
+    );
+    emit(state.copyWith(pageState: PageState.init));
+  }
 }
