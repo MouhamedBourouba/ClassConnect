@@ -6,5 +6,6 @@ class NotificationsState with _$NotificationsState {
     @Default([]) List<UserEvent> events,
     @Default([]) List<Class> classes,
     @Default(PageState.init) PageState pageState,
+    @Default('') String error,
   }) = _Initial;
 }

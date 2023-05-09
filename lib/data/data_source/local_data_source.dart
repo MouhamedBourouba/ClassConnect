@@ -38,6 +38,8 @@ abstract class LocalDataSource {
   Stream<BoxEvent> getCurrentUserUpdates();
 
   List<UserEvent> getEvents();
+
+  void removeEvent(String eventId);
 }
 
 @Singleton(as: LocalDataSource)
@@ -117,4 +119,12 @@ class HiveLocalDataBase implements LocalDataSource {
 
   @override
   List<UserEvent> getEvents() => eventBox.toMap().values.toList();
+
+  @override
+  Future<void> removeEvent(String eventId) async {
+    final updatedList = List<UserEvent>.from(eventBox.values)..removeWhere((element) => element.id == eventId);
+    await eventBox.clear();
+    await eventBox.putAll(Map.fromIterable(updatedList));
+
+  }
 }

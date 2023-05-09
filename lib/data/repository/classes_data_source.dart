@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
 import 'package:ClassConnect/data/data_source/local_data_source.dart';
 import 'package:ClassConnect/data/model/class.dart';
+import 'package:ClassConnect/data/model/class_message.dart';
 import 'package:ClassConnect/data/model/error.dart';
 import 'package:ClassConnect/data/model/source.dart';
 import 'package:ClassConnect/data/model/user_event.dart';
 import 'package:ClassConnect/data/repository/user_repository.dart';
+import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/utils/extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -28,6 +30,10 @@ abstract class ClassesRepository {
   Future<Result<Unit, MException>> inviteMember(Class class_, String teacherEmail, Role role);
 
   Future<Class> getClassById(String id);
+
+  // Future<Result<Unit, String>> sendMessage(ClassMessage classMessage);
+
+  Future<Result<Unit, String>> acceptInvitation(ClassInvitationEventData data);
 }
 
 @LazySingleton(as: ClassesRepository)
@@ -123,7 +129,6 @@ class ClassesRepositoryImp extends ClassesRepository {
     }
   }
 
-
   @override
   Future<Result<Unit, MException>> inviteMember(Class class_, String teacherEmail, Role role) async {
     final currentUser = localDataSource.getCurrentUser()!;
@@ -138,6 +143,7 @@ class ClassesRepositoryImp extends ClassesRepository {
       if (updatedClass.teachers.contains(userData.id)) return Result.error(MException("This user is already teacher in this class"));
       final sendingInvitationTask = await cloudDataSource.appendRow(
         UserEvent(
+          id: getIt<Uuid>().v1(),
           eventType: EventType.classMemberShipInvitation,
           eventReceiverId: userData.id,
           eventSenderId: currentUser.id,
@@ -164,4 +170,43 @@ class ClassesRepositoryImp extends ClassesRepository {
     final classMap = await cloudDataSource.getRow(MTable.classesTable, rowKey: id);
     return classMap!.toClass();
   }
+
+  @override
+  Future<Result<Unit, String>> acceptInvitation(ClassInvitationEventData data) async {
+    try {
+      final currentUser = localDataSource.getCurrentUser()!;
+      final classData = (await cloudDataSource.getRow(MTable.classesTable, rowKey: data.classId))!.toClass();
+      late List<String> updatedList;
+      if (classData.teachers.contains(currentUser.id)) {
+        return Result.error("You are already teacher in this class");
+      } else if (classData.studentsIds.contains(currentUser.id) && data.role == Role.classMate) {
+        return Result.error("you've already joined this class");
+      }
+
+      switch (data.role) {
+        case Role.classMate:
+          updatedList = [...classData.studentsIds, localDataSource.getCurrentUser()!.id];
+          break;
+        case Role.teacher:
+          updatedList = [...classData.teachers, localDataSource.getCurrentUser()!.id];
+          break;
+      }
+      await cloudDataSource.updateValue(
+        updatedList,
+        MTable.classesTable,
+        rowKey: data.classId,
+        columnKey: data.role == Role.classMate ? 'studentsIds' : "teachers",
+      );
+
+      await localDataSource.addClass(classData);
+      return Result.success(unit);
+    } catch (e) {
+      return Result.error("An unknown error occurred. Please try again later.");
+    }
+  }
+  //
+  // @override
+  // Future<Result<Unit, String>> sendMessage(ClassMessage classMessage) async {
+  //   cloudDataSource.appendRow(classMessage.toMap(), MTable.)
+  // }
 }

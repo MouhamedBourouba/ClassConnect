@@ -3,10 +3,10 @@ import 'package:ClassConnect/data/repository/classes_data_source.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/class_page/class_cubit.dart';
 import 'package:ClassConnect/presentation/cubit/page_state.dart';
-import 'package:ClassConnect/presentation/ui/widgets/loading.dart';
 import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:ClassConnect/utils/extension.dart';
 import 'package:ClassConnect/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,7 +52,30 @@ class _MessagesStream extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    final cubit = context.watch<ClassCubit>();
+    final state = cubit.state;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Column(
+        children: [
+          Card(
+            elevation: 4,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              title: Text(
+                "Share with your class ...",
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: CupertinoColors.inactiveGray),
+              ),
+              leading: CircleAvatar(
+                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                child: Text(state.currentUser?.fullName[0].toUpperCase() ?? "A"),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 

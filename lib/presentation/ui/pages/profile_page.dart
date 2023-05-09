@@ -116,7 +116,7 @@ class UpdateProfileBody extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 150,
+            top: 180,
             left: 16,
             right: 16,
             bottom: 100,
@@ -150,7 +150,7 @@ class UpdateProfileBody extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 120,
+            top: 150,
             left: 0,
             right: 0,
             child: Hero(

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:hive/hive.dart';
 
 part 'user.g.dart';
@@ -15,11 +13,11 @@ class User {
   });
 
   @HiveField(0)
-  String id;
+  final String id;
   @HiveField(1)
   String fullName;
   @HiveField(2)
-  String password;
+  final String password;
   @HiveField(3)
   String email;
   @HiveField(4)

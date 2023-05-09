@@ -7,6 +7,8 @@ import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/page_state.dart';
 import 'package:ClassConnect/utils/utils.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'class_cubit.freezed.dart';
@@ -59,8 +61,8 @@ class ClassCubit extends Cubit<ClassState> {
     emit(state.copyWith(pageState: PageState.loading));
     (await classesRepository.inviteMember(state.currentClass!, state.teacherEmail, role)).when(
       (success) {
-        fetchClassMembers();
-        emit(state.copyWith(pageState: PageState.init));
+        emit(state.copyWith(pageState: PageState.success));
+        Fluttertoast.showToast(msg: 'Invitation Sent successfully', backgroundColor: Colors.green);
       },
       (error) => emit(state.copyWith(pageState: PageState.error, errorMessage: error.errorMessage)),
     );

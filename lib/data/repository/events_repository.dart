@@ -11,6 +11,8 @@ abstract class EventsRepository {
   Future<List<UserEvent>> getEvents();
 
   Future<Result<Unit, Unit>> postEvent(UserEvent userEvent);
+
+  Future<void> removeEvent(String eventId);
 }
 
 @LazySingleton(as: EventsRepository)
@@ -28,6 +30,9 @@ class EventsRepositoryImpl extends EventsRepository {
       for (final element in userRelatedEvents) {
         localDataSource.addEvent(element);
       }
+      for (final event in userRelatedEvents) {
+        cloudDataSource.updateValue(true, MTable.eventsTable, rowKey: event.id, columnKey: "seen");
+      }
       return userRelatedEvents.toList();
     } else {
       return localDataSource.getEvents();
@@ -43,4 +48,10 @@ class EventsRepositoryImpl extends EventsRepository {
   @override
   Future<Result<Unit, Unit>> postEvent(UserEvent userEvent) async =>
       await cloudDataSource.appendRow(userEvent.toMap(), MTable.eventsTable) ? Result.success(unit) : Result.error(unit);
+
+  @override
+  Future<void> removeEvent(String eventId) async {
+    await cloudDataSource.deleteRow(MTable.eventsTable, rowKey: eventId);
+    localDataSource.removeEvent(eventId);
+  }
 }

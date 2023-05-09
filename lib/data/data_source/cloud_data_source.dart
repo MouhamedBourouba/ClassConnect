@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:gsheets/gsheets.dart';
 import 'package:injectable/injectable.dart';
 
-enum MTable { usersTable, classesTable, emailOtpTabel, eventsTable }
+enum MTable { usersTable, classesTable, emailOtpTabel, eventsTable, streamMessagesTable }
 
 abstract class CloudDataSource {
   Future<Map<String, String>?> getRow(MTable table, {required String rowKey});
@@ -32,6 +32,7 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   Worksheet? usersWorkSheet;
   Worksheet? classesWorkSheet;
   Worksheet? eventsWorkSheet;
+  Worksheet? streamMessagesWorkSheet;
   Worksheet? emailOtpWorkSheet;
   late Worksheet currentWorkSheet;
 
@@ -62,6 +63,7 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
       usersWorkSheet = gSheetsClient.worksheetByTitle("Users");
       classesWorkSheet = gSheetsClient.worksheetByTitle("Classes");
       emailOtpWorkSheet = gSheetsClient.worksheetByTitle("OTP");
+      streamMessagesWorkSheet = gSheetsClient.worksheetByTitle("Stream messages");
       eventsWorkSheet = gSheetsClient.worksheetByTitle("Events");
     } catch (e) {
       log(e.toString());
@@ -70,7 +72,9 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   }
 
   Future<Worksheet> getWorkSheet(MTable table) async {
-    if (usersWorkSheet == null || classesWorkSheet == null) await connectToGoogleSheets();
+    if (usersWorkSheet == null || classesWorkSheet == null || emailOtpWorkSheet == null || streamMessagesWorkSheet == null || eventsWorkSheet == null) {
+      await connectToGoogleSheets();
+    }
     switch (table) {
       case MTable.usersTable:
         return usersWorkSheet!;
@@ -80,6 +84,8 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
         return emailOtpWorkSheet!;
       case MTable.eventsTable:
         return eventsWorkSheet!;
+      case MTable.streamMessagesTable:
+        return streamMessagesWorkSheet!;
     }
   }
 
@@ -87,7 +93,10 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   Future<bool> appendRow(Map<String, dynamic> data, MTable table) async => (await getWorkSheet(table)).values.map.appendRow(data, appendMissing: true);
 
   @override
-  Future<bool> deleteRow(MTable table, {required String rowKey}) async => (await getWorkSheet(table)).values.map.insertRowByKey(rowKey, {});
+  Future<bool> deleteRow(MTable table, {required String rowKey}) async {
+    final rowIndex = await (await getWorkSheet(table)).values.rowIndexOf(rowKey);
+    return (await getWorkSheet(table)).deleteRow(rowIndex);
+  }
 
   @override
   Future<List<Map<String, String>>?> getAllRows(MTable table) async => (await getWorkSheet(table)).values.map.allRows();

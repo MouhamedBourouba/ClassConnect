@@ -19,24 +19,25 @@ mixin _$NotificationsState {
   List<UserEvent> get events => throw _privateConstructorUsedError;
   List<Class> get classes => throw _privateConstructorUsedError;
   PageState get pageState => throw _privateConstructorUsedError;
+  String get error => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(
-            List<UserEvent> events, List<Class> classes, PageState pageState)
+    required TResult Function(List<UserEvent> events, List<Class> classes,
+            PageState pageState, String error)
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(
-            List<UserEvent> events, List<Class> classes, PageState pageState)?
+    TResult? Function(List<UserEvent> events, List<Class> classes,
+            PageState pageState, String error)?
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            List<UserEvent> events, List<Class> classes, PageState pageState)?
+    TResult Function(List<UserEvent> events, List<Class> classes,
+            PageState pageState, String error)?
         initial,
     required TResult orElse(),
   }) =>
@@ -69,7 +70,11 @@ abstract class $NotificationsStateCopyWith<$Res> {
           NotificationsState value, $Res Function(NotificationsState) then) =
       _$NotificationsStateCopyWithImpl<$Res, NotificationsState>;
   @useResult
-  $Res call({List<UserEvent> events, List<Class> classes, PageState pageState});
+  $Res call(
+      {List<UserEvent> events,
+      List<Class> classes,
+      PageState pageState,
+      String error});
 }
 
 /// @nodoc
@@ -88,6 +93,7 @@ class _$NotificationsStateCopyWithImpl<$Res, $Val extends NotificationsState>
     Object? events = null,
     Object? classes = null,
     Object? pageState = null,
+    Object? error = null,
   }) {
     return _then(_value.copyWith(
       events: null == events
@@ -102,6 +108,10 @@ class _$NotificationsStateCopyWithImpl<$Res, $Val extends NotificationsState>
           ? _value.pageState
           : pageState // ignore: cast_nullable_to_non_nullable
               as PageState,
+      error: null == error
+          ? _value.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -114,7 +124,11 @@ abstract class _$$_InitialCopyWith<$Res>
       __$$_InitialCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<UserEvent> events, List<Class> classes, PageState pageState});
+  $Res call(
+      {List<UserEvent> events,
+      List<Class> classes,
+      PageState pageState,
+      String error});
 }
 
 /// @nodoc
@@ -130,6 +144,7 @@ class __$$_InitialCopyWithImpl<$Res>
     Object? events = null,
     Object? classes = null,
     Object? pageState = null,
+    Object? error = null,
   }) {
     return _then(_$_Initial(
       events: null == events
@@ -144,6 +159,10 @@ class __$$_InitialCopyWithImpl<$Res>
           ? _value.pageState
           : pageState // ignore: cast_nullable_to_non_nullable
               as PageState,
+      error: null == error
+          ? _value.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -154,7 +173,8 @@ class _$_Initial implements _Initial {
   const _$_Initial(
       {final List<UserEvent> events = const [],
       final List<Class> classes = const [],
-      this.pageState = PageState.init})
+      this.pageState = PageState.init,
+      this.error = ''})
       : _events = events,
         _classes = classes;
 
@@ -179,10 +199,13 @@ class _$_Initial implements _Initial {
   @override
   @JsonKey()
   final PageState pageState;
+  @override
+  @JsonKey()
+  final String error;
 
   @override
   String toString() {
-    return 'NotificationsState.initial(events: $events, classes: $classes, pageState: $pageState)';
+    return 'NotificationsState.initial(events: $events, classes: $classes, pageState: $pageState, error: $error)';
   }
 
   @override
@@ -193,7 +216,8 @@ class _$_Initial implements _Initial {
             const DeepCollectionEquality().equals(other._events, _events) &&
             const DeepCollectionEquality().equals(other._classes, _classes) &&
             (identical(other.pageState, pageState) ||
-                other.pageState == pageState));
+                other.pageState == pageState) &&
+            (identical(other.error, error) || other.error == error));
   }
 
   @override
@@ -201,7 +225,8 @@ class _$_Initial implements _Initial {
       runtimeType,
       const DeepCollectionEquality().hash(_events),
       const DeepCollectionEquality().hash(_classes),
-      pageState);
+      pageState,
+      error);
 
   @JsonKey(ignore: true)
   @override
@@ -212,33 +237,33 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(
-            List<UserEvent> events, List<Class> classes, PageState pageState)
+    required TResult Function(List<UserEvent> events, List<Class> classes,
+            PageState pageState, String error)
         initial,
   }) {
-    return initial(events, classes, pageState);
+    return initial(events, classes, pageState, error);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(
-            List<UserEvent> events, List<Class> classes, PageState pageState)?
+    TResult? Function(List<UserEvent> events, List<Class> classes,
+            PageState pageState, String error)?
         initial,
   }) {
-    return initial?.call(events, classes, pageState);
+    return initial?.call(events, classes, pageState, error);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            List<UserEvent> events, List<Class> classes, PageState pageState)?
+    TResult Function(List<UserEvent> events, List<Class> classes,
+            PageState pageState, String error)?
         initial,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(events, classes, pageState);
+      return initial(events, classes, pageState, error);
     }
     return orElse();
   }
@@ -276,7 +301,8 @@ abstract class _Initial implements NotificationsState {
   const factory _Initial(
       {final List<UserEvent> events,
       final List<Class> classes,
-      final PageState pageState}) = _$_Initial;
+      final PageState pageState,
+      final String error}) = _$_Initial;
 
   @override
   List<UserEvent> get events;
@@ -284,6 +310,8 @@ abstract class _Initial implements NotificationsState {
   List<Class> get classes;
   @override
   PageState get pageState;
+  @override
+  String get error;
   @override
   @JsonKey(ignore: true)
   _$$_InitialCopyWith<_$_Initial> get copyWith =>

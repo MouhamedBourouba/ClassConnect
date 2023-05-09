@@ -17,27 +17,30 @@ class UserEventAdapter extends TypeAdapter<UserEvent> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserEvent(
-      seen: fields[4] as bool,
-      eventType: fields[0] as EventType,
-      eventReceiverId: fields[1] as String,
-      eventSenderId: fields[2] as String,
-      encodedContent: fields[3] as String?,
+      seen: fields[5] as bool,
+      eventType: fields[1] as EventType,
+      eventReceiverId: fields[2] as String,
+      eventSenderId: fields[3] as String,
+      encodedContent: fields[4] as String?,
+      id: fields[0] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserEvent obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
-      ..write(obj.eventType)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.eventReceiverId)
+      ..write(obj.eventType)
       ..writeByte(2)
-      ..write(obj.eventSenderId)
+      ..write(obj.eventReceiverId)
       ..writeByte(3)
-      ..write(obj.encodedContent)
+      ..write(obj.eventSenderId)
       ..writeByte(4)
+      ..write(obj.encodedContent)
+      ..writeByte(5)
       ..write(obj.seen);
   }
 

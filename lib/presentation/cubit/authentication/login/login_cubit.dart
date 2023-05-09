@@ -24,6 +24,7 @@ class LoginCubit extends Cubit<LoginState> {
 
   Future<void> login() async {
     await checkInternetConnection();
+    print(await isOnline());
     emit(state.copyWith(isLoading: true));
     final loginResult = await userRepository.loginUser(state.email, state.password);
     loginResult.when(

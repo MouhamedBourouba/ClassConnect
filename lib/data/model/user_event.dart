@@ -51,14 +51,16 @@ class ClassInvitationEventData {
 @HiveType(typeId: 3)
 class UserEvent {
   @HiveField(0)
-  final EventType eventType;
+  final String id;
   @HiveField(1)
-  final String eventReceiverId;
+  final EventType eventType;
   @HiveField(2)
-  final String eventSenderId;
+  final String eventReceiverId;
   @HiveField(3)
-  final String? encodedContent;
+  final String eventSenderId;
   @HiveField(4)
+  final String? encodedContent;
+  @HiveField(5)
   final bool seen;
 
   Map<String, String> toMap() => {
@@ -67,12 +69,14 @@ class UserEvent {
         "eventSenderId": eventSenderId,
         "encodedContent": encodedContent ?? "",
         "seen": seen.toString(),
+        "id": id,
       };
 
-  UserEvent({required this.seen, required this.eventType, required this.eventReceiverId, required this.eventSenderId, this.encodedContent});
+  UserEvent({required this.seen, required this.eventType, required this.eventReceiverId, required this.eventSenderId, this.encodedContent, required this.id});
 
   UserEvent.fromMap(Map<String, String> userEventJson)
       : seen = userEventJson["seen"] == "true",
+        id = userEventJson["id"].toString(),
         eventType = decodeEventType(userEventJson["eventType"].toString()),
         eventReceiverId = userEventJson["eventReceiverId"].toString(),
         encodedContent = userEventJson["encodedContent"],
