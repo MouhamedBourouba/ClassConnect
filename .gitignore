@@ -1,7 +1,9 @@
 # Miscellaneous
 *.class
 *.log
-*.pyc
+*.
+*.g.dart
+*.freezed.dart
 *.swp
 .DS_Store
 .atom/

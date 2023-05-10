@@ -5,6 +5,8 @@ import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 Future<bool> isOnline() async {
   try {
@@ -66,3 +68,11 @@ class RandomColorGenerator {
     }
   }
 }
+
+String pdfTosJson(String pdfFilePath) async {
+  final file = File(pdfFilePath);
+  final bytes = await file.readAsBytes();
+  final pdfDoc = PdfDocument();
+
+}
+
