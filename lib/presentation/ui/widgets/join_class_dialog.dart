@@ -24,7 +24,7 @@ class JoinClassDialog extends StatelessWidget {
           insetPadding: EdgeInsets.zero,
           child: SizedBox(
             width: MediaQuery.of(context).size.width / 1.1,
-            height: 265,
+            height: 280,
             child: Stack(
               clipBehavior: Clip.none,
               alignment: Alignment.center,

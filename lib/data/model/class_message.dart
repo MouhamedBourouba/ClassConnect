@@ -34,7 +34,7 @@ class ClassMessage {
         "streamMessagesId": streamMessagesId,
         "senderId": senderId,
         "senderName": senderName,
-        "sentTimeMS": sentTimeMS,
+        "sentTimeMS": sentTimeMS.toString(),
         "title": title,
         "content": content ?? "",
       };

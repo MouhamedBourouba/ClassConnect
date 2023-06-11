@@ -31,7 +31,7 @@ class Class {
         "homeWorkId": homeWorkId,
         "bannedStudents": jsonEncode(bannedStudents),
         "className": className,
-        "subject": subject  ,
+        "subject": subject,
       };
 
   Class({

@@ -3,6 +3,7 @@ import 'package:ClassConnect/data/repository/classes_data_source.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/cubit/class_page/class_cubit.dart';
 import 'package:ClassConnect/presentation/cubit/page_state.dart';
+import 'package:ClassConnect/presentation/ui/pages/send_message_page.dart';
 import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:ClassConnect/utils/extension.dart';
 import 'package:ClassConnect/utils/utils.dart';
@@ -34,7 +35,8 @@ class ClassPage extends StatelessWidget {
             bottomNavigationBar: BottomNavigationBar(
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.message), label: "Stream"),
-                BottomNavigationBarItem(icon: Icon(Icons.assignment_turned_in_sharp), label: "assignment"),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.assignment_turned_in_sharp), label: "assignment"),
                 BottomNavigationBarItem(icon: Icon(Icons.person), label: "members"),
               ],
               onTap: classCubit.navigate,
@@ -55,7 +57,8 @@ class _MessagesStream extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.watch<ClassCubit>();
     final state = cubit.state;
-    if (state.pageState == PageState.loading) return const Center(child: CircularProgressIndicator());
+    if (state.pageState == PageState.loading)
+      return const Center(child: CircularProgressIndicator());
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: RefreshIndicator(
@@ -68,14 +71,22 @@ class _MessagesStream extends StatelessWidget {
                 contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 title: Text(
                   "Share with your class ...",
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: CupertinoColors.inactiveGray),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: CupertinoColors.inactiveGray),
                 ),
                 leading: CircleAvatar(
                   foregroundColor: Colors.white,
                   backgroundColor: Theme.of(context).colorScheme.secondary,
                   child: Text(state.currentUser?.fullName[0].toUpperCase() ?? "A"),
                 ),
-                onTap: () => cubit.sendStreamMessage(),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SendMessagePage(currentClass: state.currentClass!),
+                  ),
+                ),
               ),
             ),
             Expanded(
@@ -97,7 +108,8 @@ class _MessagesStream extends StatelessWidget {
                             child: Text(message.senderName[0].toUpperCase()),
                           ),
                           subtitle: Text(
-                            DateFormat("MMMM, d").format(DateTime.fromMillisecondsSinceEpoch(int.parse(message.sentTimeMS))),
+                            DateFormat("MMMM, d")
+                                .format(DateTime.fromMillisecondsSinceEpoch(int.parse(message.sentTimeMS))),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           trailing: GestureDetector(
@@ -125,7 +137,11 @@ class _MessagesStream extends StatelessWidget {
                         const Divider(thickness: 1),
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
-                          child: Text("Add class comment ...", textAlign: TextAlign.left, style: Theme.of(context).textTheme.bodySmall,),
+                          child: Text(
+                            "Add class comment ...",
+                            textAlign: TextAlign.left,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         ),
                         const SizedBox(height: 8),
                       ],
@@ -195,7 +211,9 @@ class _Members extends StatelessWidget {
           },
           title: "Teachers",
         ),
-        SizedBox(height: state.teachers.length * 56, child: buildListOfUsers(context, users: state.teachers)),
+        SizedBox(
+            height: state.teachers.length * 56,
+            child: buildListOfUsers(context, users: state.teachers)),
         buildMembersSeparator(
           context,
           onAddIconClicked: () {
@@ -222,7 +240,9 @@ class _Members extends StatelessWidget {
           },
           title: "Class Mates",
         ),
-        Expanded(child: buildListOfUsers(context, users: state.classMembers, colorsHash: state.teachers.length)),
+        Expanded(
+            child: buildListOfUsers(context,
+                users: state.classMembers, colorsHash: state.teachers.length)),
       ],
     );
   }

@@ -15,7 +15,8 @@ abstract class CloudDataSource {
 
   Future<bool> appendRow(Map<String, dynamic> data, MTable table);
 
-  Future<bool> updateValue(Object newValue, MTable table, {required String rowKey, required String columnKey});
+  Future<bool> updateValue(Object newValue, MTable table,
+      {required String rowKey, required String columnKey});
 
   Future<bool> deleteRow(MTable table, {required String rowKey});
 
@@ -72,7 +73,11 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   }
 
   Future<Worksheet> getWorkSheet(MTable table) async {
-    if (usersWorkSheet == null || classesWorkSheet == null || emailOtpWorkSheet == null || streamMessagesWorkSheet == null || eventsWorkSheet == null) {
+    if (usersWorkSheet == null ||
+        classesWorkSheet == null ||
+        emailOtpWorkSheet == null ||
+        streamMessagesWorkSheet == null ||
+        eventsWorkSheet == null) {
       await connectToGoogleSheets();
     }
     switch (table) {
@@ -90,7 +95,8 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   }
 
   @override
-  Future<bool> appendRow(Map<String, dynamic> data, MTable table) async => (await getWorkSheet(table)).values.map.appendRow(data, appendMissing: true);
+  Future<bool> appendRow(Map<String, dynamic> data, MTable table) async =>
+      (await getWorkSheet(table)).values.map.appendRow(data, appendMissing: true);
 
   @override
   Future<bool> deleteRow(MTable table, {required String rowKey}) async {
@@ -99,13 +105,16 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   }
 
   @override
-  Future<List<Map<String, String>>?> getAllRows(MTable table) async => (await getWorkSheet(table)).values.map.allRows();
+  Future<List<Map<String, String>>?> getAllRows(MTable table) async =>
+      (await getWorkSheet(table)).values.map.allRows();
 
   @override
-  Future<Map<String, String>?> getRow(MTable table, {required String rowKey}) async => (await getWorkSheet(table)).values.map.rowByKey(rowKey);
+  Future<Map<String, String>?> getRow(MTable table, {required String rowKey}) async =>
+      (await getWorkSheet(table)).values.map.rowByKey(rowKey);
 
   @override
-  Future<bool> updateValue(Object newValue, MTable table, {required String rowKey, required String columnKey}) async =>
+  Future<bool> updateValue(Object newValue, MTable table,
+          {required String rowKey, required String columnKey}) async =>
       (await getWorkSheet(table)).values.insertValueByKeys(
             newValue.runtimeType == String ? newValue : jsonEncode(newValue),
             columnKey: columnKey,

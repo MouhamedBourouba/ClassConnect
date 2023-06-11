@@ -68,11 +68,3 @@ class RandomColorGenerator {
     }
   }
 }
-
-String pdfTosJson(String pdfFilePath) async {
-  final file = File(pdfFilePath);
-  final bytes = await file.readAsBytes();
-  final pdfDoc = PdfDocument();
-
-}
-

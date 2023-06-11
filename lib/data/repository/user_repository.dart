@@ -73,7 +73,7 @@ class UserRepositoryImp extends UserRepository {
       final List<User> allUsers = [];
       for (final userMap in allUsersMap!) {
         allUsers.add(userMap.toUser());
-        await localDataSource.addUserToUsersBox(userMap.toUser());
+        await localDataSource.addUser(userMap.toUser());
       }
       return Result.success(allUsers);
     } catch (e) {
@@ -159,7 +159,7 @@ class UserRepositoryImp extends UserRepository {
         if (usersJson == null || usersJson.isEmpty) return Result.error(MException.unknown());
         final List<User> users = usersJson.map((e) => e.toUser()).toList();
         for (final user in users) {
-          localDataSource.addUserToUsersBox(user);
+          localDataSource.addUser(user);
         }
         return Result.success(users);
       } catch (e) {

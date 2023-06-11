@@ -9,8 +9,7 @@ import 'package:injectable/injectable.dart';
 abstract class LocalDataSource {
   Future<void> putDataToAppBox(String key, dynamic value);
 
-  //returns user index
-  Future<int> addUserToUsersBox(User user);
+  Future<void> addUser(User user);
 
   List<User> getUsers();
 
@@ -72,7 +71,8 @@ class HiveLocalDataBase implements LocalDataSource {
   }
 
   @override
-  dynamic getValueFromAppBox(String key, {dynamic defaultValue}) => appBox.get(key, defaultValue: defaultValue);
+  dynamic getValueFromAppBox(String key, {dynamic defaultValue}) =>
+      appBox.get(key, defaultValue: defaultValue);
 
   @override
   void setValueToAppBox(String key, dynamic value) => appBox.put(key, value);
@@ -84,13 +84,13 @@ class HiveLocalDataBase implements LocalDataSource {
   Future<void> putDataToAppBox(String key, dynamic value) => appBox.put(key, value);
 
   @override
-  Future<int> addUserToUsersBox(User user) => usersBox.add(user);
+  Future<void> addUser(User user) => usersBox.put(user.id, user);
 
   @override
   List<User> getUsers() => usersBox.toMap().values.toList();
 
   @override
-  Future<void> addClass(Class class_) => classesBox.add(class_);
+  Future<void> addClass(Class class_) => classesBox.put(class_.id, class_);
 
   @override
   List<Class> getClasses() => classesBox.values.toList();
@@ -123,17 +123,13 @@ class HiveLocalDataBase implements LocalDataSource {
   }
 
   @override
-  Future<void> addEvent(UserEvent userEvent) => eventBox.add(userEvent);
+  Future<void> addEvent(UserEvent userEvent) => eventBox.put(userEvent.id, userEvent);
 
   @override
   List<UserEvent> getEvents() => eventBox.toMap().values.toList();
 
   @override
-  Future<void> removeEvent(String eventId) async {
-    final updatedList = List<UserEvent>.from(eventBox.values)..removeWhere((element) => element.id == eventId);
-    await eventBox.clear();
-    await eventBox.putAll(Map.fromIterable(updatedList));
-  }
+  Future<void> removeEvent(String eventId) => eventBox.delete(eventId);
 
   @override
   Future<void> addClassMessage(ClassMessage classMessage) => classMessagesBox.add(classMessage);

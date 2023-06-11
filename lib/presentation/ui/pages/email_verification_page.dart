@@ -93,7 +93,8 @@ class EmailVerificationPage extends StatelessWidget {
                                       context: context,
                                       barrierDismissible: false,
                                       builder: (context) => const UpdateEmailDialog(),
-                                    ).then((value) => emailVerificationCubit.isDialogOpened = false);
+                                    ).then(
+                                        (value) => emailVerificationCubit.isDialogOpened = false);
                                   },
                               ),
                             ],
@@ -116,7 +117,9 @@ class EmailVerificationPage extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: !state.isMessageSent && !state.loadingEmail ? "Didn't receive code ? " : "",
+                              text: !state.isMessageSent && !state.loadingEmail
+                                  ? "Didn't receive code ? "
+                                  : "",
                               style: textStyles.bodySmall,
                             ),
                             TextSpan(
@@ -133,7 +136,8 @@ class EmailVerificationPage extends StatelessWidget {
                                     )
                                   : textStyles.bodySmall,
                               recognizer: !state.isMessageSent && !state.loadingEmail
-                                  ? (TapGestureRecognizer()..onTap = emailVerificationCubit.sendEmailVerificationMessage)
+                                  ? (TapGestureRecognizer()
+                                    ..onTap = emailVerificationCubit.sendEmailVerificationMessage)
                                   : null,
                             ),
                           ],
@@ -146,8 +150,9 @@ class EmailVerificationPage extends StatelessWidget {
                         child: SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed:
-                                state.code.length == 6 && !state.loadingEmail ? emailVerificationCubit.verifyEmail : null,
+                            onPressed: state.code.length == 6 && !state.loadingEmail
+                                ? emailVerificationCubit.verifyEmail
+                                : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colors.secondary,
                               shape: const RoundedRectangleBorder(
@@ -225,7 +230,9 @@ class UpdateEmailDialog extends StatelessWidget {
                 Visibility(
                   visible: !state.isLoading,
                   child: TextButton(
-                    onPressed: state.email.isEmail() && !state.isLoading ? context.read<UpdateEmailCubit>().update : null,
+                    onPressed: state.email.isEmail() && !state.isLoading
+                        ? context.read<UpdateEmailCubit>().update
+                        : null,
                     child: const Text("update"),
                   ),
                 ),

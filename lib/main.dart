@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/user_event.dart';
 import 'package:ClassConnect/data/repository/classes_data_source.dart';

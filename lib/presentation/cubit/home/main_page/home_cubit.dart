@@ -44,12 +44,12 @@ class HomeCubit extends Cubit<HomeState> {
               classes: classes,
             ),
           );
-          _eventsRepository.getNotificationNumber().then(
-                (notificationCounter) => emit(
+          _eventsRepository.getEvents().then(
+                (events) => emit(
                   HomeState.loaded(
                     currentUser: currentUser,
                     classes: classes,
-                    notificationCounter: notificationCounter,
+                    notificationCounter: events.length,
                   ),
                 ),
               );

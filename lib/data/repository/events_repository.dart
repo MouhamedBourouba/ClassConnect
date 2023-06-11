@@ -6,9 +6,10 @@ import 'package:injectable/injectable.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 abstract class EventsRepository {
-  Future<int> getNotificationNumber();
 
   Future<List<UserEvent>> getEvents();
+
+  Future<void> markAsSeen(List<UserEvent> events);
 
   Future<Result<Unit, Unit>> postEvent(UserEvent userEvent);
 
@@ -25,13 +26,12 @@ class EventsRepositoryImpl extends EventsRepository {
   @override
   Future<List<UserEvent>> getEvents() async {
     if (await isOnline()) {
-      final events = (await cloudDataSource.getAllRows(MTable.eventsTable) ?? []).map((e) => UserEvent.fromMap(e));
-      final userRelatedEvents = events.where((element) => element.eventReceiverId == localDataSource.getCurrentUser()!.id);
+      final events = (await cloudDataSource.getAllRows(MTable.eventsTable) ?? [])
+          .map((e) => UserEvent.fromMap(e));
+      final userRelatedEvents = events
+          .where((element) => element.eventReceiverId == localDataSource.getCurrentUser()!.id);
       for (final element in userRelatedEvents) {
         localDataSource.addEvent(element);
-      }
-      for (final event in userRelatedEvents) {
-        cloudDataSource.updateValue(true, MTable.eventsTable, rowKey: event.id, columnKey: "seen");
       }
       return userRelatedEvents.toList();
     } else {
@@ -40,18 +40,22 @@ class EventsRepositoryImpl extends EventsRepository {
   }
 
   @override
-  Future<int> getNotificationNumber() async {
-    final events = (await isOnline()) ? (await cloudDataSource.getAllRows(MTable.eventsTable))?.map((e) => UserEvent.fromMap(e)) : localDataSource.getEvents();
-    return ((events?.where((element) => element.eventReceiverId == localDataSource.getCurrentUser()?.id && !element.seen).length) ?? -1) + 1;
-  }
-
-  @override
   Future<Result<Unit, Unit>> postEvent(UserEvent userEvent) async =>
-      await cloudDataSource.appendRow(userEvent.toMap(), MTable.eventsTable) ? Result.success(unit) : Result.error(unit);
+      await cloudDataSource.appendRow(userEvent.toMap(), MTable.eventsTable)
+          ? Result.success(unit)
+          : Result.error(unit);
 
   @override
   Future<void> removeEvent(String eventId) async {
     await cloudDataSource.deleteRow(MTable.eventsTable, rowKey: eventId);
     localDataSource.removeEvent(eventId);
+  }
+
+  @override
+  Future<void> markAsSeen(List<UserEvent> events) async {
+    for (final event in events) {
+      cloudDataSource.updateValue(true, MTable.eventsTable, rowKey: event.id, columnKey: "seen");
+    }
+
   }
 }

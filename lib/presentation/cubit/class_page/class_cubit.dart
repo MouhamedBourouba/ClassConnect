@@ -73,20 +73,6 @@ class ClassCubit extends Cubit<ClassState> {
 
   void setStateToInit() => emit(state.copyWith(pageState: PageState.init));
 
-  Future<void> sendStreamMessage() async {
-    await checkInternetConnection();
-    await classesRepository.sendMessage(
-      ClassMessage(
-        id: getIt<Uuid>().v1(),
-        streamMessagesId: state.currentClass!.streamMessagesId,
-        senderId: state.currentUser!.id,
-        senderName: state.currentUser!.fullName,
-        sentTimeMS: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: "example",
-      ),
-    );
-  }
-
   Future<void> fetchStreamMessages() async {
     emit(state.copyWith(pageState: PageState.loading));
     (await classesRepository.getClassMessages(state.currentClass!.streamMessagesId)).when(
