@@ -50,6 +50,11 @@ class _SendMessagePageState extends State<SendMessagePage> {
         actions: [
           IconButton(
             onPressed: () {
+              if(subject.isEmpty || body.isEmpty) {
+                getIt<ErrorLogger>()
+                    .showError('Please fill all required fields');
+                return;
+              }
               showLoading(context);
               sendMessage().then((success) {
                 hideLoading(context);

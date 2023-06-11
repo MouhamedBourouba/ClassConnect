@@ -57,8 +57,9 @@ class _MessagesStream extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.watch<ClassCubit>();
     final state = cubit.state;
-    if (state.pageState == PageState.loading)
+    if (state.pageState == PageState.loading) {
       return const Center(child: CircularProgressIndicator());
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: RefreshIndicator(
@@ -108,8 +109,8 @@ class _MessagesStream extends StatelessWidget {
                             child: Text(message.senderName[0].toUpperCase()),
                           ),
                           subtitle: Text(
-                            DateFormat("MMMM, d")
-                                .format(DateTime.fromMillisecondsSinceEpoch(int.parse(message.sentTimeMS))),
+                            DateFormat("MMMM, d").format(
+                                DateTime.fromMillisecondsSinceEpoch(int.parse(message.sentTimeMS))),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           trailing: GestureDetector(
@@ -133,7 +134,29 @@ class _MessagesStream extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Text(message.content ?? ""),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 23),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                message.title,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(fontWeight: FontWeight.w600, fontSize: 15),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                message.content!,
+                                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      fontSize: 15,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
                         const Divider(thickness: 1),
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
