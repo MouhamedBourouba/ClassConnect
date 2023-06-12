@@ -36,7 +36,9 @@ class ClassPage extends StatelessWidget {
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.message), label: "Stream"),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.assignment_turned_in_sharp), label: "assignment"),
+                  icon: Icon(Icons.assignment_turned_in_sharp),
+                  label: "assignment",
+                ),
                 BottomNavigationBarItem(icon: Icon(Icons.person), label: "members"),
               ],
               onTap: classCubit.navigate,
@@ -61,7 +63,7 @@ class _MessagesStream extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       child: RefreshIndicator(
         onRefresh: cubit.fetchStreamMessages,
         child: Column(
@@ -144,7 +146,7 @@ class _MessagesStream extends StatelessWidget {
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge!
-                                    .copyWith(fontWeight: FontWeight.w600, fontSize: 15),
+                                    .copyWith(fontWeight: FontWeight.w500, fontSize: 16),
                               ),
                               const SizedBox(height: 8),
                               Text(

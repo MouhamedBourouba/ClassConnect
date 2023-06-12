@@ -2,13 +2,12 @@ import "package:ClassConnect/data/model/class.dart";
 import "package:ClassConnect/data/model/class_message.dart";
 import "package:ClassConnect/data/repository/classes_data_source.dart";
 import "package:ClassConnect/data/repository/user_repository.dart";
+import 'package:ClassConnect/di/di.dart';
 import "package:ClassConnect/presentation/ui/widgets/loading.dart";
 import "package:ClassConnect/utils/error_logger.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:uuid/uuid.dart";
-
-import "../../../di/di.dart";
 
 class SendMessagePage extends StatefulWidget {
   const SendMessagePage({super.key, required this.currentClass});
@@ -50,9 +49,8 @@ class _SendMessagePageState extends State<SendMessagePage> {
         actions: [
           IconButton(
             onPressed: () {
-              if(subject.isEmpty || body.isEmpty) {
-                getIt<ErrorLogger>()
-                    .showError('Please fill all required fields');
+              if (subject.isEmpty || body.isEmpty) {
+                getIt<ErrorLogger>().showError('Please fill all required fields');
                 return;
               }
               showLoading(context);
@@ -76,6 +74,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
+              style: theme.textTheme.headlineSmall,
               decoration: const InputDecoration(border: InputBorder.none, hintText: "Subject"),
               onChanged: (value) => subject = value,
             ),
@@ -85,6 +84,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
             ),
             Expanded(
               child: TextField(
+                style: theme.textTheme.headlineSmall!.copyWith(fontSize: 17),
                 onChanged: (value) => body = value,
                 decoration: const InputDecoration(border: InputBorder.none, hintText: "Body"),
                 maxLines: null,

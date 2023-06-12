@@ -84,7 +84,8 @@ class ClassesRepositoryImp extends ClassesRepository {
       }
       final class_ = searchingForClass.first.toClass();
       if (class_.teachers.contains(currentUser.id)) {
-        return Result.error(MException("You are the teacher of this class you cant join it as student"));
+        return Result.error(
+            MException("You are the teacher of this class you cant join it as student"));
       } else if (class_.studentsIds.contains(currentUser.id)) {
         return Result.error(MException("you've already joined this class"));
       }
@@ -107,7 +108,8 @@ class ClassesRepositoryImp extends ClassesRepository {
   }
 
   @override
-  ValueListenable<Box<Class>> getClassesValueListener() => localDataSource.getClassesValueListener();
+  ValueListenable<Box<Class>> getClassesValueListener() =>
+      localDataSource.getClassesValueListener();
 
   @override
   Future<List<Class>> getClasses(DataSource source) async {
@@ -119,7 +121,8 @@ class ClassesRepositoryImp extends ClassesRepository {
         final List<Class> classes = [];
         classesMap?.forEach((classMap) {
           final class_ = classMap.toClass();
-          if (class_.studentsIds.contains(localDataSource.getCurrentUser()!.id) || class_.teachers.contains(localDataSource.getCurrentUser()!.id)) {
+          if (class_.studentsIds.contains(localDataSource.getCurrentUser()!.id) ||
+              class_.teachers.contains(localDataSource.getCurrentUser()!.id)) {
             classes.add(class_);
             localDataSource.addClass(class_);
           }
@@ -132,17 +135,22 @@ class ClassesRepositoryImp extends ClassesRepository {
   }
 
   @override
-  Future<Result<Unit, MException>> inviteMember(Class class_, String teacherEmail, Role role) async {
+  Future<Result<Unit, MException>> inviteMember(
+      Class class_, String teacherEmail, Role role) async {
     final currentUser = localDataSource.getCurrentUser()!;
     final updatedClass = await getClassById(class_.id);
-    if (currentUser.email == teacherEmail) return Result.error(MException("you can't invite yourself"));
+    if (currentUser.email == teacherEmail)
+      return Result.error(MException("you can't invite yourself"));
     try {
-      final searchingForUser = await cloudDataSource.getRowsByValue(teacherEmail, MTable.usersTable);
+      final searchingForUser =
+          await cloudDataSource.getRowsByValue(teacherEmail, MTable.usersTable);
       if (searchingForUser.isEmpty) {
-        return Result.error(MException("Can't find this ${role == Role.teacher ? "teacher" : "user"} please double check the email address"));
+        return Result.error(MException(
+            "Can't find this ${role == Role.teacher ? "teacher" : "user"} please double check the email address"));
       }
       final userData = searchingForUser.first.toUser();
-      if (updatedClass.teachers.contains(userData.id)) return Result.error(MException("This user is already teacher in this class"));
+      if (updatedClass.teachers.contains(userData.id))
+        return Result.error(MException("This user is already teacher in this class"));
       final sendingInvitationTask = await cloudDataSource.appendRow(
         UserEvent(
           id: getIt<Uuid>().v1(),
@@ -177,7 +185,8 @@ class ClassesRepositoryImp extends ClassesRepository {
   Future<Result<Unit, String>> acceptInvitation(ClassInvitationEventData data) async {
     try {
       final currentUser = localDataSource.getCurrentUser()!;
-      final classData = (await cloudDataSource.getRow(MTable.classesTable, rowKey: data.classId))!.toClass();
+      final classData =
+          (await cloudDataSource.getRow(MTable.classesTable, rowKey: data.classId))!.toClass();
       late List<String> updatedList;
       if (classData.teachers.contains(currentUser.id)) {
         return Result.error("You are already teacher in this class");
@@ -209,17 +218,22 @@ class ClassesRepositoryImp extends ClassesRepository {
 
   @override
   Future<Result<Unit, String>> sendMessage(ClassMessage classMessage) async {
-    final isSuccess = await cloudDataSource.appendRow(classMessage.toMap(), MTable.streamMessagesTable);
-    return isSuccess ? Result.success(unit) : Result.error("An unknown error occurred. Please try again later.");
+    final isSuccess =
+        await cloudDataSource.appendRow(classMessage.toMap(), MTable.streamMessagesTable);
+    return isSuccess
+        ? Result.success(unit)
+        : Result.error("An unknown error occurred. Please try again later.");
   }
 
   @override
   Future<Result<List<ClassMessage>, String>> getClassMessages(String streamMessagesId) async {
-    final allMessages =
-        (await cloudDataSource.getAllRows(MTable.streamMessagesTable))?.map((e) => ClassMessage.fromMap(e)) ?? localDataSource.getClassMessages();
+    final allMessages = (await cloudDataSource.getAllRows(MTable.streamMessagesTable))
+            ?.map((e) => ClassMessage.fromMap(e)) ??
+        localDataSource.getClassMessages();
     for (final message in allMessages) {
       localDataSource.addClassMessage(message);
     }
-    return Result.success(allMessages.where((element) => element.streamMessagesId == streamMessagesId).toList());
+    return Result.success(
+        allMessages.where((element) => element.streamMessagesId == streamMessagesId).toList());
   }
 }
