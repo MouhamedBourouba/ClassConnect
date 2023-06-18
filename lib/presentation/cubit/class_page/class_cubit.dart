@@ -11,7 +11,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 part 'class_cubit.freezed.dart';
 
@@ -22,7 +21,9 @@ class ClassCubit extends Cubit<ClassState> {
     emit(state.copyWith(classId: classId, currentUser: userRepository.getCurrentUser()));
     late final Class currentClass;
     isOnline().then((isOnline) async {
-      currentClass = (isOnline ? await classesRepository.getClasses(DataSource.remote) : await classesRepository.getClasses(DataSource.local))
+      currentClass = (isOnline
+              ? await classesRepository.getClasses(DataSource.remote)
+              : await classesRepository.getClasses(DataSource.local))
           .where((class_) => class_.id == state.classId)
           .first;
       emit(state.copyWith(currentClass: currentClass));

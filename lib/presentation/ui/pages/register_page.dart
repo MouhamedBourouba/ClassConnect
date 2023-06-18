@@ -1,6 +1,5 @@
 import 'package:ClassConnect/presentation/cubit/authentication/register/register_cubit.dart';
 import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
-import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/pages/login_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/authentication_scaffold.dart';
 import 'package:ClassConnect/presentation/ui/widgets/button.dart';
@@ -130,7 +129,8 @@ class RegisterForm extends StatelessWidget {
               ),
               onChanged: registerCubit.onEmailChanged,
               validator: (value) {
-                if ((value == "" || value == null) || value.contains("@") && value.contains(".")) return null;
+                if ((value == "" || value == null) || value.contains("@") && value.contains("."))
+                  return null;
                 return "Invalid email";
               },
             ),
@@ -150,7 +150,8 @@ class RegisterForm extends StatelessWidget {
               obscureText: true,
               onChanged: registerCubit.onConformPasswordChanged,
               validator: (value) {
-                if (value == "" || value == null || value == registerCubit.state.password) return null;
+                if (value == "" || value == null || value == registerCubit.state.password)
+                  return null;
                 return "Password dose not match";
               },
             ),
@@ -158,9 +159,9 @@ class RegisterForm extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(left: 12),
               child: InternationalPhoneNumberInput(
-               validator: (val) => null,
+                validator: (val) => null,
                 inputDecoration: const InputDecoration(
-                  hintText:"Phone number",
+                  hintText: "Phone number",
                   border: outlinedInputBorder,
                   prefixIcon: Icon(Icons.phone),
                 ),

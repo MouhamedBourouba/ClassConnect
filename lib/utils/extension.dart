@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/user.dart';
@@ -92,5 +91,3 @@ extension StringUtils on String? {
 extension WidgetUtlis on StatelessWidget {
   MaterialPageRoute asRoute() => MaterialPageRoute(builder: (context) => this);
 }
-
-

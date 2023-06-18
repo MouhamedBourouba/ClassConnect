@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
+import 'package:ClassConnect/data/data_source/data_source.dart';
 import 'package:ClassConnect/data/data_source/local_data_source.dart';
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/class_message.dart';
@@ -62,7 +63,7 @@ class ClassesRepositoryImp extends ClassesRepository {
         className: className,
         subject: classSubject,
       );
-      final addingClassTask = cloudDataSource.appendRow(class_.toMap(), MTable.classesTable);
+      final addingClassTask = cloudDataSource.appendRow(class_.toMap(), MDataTable.classes);
       if (await addingClassTask) {
         await localDataSource.addClass(class_);
         return Result.success(unit);
@@ -78,7 +79,7 @@ class ClassesRepositoryImp extends ClassesRepository {
   Future<Result<Unit, MException>> joinClass(String classId) async {
     try {
       final currentUser = localDataSource.getCurrentUser()!;
-      final searchingForClass = await cloudDataSource.getRowsByValue(classId, MTable.classesTable);
+      final searchingForClass = await cloudDataSource.getRowsByValue(classId, MDataTable.classes);
       if (searchingForClass.isEmpty == true) {
         return Result.error(MException("Class dose not exist please check the code"));
       }
@@ -92,7 +93,7 @@ class ClassesRepositoryImp extends ClassesRepository {
       class_.studentsIds.add(currentUser.id);
       final updatingClassTask = cloudDataSource.updateValue(
         jsonEncode(class_.studentsIds),
-        MTable.classesTable,
+        MDataTable.classes,
         rowKey: classId,
         columnKey: "studentsIds",
       );
@@ -117,7 +118,7 @@ class ClassesRepositoryImp extends ClassesRepository {
       if (source == DataSource.local) {
         return localDataSource.getClasses();
       } else {
-        final classesMap = await cloudDataSource.getAllRows(MTable.classesTable);
+        final classesMap = await cloudDataSource.getAllRows(MDataTable.classes);
         final List<Class> classes = [];
         classesMap?.forEach((classMap) {
           final class_ = classMap.toClass();
@@ -143,7 +144,7 @@ class ClassesRepositoryImp extends ClassesRepository {
       return Result.error(MException("you can't invite yourself"));
     try {
       final searchingForUser =
-          await cloudDataSource.getRowsByValue(teacherEmail, MTable.usersTable);
+          await cloudDataSource.getRowsByValue(teacherEmail, MDataTable.users);
       if (searchingForUser.isEmpty) {
         return Result.error(MException(
             "Can't find this ${role == Role.teacher ? "teacher" : "user"} please double check the email address"));
@@ -167,7 +168,7 @@ class ClassesRepositoryImp extends ClassesRepository {
             ).toMap(),
           ),
         ).toMap(),
-        MTable.eventsTable,
+        MDataTable.events,
       );
       return sendingInvitationTask ? Result.success(unit) : Result.error(MException.unknown());
     } catch (e) {
@@ -177,7 +178,7 @@ class ClassesRepositoryImp extends ClassesRepository {
 
   @override
   Future<Class> getClassById(String id) async {
-    final classMap = await cloudDataSource.getRow(MTable.classesTable, rowKey: id);
+    final classMap = await cloudDataSource.getRow(MDataTable.classes, rowKey: id);
     return classMap!.toClass();
   }
 
@@ -186,7 +187,7 @@ class ClassesRepositoryImp extends ClassesRepository {
     try {
       final currentUser = localDataSource.getCurrentUser()!;
       final classData =
-          (await cloudDataSource.getRow(MTable.classesTable, rowKey: data.classId))!.toClass();
+          (await cloudDataSource.getRow(MDataTable.classes, rowKey: data.classId))!.toClass();
       late List<String> updatedList;
       if (classData.teachers.contains(currentUser.id)) {
         return Result.error("You are already teacher in this class");
@@ -204,7 +205,7 @@ class ClassesRepositoryImp extends ClassesRepository {
       }
       await cloudDataSource.updateValue(
         updatedList,
-        MTable.classesTable,
+        MDataTable.classes,
         rowKey: data.classId,
         columnKey: data.role == Role.classMate ? 'studentsIds' : "teachers",
       );
@@ -219,7 +220,7 @@ class ClassesRepositoryImp extends ClassesRepository {
   @override
   Future<Result<Unit, String>> sendMessage(ClassMessage classMessage) async {
     final isSuccess =
-        await cloudDataSource.appendRow(classMessage.toMap(), MTable.streamMessagesTable);
+        await cloudDataSource.appendRow(classMessage.toMap(), MDataTable.messages);
     return isSuccess
         ? Result.success(unit)
         : Result.error("An unknown error occurred. Please try again later.");
@@ -227,7 +228,7 @@ class ClassesRepositoryImp extends ClassesRepository {
 
   @override
   Future<Result<List<ClassMessage>, String>> getClassMessages(String streamMessagesId) async {
-    final allMessages = (await cloudDataSource.getAllRows(MTable.streamMessagesTable))
+    final allMessages = (await cloudDataSource.getAllRows(MDataTable.messages))
             ?.map((e) => ClassMessage.fromMap(e)) ??
         localDataSource.getClassMessages();
     for (final message in allMessages) {

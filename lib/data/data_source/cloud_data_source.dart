@@ -1,28 +1,27 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:ClassConnect/data/data_source/data_source.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:injectable/injectable.dart';
 
-enum MTable { usersTable, classesTable, emailOtpTabel, eventsTable, streamMessagesTable }
-
 abstract class CloudDataSource {
-  Future<Map<String, String>?> getRow(MTable table, {required String rowKey});
+  Future<Map<String, String>?> getRow(MDataTable table, {required String rowKey});
 
-  Future<List<Map<String, String>>?> getAllRows(MTable table);
+  Future<List<Map<String, String>>?> getAllRows(MDataTable table);
 
-  Future<List<Map<String, String>>> getRowsByValue(dynamic value, MTable table);
+  Future<List<Map<String, String>>> getRowsByValue(dynamic value, MDataTable table);
 
-  Future<bool> appendRow(Map<String, dynamic> data, MTable table);
+  Future<bool> appendRow(Map<String, dynamic> data, MDataTable table);
 
-  Future<bool> updateValue(Object newValue, MTable table,
+  Future<bool> updateValue(Object newValue, MDataTable table,
       {required String rowKey, required String columnKey});
 
-  Future<bool> deleteRow(MTable table, {required String rowKey});
+  Future<bool> deleteRow(MDataTable table, {required String rowKey});
 
   Future<bool> updateValues(
     dynamic newValue,
-    MTable table, {
+    MDataTable table, {
     required String rowKey,
     required int column,
   });
@@ -72,7 +71,7 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
     }
   }
 
-  Future<Worksheet> getWorkSheet(MTable table) async {
+  Future<Worksheet> getWorkSheet(MDataTable table) async {
     if (usersWorkSheet == null ||
         classesWorkSheet == null ||
         emailOtpWorkSheet == null ||
@@ -81,39 +80,39 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
       await connectToGoogleSheets();
     }
     switch (table) {
-      case MTable.usersTable:
+      case MDataTable.users:
         return usersWorkSheet!;
-      case MTable.classesTable:
+      case MDataTable.classes:
         return classesWorkSheet!;
-      case MTable.emailOtpTabel:
+      case MDataTable.emailOtp:
         return emailOtpWorkSheet!;
-      case MTable.eventsTable:
+      case MDataTable.events:
         return eventsWorkSheet!;
-      case MTable.streamMessagesTable:
+      case MDataTable.messages:
         return streamMessagesWorkSheet!;
     }
   }
 
   @override
-  Future<bool> appendRow(Map<String, dynamic> data, MTable table) async =>
+  Future<bool> appendRow(Map<String, dynamic> data, MDataTable table) async =>
       (await getWorkSheet(table)).values.map.appendRow(data, appendMissing: true);
 
   @override
-  Future<bool> deleteRow(MTable table, {required String rowKey}) async {
+  Future<bool> deleteRow(MDataTable table, {required String rowKey}) async {
     final rowIndex = await (await getWorkSheet(table)).values.rowIndexOf(rowKey);
     return (await getWorkSheet(table)).deleteRow(rowIndex);
   }
 
   @override
-  Future<List<Map<String, String>>?> getAllRows(MTable table) async =>
+  Future<List<Map<String, String>>?> getAllRows(MDataTable table) async =>
       (await getWorkSheet(table)).values.map.allRows();
 
   @override
-  Future<Map<String, String>?> getRow(MTable table, {required String rowKey}) async =>
+  Future<Map<String, String>?> getRow(MDataTable table, {required String rowKey}) async =>
       (await getWorkSheet(table)).values.map.rowByKey(rowKey);
 
   @override
-  Future<bool> updateValue(Object newValue, MTable table,
+  Future<bool> updateValue(Object newValue, MDataTable table,
           {required String rowKey, required String columnKey}) async =>
       (await getWorkSheet(table)).values.insertValueByKeys(
             newValue.runtimeType == String ? newValue : jsonEncode(newValue),
@@ -124,7 +123,7 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   @override
   Future<bool> updateValues(
     dynamic newValue,
-    MTable table, {
+    MDataTable table, {
     required String rowKey,
     required int column,
   }) async {
@@ -137,17 +136,14 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
   }
 
   @override
-  Future<List<Map<String, String>>> getRowsByValue(dynamic value, MTable table) async {
-    final cellsList = await (await getWorkSheet(table)).cells.findByValue(value.toString());
-    final List<Future<Map<String, String>>> fetchTasks = [];
-    final List<Map<String, String>> valuesMaps = [];
-    for (final cell in cellsList) {
-      fetchTasks.add((await getWorkSheet(table)).values.map.row(cell.row));
+  Future<List<Map<String, String>>> getRowsByValue(dynamic value, MDataTable table) async {
+    final Worksheet worksheet = await getWorkSheet(table);
+    final cells = await worksheet.cells.findByValue(value.toString());
+    final rows = <Map<String, String>>[];
+    for (final cell in cells) {
+      final row = await worksheet.values.map.row(cell.row);
+      rows.add(row);
     }
-    for (final task in fetchTasks) {
-      final data = await task;
-      valuesMaps.add(data);
-    }
-    return valuesMaps;
+    return rows;
   }
 }

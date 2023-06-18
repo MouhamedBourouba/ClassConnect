@@ -5,9 +5,7 @@ import 'package:ClassConnect/presentation/ui/pages/home_page.dart';
 import 'package:ClassConnect/presentation/ui/widgets/loading.dart';
 import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:ClassConnect/utils/extension.dart';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -257,7 +255,8 @@ class UpdateProfileBody extends StatelessWidget {
                 ),
               ).then((value) {
                 if (value) {
-                  if (context.read<UpdateProfileCubit>().state.phoneNumber.length < 11 && context.read<UpdateProfileCubit>().state.phoneNumber.length > 9) {
+                  if (context.read<UpdateProfileCubit>().state.phoneNumber.length < 11 &&
+                      context.read<UpdateProfileCubit>().state.phoneNumber.length > 9) {
                     updateProfileCubit.update(UserField.phoneNumber);
                   } else {
                     getIt<ErrorLogger>().showError("Invalid input");
@@ -391,7 +390,8 @@ class UpdateProfileBody extends StatelessWidget {
         ),
         Text(
           title,
-          style: theme.textTheme.bodyLarge!.copyWith(color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.w400),
+          style: theme.textTheme.bodyLarge!
+              .copyWith(color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.w400),
         ),
         Text(
           value,

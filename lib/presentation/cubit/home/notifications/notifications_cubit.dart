@@ -26,7 +26,8 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   final ClassesRepository _classesRepository = getIt();
 
   ClassInvitationEventData decodeClassInvitationEventData(String data) {
-    final classInvitationDataMap = (jsonDecode(data) as Map<String, dynamic>).map((key, value) => MapEntry(key, value.toString()));
+    final classInvitationDataMap = (jsonDecode(data) as Map<String, dynamic>)
+        .map((key, value) => MapEntry(key, value.toString()));
     return ClassInvitationEventData.fromMap(classInvitationDataMap);
   }
 
@@ -35,7 +36,9 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     emit(state.copyWith(pageState: PageState.loading));
     (await _classesRepository.acceptInvitation(data)).when(
       (success) {
-        emit(state.copyWith(pageState: PageState.success, events: List.from(state.events)..removeWhere((element) => element.id == eventId)));
+        emit(state.copyWith(
+            pageState: PageState.success,
+            events: List.from(state.events)..removeWhere((element) => element.id == eventId)));
         _eventsRepository.removeEvent(eventId);
       },
       (error) => emit(
@@ -48,6 +51,8 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     await checkInternetConnection();
     emit(state.copyWith(pageState: PageState.loading));
     await _eventsRepository.removeEvent(eventId);
-    emit(state.copyWith(pageState: PageState.init, events: List.from(state.events)..removeWhere((element) => element.id == eventId)));
+    emit(state.copyWith(
+        pageState: PageState.init,
+        events: List.from(state.events)..removeWhere((element) => element.id == eventId)));
   }
 }

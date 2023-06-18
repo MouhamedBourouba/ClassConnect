@@ -1,10 +1,14 @@
+import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
 import 'package:ClassConnect/data/model/class.dart';
 import 'package:ClassConnect/data/model/class_message.dart';
+import 'package:ClassConnect/data/model/error.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/model/user_event.dart';
+import 'package:ClassConnect/utils/utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:multiple_result/multiple_result.dart';
 
-final user = User.defaultUser();
+final user = User.defaultUser()..fullName = "fdshfd";
 
 final message = ClassMessage(
   id: "dshg",
@@ -33,18 +37,20 @@ final ggClass = Class(
 );
 
 void TestingFun() async {
-  final localDB = LocalDataSource();
+  final localDB = _LocalDataSource();
   await localDB.init();
-  print((await localDB.getAllObjects<Class>()).length);
+  final clouddb = GoogleSheetsCloudDataSource();
+  await clouddb.init();
+  final datasource = DataBase(localDB, clouddb);
+  localDB.storeObject(event);
+  print((await localDB.getAllObjects<UserEvent>()).length);
   print((await localDB.getObjectById<Class>("gg")).className);
+
+  final g = await datasource.storeData(ggClass);
+  print(g.tryGetError());
 }
 
-enum MDataTable {
-  users,
-  classes,
-  events,
-  messages,
-}
+enum MDataTable { users, classes, events, messages, emailOtp }
 
 MDataTable dataTableFromType(Type type) {
   if (type == User) {
@@ -75,13 +81,12 @@ String idFromObject(Object data) {
   }
 }
 
-class LocalDataSource {
+class _LocalDataSource {
   late Box appBox;
   late Box<User> usersBox;
   late Box<Class> classesBox;
   late Box<ClassMessage> classMessagesBox;
   late Box<UserEvent> eventBox;
-  final User? currentUser = null;
 
   Future<void> init() async {
     await Hive.initFlutter();
@@ -97,7 +102,7 @@ class LocalDataSource {
     eventBox = await Hive.openBox("events");
   }
 
-  Box<T> boxFromType<T>(Type type) {
+  Box<T> boxFromType<T>() {
     switch (T) {
       case User:
         return usersBox as Box<T>;
@@ -113,11 +118,11 @@ class LocalDataSource {
   }
 
   Future<Iterable<T>> getAllObjects<T>() async {
-    return boxFromType<T>(T).values;
+    return boxFromType<T>().values;
   }
 
   Future<bool> storeObject<T extends Object>(T data) async {
-    await boxFromType<T>(T).put(idFromObject(data), data);
+    await boxFromType<T>().put(idFromObject(data), data);
     return true;
   }
 
@@ -127,5 +132,64 @@ class LocalDataSource {
     return data.first;
   }
 
+  Future<void> deleteObject<T>(String id) async {
+    await boxFromType<T>().delete(id);
+  }
+
   Future<void> putDataToAppBox(String key, dynamic value) => appBox.put(key, value);
+}
+
+class DataBase {
+  final _LocalDataSource localDataSource;
+  final CloudDataSource cloudDataSource;
+
+  DataBase(this.localDataSource, this.cloudDataSource);
+
+  Future<Result<Unit, String>> storeData<T extends Object>(T data) async {
+    if (await isOnline()) {
+      final encodeData = encodeObject(data);
+      final table = dataTableFromType(T);
+      final success = await cloudDataSource.appendRow(encodeData, table);
+      if (success) {
+        await localDataSource.storeObject<T>(data);
+        return Result.success(unit);
+      } else {
+        return Result.error(MException.unknown().errorMessage);
+      }
+    }
+    return Result.error(
+      MException.noInternetConnection().errorMessage,
+    );
+  }
+
+  Future<Result<List<T>, String>> readAllObjects<T>() {
+    throw UnimplementedError();
+  }
+
+  Future<Result<T, String>> readObjectById<T>(String id) {
+    throw UnimplementedError();
+  }
+
+  Future<Result<Unit, String>> updateObject<T>(String id, T newObject) {
+    throw UnimplementedError();
+  }
+
+  Future<Result<Unit, String>> deleteObject<T>(String id) {
+    throw UnimplementedError();
+  }
+
+  Map<String, dynamic> encodeObject(Object data) {
+    switch (dataTableFromType(data.runtimeType)) {
+      case MDataTable.users:
+        return (data as User).toMap();
+      case MDataTable.classes:
+        return (data as Class).toMap();
+      case MDataTable.events:
+        return (data as UserEvent).toMap();
+      case MDataTable.messages:
+        return (data as ClassMessage).toMap();
+      case MDataTable.emailOtp:
+        return data as Map<String, dynamic>;
+    }
+  }
 }

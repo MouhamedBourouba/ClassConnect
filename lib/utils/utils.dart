@@ -5,8 +5,6 @@ import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:flutter/material.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 
 Future<bool> isOnline() async {
   try {
@@ -25,7 +23,8 @@ List<T> removeDuplicates<T>(List<T> list, {bool? isClass, bool? isUser}) {
   final List<T> finalList = [];
   for (final element in list) {
     if (isUser == true) {
-      if (!finalList.any((user) => (user as User).id == (element as User).id)) finalList.add(element);
+      if (!finalList.any((user) => (user as User).id == (element as User).id))
+        finalList.add(element);
     } else if (isClass == true) {
       if (!finalList.any((class_) => (class_ as Class).id == (element as Class).id)) {
         finalList.add(element);

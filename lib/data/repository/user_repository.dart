@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ClassConnect/data/data_source/cloud_data_source.dart';
+import 'package:ClassConnect/data/data_source/data_source.dart';
 import 'package:ClassConnect/data/data_source/local_data_source.dart';
 import 'package:ClassConnect/data/model/error.dart';
 import 'package:ClassConnect/data/model/source.dart';
@@ -69,7 +70,7 @@ class UserRepositoryImp extends UserRepository {
   @override
   Future<Result<List<User>, MException>> saveUsersToLocalDataSource() async {
     try {
-      final allUsersMap = await cloudDataSource.getAllRows(MTable.usersTable);
+      final allUsersMap = await cloudDataSource.getAllRows(MDataTable.users);
       final List<User> allUsers = [];
       for (final userMap in allUsersMap!) {
         allUsers.add(userMap.toUser());
@@ -98,7 +99,7 @@ class UserRepositoryImp extends UserRepository {
       if (allUsers.isError()) return Error(allUsers.tryGetError()!);
       final isUserValidResult = checkUserDetails(fullName, email, allUsers.tryGetSuccess()!);
       if (isUserValidResult.isError()) return Result.error(isUserValidResult.tryGetError()!);
-      await cloudDataSource.appendRow(user.toMap(), MTable.usersTable);
+      await cloudDataSource.appendRow(user.toMap(), MDataTable.users);
       await localDataSource.putDataToAppBox("current_user", user);
       return const Success(unit);
     } catch (e) {
@@ -107,7 +108,7 @@ class UserRepositoryImp extends UserRepository {
   }
 
   Future<Result<User, MException>> fetchUserByEmailOrUsername(String value) async {
-    final searchingResult = await cloudDataSource.getRowsByValue(value, MTable.usersTable);
+    final searchingResult = await cloudDataSource.getRowsByValue(value, MDataTable.users);
     if (searchingResult.isEmpty) {
       return Result.error(MException("There is no user associated with this Email/Username, Please register ..."));
     }
@@ -132,7 +133,7 @@ class UserRepositoryImp extends UserRepository {
   }
 
   Future<bool> checkEmailVerification(User user) async {
-    final otpList = await cloudDataSource.getAllRows(MTable.emailOtpTabel);
+    final otpList = await cloudDataSource.getAllRows(MDataTable.emailOtp);
     final isVerified = otpList?.any((element) => element["isVerified"] == "true" && element["userId"] == user.id);
     return isVerified == true;
   }
@@ -140,7 +141,7 @@ class UserRepositoryImp extends UserRepository {
   @override
   Future<Result<User, Unit>> fetchUserById(String id) async {
     if (await isOnline()) {
-      final userMapById = await cloudDataSource.getRow(MTable.usersTable, rowKey: id);
+      final userMapById = await cloudDataSource.getRow(MDataTable.users, rowKey: id);
       if (userMapById == null) return Result.error(unit);
       return Result.success(userMapById.toUser());
     } else {
@@ -155,7 +156,7 @@ class UserRepositoryImp extends UserRepository {
       return Result.success(localDataSource.getUsers());
     } else {
       try {
-        final usersJson = await cloudDataSource.getAllRows(MTable.usersTable);
+        final usersJson = await cloudDataSource.getAllRows(MDataTable.users);
         if (usersJson == null || usersJson.isEmpty) return Result.error(MException.unknown());
         final List<User> users = usersJson.map((e) => e.toUser()).toList();
         for (final user in users) {
@@ -197,7 +198,7 @@ ClassConnect APP""";
       if (response.statusCode == 200) {
         cloudDataSource.appendRow(
           {"userId": localDataSource.getCurrentUser()!.id, "code": jsonDecode(response.body) as String, "isVerified": false},
-          MTable.emailOtpTabel,
+          MDataTable.emailOtp,
         );
         return Result.success(unit);
       } else {
@@ -211,13 +212,13 @@ ClassConnect APP""";
   @override
   Future<Result<Unit, String>> verifyEmail(String code) async {
     try {
-      final otpMap = await cloudDataSource.getRowsByValue(code, MTable.emailOtpTabel);
+      final otpMap = await cloudDataSource.getRowsByValue(code, MDataTable.emailOtp);
       if (otpMap.isEmpty) return Result.error("code does not exist. Please double-check and try again");
       final isCodeCorrect = otpMap.any((element) => element["userId"] == localDataSource.getCurrentUser()!.id && element["code"] == code);
       if (isCodeCorrect) {
         await cloudDataSource.updateValues(
           true,
-          MTable.emailOtpTabel,
+          MDataTable.emailOtp,
           rowKey: localDataSource.getCurrentUser()!.id,
           column: 3,
         );
@@ -242,11 +243,11 @@ ClassConnect APP""";
     final userId = localDataSource.getCurrentUser()!.id;
     final List<Future<bool>> tasksList = [];
     if (fullName != null) {
-      if ((await cloudDataSource.getRowsByValue(fullName, MTable.usersTable)).isEmpty) {
+      if ((await cloudDataSource.getRowsByValue(fullName, MDataTable.users)).isEmpty) {
         tasksList.add(
           cloudDataSource.updateValue(
             fullName,
-            MTable.usersTable,
+            MDataTable.users,
             rowKey: userId,
             columnKey: "fullName",
           ),
@@ -257,11 +258,11 @@ ClassConnect APP""";
       }
     }
     if (email != null) {
-      if ((await cloudDataSource.getRowsByValue(email, MTable.usersTable)).isEmpty) {
+      if ((await cloudDataSource.getRowsByValue(email, MDataTable.users)).isEmpty) {
         tasksList.add(
           cloudDataSource.updateValue(
             email,
-            MTable.usersTable,
+            MDataTable.users,
             rowKey: userId,
             columnKey: "email",
           ),
@@ -280,7 +281,7 @@ ClassConnect APP""";
       tasksList.add(
         cloudDataSource.updateValue(
           phoneNumber,
-          MTable.usersTable,
+          MDataTable.users,
           rowKey: userId,
           columnKey: "phoneNumber",
         ),

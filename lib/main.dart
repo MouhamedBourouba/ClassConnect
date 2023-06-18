@@ -1,6 +1,4 @@
-import 'package:ClassConnect/data/model/class.dart';
-import 'package:ClassConnect/data/model/user_event.dart';
-import 'package:ClassConnect/data/repository/classes_data_source.dart';
+import 'package:ClassConnect/data/data_source/data_source.dart';
 import 'package:ClassConnect/data/repository/settings_repository.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/presentation/ui/pages/email_verification_page.dart';
@@ -10,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
-  await init();
-  runApp(const App());
+  // await init();
+  // runApp(const App());
+
+  TestingFun();
 }
 
 class App extends StatelessWidget {
