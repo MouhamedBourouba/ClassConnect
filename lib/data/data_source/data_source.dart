@@ -92,6 +92,7 @@ class _LocalDataSource {
   }
 
   Future<Iterable<T>> getAllObjects<T>() async {
+    assert(T != dynamic);
     return boxFromType<T>().values;
   }
 
@@ -101,12 +102,14 @@ class _LocalDataSource {
   }
 
   Future<T> getObjectById<T>(String id) async {
+    assert(T != dynamic);
     final data = boxFromType<T>().get(id);
     if (data == null) throw Exception("cant find object with id: $id");
     return data;
   }
 
   Future<void> deleteObject<T>(String id) async {
+    assert(T != dynamic);
     await boxFromType<T>().delete(id);
   }
 
@@ -182,9 +185,12 @@ class DataBase {
     throw UnimplementedError();
   }
 
-  Future<Result<Unit, String>> deleteObject<T>(String id) {
+  Future<Result<Unit, String>> deleteObject<T>(String id) async {
     assert(T != dynamic);
-    throw UnimplementedError();
+    if (await isOnline()) {
+      await cloudDataSource.deleteRow(_dataTableFromType(T), rowKey: id);
+      localDataSource.deleteObject(id);
+    }
   }
 
   Map<String, dynamic> encodeObject<T>(T data) {
