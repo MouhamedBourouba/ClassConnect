@@ -49,6 +49,10 @@ void TestingFun() async {
   final g = await datasource.storeData(event);
   final g1 = await datasource.readObjectById<User>("4882e1e0-ddf0-11ed-9f83-6fb8daa1cc4d");
   final g2 = await datasource.readAllObjects<User>();
+  final g4 = await datasource.overwriteObject(
+    message,
+    oldObjectId: "c8b050e0-0961-11ee-ab38-41bd732d2ffd",
+  );
   await localDB.storeObject(g1.tryGetSuccess()!);
   final g3 = await localDB.getAllObjects<User>();
 }
@@ -181,19 +185,33 @@ class DataBase {
     }
   }
 
-  Future<Result<Unit, String>> updateObject<T>(String id, T newObject) {
-    throw UnimplementedError();
+  Future<Result<Unit, String>> overwriteObject<T>(T newObject, {String? oldObjectId}) async {
+    if (await isOnline()) {
+      final success = await cloudDataSource.overwriteRow(
+        _dataTableFromType(T),
+        rowKey: oldObjectId ?? idFromObject(newObject),
+        newRow: encodeObject(newObject),
+      );
+      if (!success) return Result.error(MException.unknown().errorMessage);
+      localDataSource.storeObject(newObject);
+      return Result.success(unit);
+    } else {
+      return Result.error(MException.noInternetConnection().errorMessage);
+    }
   }
 
   Future<Result<Unit, String>> deleteObject<T>(String id) async {
     assert(T != dynamic);
     if (await isOnline()) {
       await cloudDataSource.deleteRow(_dataTableFromType(T), rowKey: id);
-      localDataSource.deleteObject(id);
+      await localDataSource.deleteObject<T>(id);
+      return Result.success(unit);
+    } else {
+      return Result.error(MException.noInternetConnection().errorMessage);
     }
   }
 
-  Map<String, dynamic> encodeObject<T>(T data) {
+  Map<String, String> encodeObject<T>(T data) {
     switch (_dataTableFromType(data.runtimeType)) {
       case MDataTable.users:
         return (data as User).toMap();
@@ -204,7 +222,7 @@ class DataBase {
       case MDataTable.messages:
         return (data as ClassMessage).toMap();
       case MDataTable.emailOtp:
-        return data as Map<String, dynamic>;
+        return data as Map<String, String>;
     }
   }
 

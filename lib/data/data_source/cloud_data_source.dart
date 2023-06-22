@@ -12,6 +12,9 @@ abstract class CloudDataSource {
 
   Future<List<Map<String, String>>> getRowsByValue(dynamic value, MDataTable table);
 
+  Future<bool> overwriteRow(MDataTable table,
+      {required String rowKey, required Map<String, String> newRow});
+
   Future<bool> appendRow(Map<String, dynamic> data, MDataTable table);
 
   Future<bool> updateValue(Object newValue, MDataTable table,
@@ -145,5 +148,14 @@ class GoogleSheetsCloudDataSource implements CloudDataSource {
       rows.add(row);
     }
     return rows;
+  }
+
+  @override
+  Future<bool> overwriteRow(
+    MDataTable table, {
+    required String rowKey,
+    required Map<String, String> newRow,
+  }) async {
+    return (await getWorkSheet(table)).values.map.insertRowByKey(rowKey, newRow, overwrite: true);
   }
 }

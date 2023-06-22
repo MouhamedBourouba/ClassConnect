@@ -30,7 +30,7 @@ class User {
         phoneNumber = "",
         email = "";
 
-  Map<String, dynamic> toMap() => {
+  Map<String, String> toMap() => {
         "id": id,
         "fullName": fullName,
         "email": email,
