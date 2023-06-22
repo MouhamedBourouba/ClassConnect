@@ -4,6 +4,7 @@ import 'package:ClassConnect/data/model/class_message.dart';
 import 'package:ClassConnect/data/model/error.dart';
 import 'package:ClassConnect/data/model/user.dart';
 import 'package:ClassConnect/data/model/user_event.dart';
+import 'package:ClassConnect/utils/extension.dart';
 import 'package:ClassConnect/utils/utils.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:multiple_result/multiple_result.dart';
@@ -23,10 +24,10 @@ final event = UserEvent(
   eventType: EventType.classMemberShipInvitation,
   eventReceiverId: "dfh",
   eventSenderId: "fdhs",
-  id: "hfds",
+  id: "hfdfdhs",
 );
 final ggClass = Class(
-  id: "gg",
+  id: "ggh",
   teachers: [],
   streamMessagesId: "dsh",
   studentsIds: ["fdqd", "sdgs"],
@@ -42,44 +43,17 @@ void TestingFun() async {
   final clouddb = GoogleSheetsCloudDataSource();
   await clouddb.init();
   final datasource = DataBase(localDB, clouddb);
-  localDB.storeObject(event);
-  print((await localDB.getAllObjects<UserEvent>()).length);
-  print((await localDB.getObjectById<Class>("gg")).className);
 
-  final g = await datasource.storeData(ggClass);
-  print(g.tryGetError());
+  final o = await isOnline();
+  final f = await localDB.getAllObjects<User>();
+  final g = await datasource.storeData(event);
+  final g1 = await datasource.readObjectById<User>("4882e1e0-ddf0-11ed-9f83-6fb8daa1cc4d");
+  final g2 = await datasource.readAllObjects<User>();
+  await localDB.storeObject(g1.tryGetSuccess()!);
+  final g3 = await localDB.getAllObjects<User>();
 }
 
 enum MDataTable { users, classes, events, messages, emailOtp }
-
-MDataTable dataTableFromType(Type type) {
-  if (type == User) {
-    return MDataTable.users;
-  } else if (type == Class) {
-    return MDataTable.classes;
-  } else if (type == UserEvent) {
-    return MDataTable.events;
-  } else if (type == ClassMessage) {
-    return MDataTable.messages;
-  } else {
-    throw UnsupportedError("Unsupported type");
-  }
-}
-
-String idFromObject(Object data) {
-  switch (data.runtimeType) {
-    case User:
-      return (data as User).id;
-    case Class:
-      return (data as Class).id;
-    case UserEvent:
-      return (data as UserEvent).id;
-    case ClassMessage:
-      return (data as ClassMessage).id;
-    default:
-      throw UnsupportedError('unsupported Type ${data.runtimeType}');
-  }
-}
 
 class _LocalDataSource {
   late Box appBox;
@@ -121,15 +95,15 @@ class _LocalDataSource {
     return boxFromType<T>().values;
   }
 
-  Future<bool> storeObject<T extends Object>(T data) async {
+  Future<bool> storeObject<T>(T data) async {
     await boxFromType<T>().put(idFromObject(data), data);
     return true;
   }
 
-  Future<T> getObjectById<T extends Object>(String id) async {
-    final data = (await getAllObjects<T>()).where((element) => idFromObject(element) == id);
-    if (data.isEmpty) throw Exception("cant find object with id: $id");
-    return data.first;
+  Future<T> getObjectById<T>(String id) async {
+    final data = boxFromType<T>().get(id);
+    if (data == null) throw Exception("cant find object with id: $id");
+    return data;
   }
 
   Future<void> deleteObject<T>(String id) async {
@@ -143,18 +117,34 @@ class DataBase {
   final _LocalDataSource localDataSource;
   final CloudDataSource cloudDataSource;
 
+  MDataTable _dataTableFromType(Type type) {
+    if (type == User) {
+      return MDataTable.users;
+    } else if (type == Class) {
+      return MDataTable.classes;
+    } else if (type == UserEvent) {
+      return MDataTable.events;
+    } else if (type == ClassMessage) {
+      return MDataTable.messages;
+    } else {
+      throw UnsupportedError("Unsupported type");
+    }
+  }
+
   DataBase(this.localDataSource, this.cloudDataSource);
 
-  Future<Result<Unit, String>> storeData<T extends Object>(T data) async {
+  Future<Result<Unit, String>> storeData<T>(T data) async {
     if (await isOnline()) {
       final encodeData = encodeObject(data);
-      final table = dataTableFromType(T);
+      final table = _dataTableFromType(T);
       final success = await cloudDataSource.appendRow(encodeData, table);
       if (success) {
         await localDataSource.storeObject<T>(data);
         return Result.success(unit);
       } else {
-        return Result.error(MException.unknown().errorMessage);
+        return Result.error(
+          MException.unknown().errorMessage,
+        );
       }
     }
     return Result.error(
@@ -162,12 +152,30 @@ class DataBase {
     );
   }
 
-  Future<Result<List<T>, String>> readAllObjects<T>() {
-    throw UnimplementedError();
+  Future<Result<Iterable<T>, String>> readAllObjects<T>() async {
+    assert(T != dynamic);
+    if (await isOnline()) {
+      final objectList =
+          (await cloudDataSource.getAllRows(_dataTableFromType(T)))?.map((e) => decodeObject<T>(e));
+      if (objectList == null) return Result.error("NO DATA FOUND");
+      await _storeDataToLocalDB(objectList);
+      return Result.success(objectList);
+    } else {
+      return Result.success(await localDataSource.getAllObjects<T>());
+    }
   }
 
-  Future<Result<T, String>> readObjectById<T>(String id) {
-    throw UnimplementedError();
+  Future<Result<T, String>> readObjectById<T>(String id) async {
+    assert(T != dynamic);
+    if (await isOnline()) {
+      final objectList = await readAllObjects<T>();
+      final wantedObject =
+          objectList.tryGetSuccess()!.where((element) => idFromObject(element) == id);
+      if (wantedObject.isEmpty) return Result.error("NO DATA FOUND");
+      return Result.success(wantedObject.first);
+    } else {
+      return Result.success(await localDataSource.getObjectById<T>(id));
+    }
   }
 
   Future<Result<Unit, String>> updateObject<T>(String id, T newObject) {
@@ -175,11 +183,12 @@ class DataBase {
   }
 
   Future<Result<Unit, String>> deleteObject<T>(String id) {
+    assert(T != dynamic);
     throw UnimplementedError();
   }
 
-  Map<String, dynamic> encodeObject(Object data) {
-    switch (dataTableFromType(data.runtimeType)) {
+  Map<String, dynamic> encodeObject<T>(T data) {
+    switch (_dataTableFromType(data.runtimeType)) {
       case MDataTable.users:
         return (data as User).toMap();
       case MDataTable.classes:
@@ -190,6 +199,27 @@ class DataBase {
         return (data as ClassMessage).toMap();
       case MDataTable.emailOtp:
         return data as Map<String, dynamic>;
+    }
+  }
+
+  T decodeObject<T>(Map<String, String> map) {
+    switch (_dataTableFromType(T)) {
+      case MDataTable.users:
+        return map.toUser() as T;
+      case MDataTable.classes:
+        return map.toClass() as T;
+      case MDataTable.events:
+        return UserEvent.fromMap(map) as T;
+      case MDataTable.messages:
+        return ClassMessage.fromMap(map) as T;
+      case MDataTable.emailOtp:
+        throw UnsupportedError("unsupported type");
+    }
+  }
+
+  Future<void> _storeDataToLocalDB<T>(Iterable<T> values) async {
+    for (final object in values) {
+      await localDataSource.storeObject<T>(object);
     }
   }
 }

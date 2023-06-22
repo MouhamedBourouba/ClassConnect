@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 abstract class AppModule {
   @lazySingleton
   Uuid get uuid => const Uuid();
+
   @lazySingleton
   RandomColorGenerator get randomColorGenerator => RandomColorGenerator();
 }

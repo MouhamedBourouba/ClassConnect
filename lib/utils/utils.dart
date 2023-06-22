@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:ClassConnect/data/model/class.dart';
+import 'package:ClassConnect/data/model/class_message.dart';
 import 'package:ClassConnect/data/model/user.dart';
+import 'package:ClassConnect/data/model/user_event.dart';
 import 'package:ClassConnect/di/di.dart';
 import 'package:ClassConnect/utils/error_logger.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +21,28 @@ Future<bool> isOnline() async {
   }
 }
 
+String idFromObject<T>(T data) {
+  switch (data.runtimeType) {
+    case User:
+      return (data as User).id;
+    case Class:
+      return (data as Class).id;
+    case UserEvent:
+      return (data as UserEvent).id;
+    case ClassMessage:
+      return (data as ClassMessage).id;
+    default:
+      throw UnsupportedError('unsupported Type ${data.runtimeType}');
+  }
+}
+
 List<T> removeDuplicates<T>(List<T> list, {bool? isClass, bool? isUser}) {
   final List<T> finalList = [];
   for (final element in list) {
     if (isUser == true) {
-      if (!finalList.any((user) => (user as User).id == (element as User).id))
+      if (!finalList.any((user) => (user as User).id == (element as User).id)) {
         finalList.add(element);
+      }
     } else if (isClass == true) {
       if (!finalList.any((class_) => (class_ as Class).id == (element as Class).id)) {
         finalList.add(element);
